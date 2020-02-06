@@ -1,0 +1,45 @@
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: alpine-test-pvc
+  namespace: default
+spec:
+  storageClassName: rook-ceph-block
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alpine-test-pvc
+  namespace: default
+  labels:
+    name: alpine-test-pvc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: alpine-test-pvc
+  template:
+    metadata:
+      labels:
+        name: alpine-test-pvc
+    spec:
+      containers:
+      - name: alpine-test-pvc
+        image: alpine:latest
+        command:
+        - sh
+        - -c
+        - 'sleep 6000'
+        volumeMounts:
+        - mountPath: /test
+          name: alpine-test-pvc
+      volumes:
+      - name: alpine-test-pvc
+        persistentVolumeClaim:
+          claimName: alpine-test-pvc
