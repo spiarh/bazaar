@@ -1,0 +1,29 @@
+---
+- name: create_dummy_interface
+  template:
+    src: dummy.netdev.j2
+    dest: "/etc/systemd/network/10-{{ item.name }}.netdev"
+    owner: root
+    group: root
+    mode: 0644
+  with_items: 
+    - "{{ dummy }}"
+  when: 
+    - dummy is defined
+    - item.name not in ansible_interfaces
+  notify:
+    - restart_systemd_networkd
+
+- name: add_netplan_ip_dummy_interface
+  template:
+    src: 10-dummy.yaml.j2
+    dest: "/etc/netplan/10-dummy.yaml"
+    owner: root
+    group: root
+    mode: 0644
+  with_items: 
+    - "{{ dummy }}"
+  when:
+    - dummy is defined
+  notify:
+    - apply_netplan_configuration

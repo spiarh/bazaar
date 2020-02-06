@@ -1,0 +1,36 @@
+---
+- import_tasks: certs.yml
+- import_tasks: prereq.yml
+
+- name: copy_init_conf
+  template:
+    src: init.conf.j2
+    dest: "{{ kubeadm_init_file }}"
+    owner: root
+    group: root
+    mode: 0440
+
+- name: run_kubeadm_upgrade
+  command: "kubeadm upgrade apply -v5 v{{ kubernetes_version }} --yes"
+#  command: /bin/true
+#  notify: create_init_witness_file
+  register: run_kubeadm_upgrade
+  when:
+    - inventory_hostname == groups.masters[0]
+
+- name: run_kubeadm_node_upgrade
+  command: "kubeadm upgrade node -v4"
+  register: run_kubeadm_node_upgrade
+  when:
+    - inventory_hostname != groups.masters[0]
+
+- debug:
+    var: run_kubeadm_upgrade.stdout_lines
+
+- debug:
+    var: run_kubeadm_node_upgrade.stdout_lines
+
+- meta: flush_handlers
+
+#- include_tasks: init_check.yml
+#  when: run_kubeadm_init is succeeded

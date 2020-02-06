@@ -1,0 +1,49 @@
+---
+- name: install_apparmor_packages
+  apt:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+  with_items:
+    - "{{ apparmor_pkgs }}"
+  notify:
+    - restart_apparmor
+
+- name: start_enable_service_apparmor
+  service:
+    name: apparmor
+    state: started
+    enabled: True
+
+- name: check_if_apparmor_kernel_options_exist
+  command: grep -q "APPEND=\"{{ default_kernel_options }} {{ apparmor_kernel_options }}\"" "{{ extlinux_kernel_options_file }}"
+  ignore_errors: True
+  changed_when: False
+  register: apparmor_options_exist
+  when:
+    - board_type is defined
+    - board_type == "rock64"
+
+- name: add_apparmor_kernel_options
+  lineinfile:
+    path: "{{ extlinux_kernel_options_file }}"
+    regexp: "^APPEND=.*"
+    line: "APPEND=\"{{ default_kernel_options }} {{ apparmor_kernel_options }}\""
+  when:
+    - board_type is defined
+    - board_type == "rock64"
+    - apparmor_options_exist.rc == 1
+  register: apparmor_kernel_option
+
+- name: update_extlinux
+  command: update-extlinux.sh
+  when:
+    - board_type is defined
+    - board_type == "rock64"
+    - apparmor_kernel_option.changed
+
+- debug:
+    msg: "Default apparmor parameters have been added, a reboot is required for the parameters to take effect"
+  when:
+    - board_type is defined
+    - board_type == "rock64"
+    - apparmor_kernel_option.changed

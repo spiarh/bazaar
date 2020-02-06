@@ -1,0 +1,17 @@
+---
+- name: create_var_lib_kubelet
+  file:
+    path: /var/lib/kubelet
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+
+- name: copy_kubeadm_args
+  copy:
+    content: "KUBELET_KUBEADM_ARGS='{{ kubelet_kubeadm_args }}'"
+    dest: /var/lib/kubelet/kubeadm-flags.env
+    owner: root
+    group: root
+    mode: 0644
+  when: kubelet_kubeadm_args != ""

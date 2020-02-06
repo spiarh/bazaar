@@ -1,0 +1,64 @@
+---
+# defaults file for deploy-cluster-kubeadm
+#kubelet_kubeadm_args: "--container-runtime=remote --container-runtime-endpoint=/var/run/crio/crio.sock --resolv-conf=/run/systemd/resolve/resolv.conf"
+kubelet_kubeadm_args: ""
+
+admission_plugins: "NamespaceLifecycle,LimitRanger,ServiceAccount,TaintNodesByCondition,Priority,DefaultTolerationSeconds,DefaultStorageClass,PersistentVolumeClaimResize,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,NodeRestriction,PodSecurityPolicy"
+cluster_name: "the_knick"
+control_plane_endpoint: "services.maison.lan:6443"
+kubernetes_version: "1.17.2"
+
+pod_subnet_cidr: "172.16.0.0/16"
+service_subnet: "172.17.0.0/16"
+
+kubeadm_init_file: "/etc/kubernetes/kubeadm-init.yaml"
+kubeadm_join_file: "/etc/kubernetes/kubeadm-join.yaml"
+init_witness_file: "/etc/kubernetes/init_already_done"
+join_witness_file: "/etc/kubernetes/join_already_done"
+
+#kubeconfig_admin: "/etc/kubernetes/admin.conf"
+
+kubelet_extra_configuration_default: |
+  cgroupDriver: systemd
+  cgroupRoot: /
+  kubeletCgroups: /podruntime.slice
+  kubeReservedCgroup: /podruntime.slice
+  resolvConf: /run/systemd/resolve/resolv.conf
+  runtimeCgroups: /podruntime.slice
+  systemReserved:
+    cpu: 250m
+    memory: 256Mi
+  resolvConf: /run/systemd/resolve/resolv.conf
+
+kubelet_extra_configuration_kubereserved: |
+  kubeReserved:
+    cpu: 250m
+    memory: 256Mi
+    ephemeral-storage: 1024Mi
+
+# Split with comma "phase1,phase2"
+init_skip_phases: "addon/kube-proxy"
+join_skip_phases: ""
+
+token: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          34313734333264653633666330346137363330353561623861643739623830313466313038373564
+          3436323862326636653562363839373332396266363738630a636562393866653535346339666431
+          38333033356662366133363761313664616361643536666536326633646533393239323839353439
+          3933616631336636390a373232366536313465613430326365643564656561653561326366373932
+          34316534663837653532346639303634333631363166306164643834376661636637
+
+# openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'
+ca_cert_hash: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          34613861313264346661303463363431633464336665653761303432633734643865636664366336
+          3232343536343265623939613431353635343630353737370a336233366561623531373661666631
+          36363462353738343231383963356566633866616465653633323336316630616338313862666234
+          3563373766346533630a653661313433323430393437356534663030316562343936623035323739
+          36326434383830656433333036393864613765343839376336346430623332616238613163383938
+          30363837343061653632613665323237353232343934626437383965313566363162303163663233
+          39656461346437363763623538653130343530326533393831653730306561393366663239333336
+          66303930616236353538
+
+## cat /etc/default/kubelet 
+#KUBELET_EXTRA_ARGS="-v=4"

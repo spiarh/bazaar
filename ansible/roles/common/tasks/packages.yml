@@ -1,0 +1,7 @@
+---
+- name: install_common_packages
+  apt:
+    name: "{{ item.key }}"
+    state: "{{ item.value }}"
+  with_dict:
+    - "{{ common_pkgs }}"

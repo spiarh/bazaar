@@ -1,0 +1,20 @@
+apiVersion: kubeadm.k8s.io/v1beta2
+caCertPath: /etc/kubernetes/pki/ca.crt
+{% if inventory_hostname in groups['masters'] %}
+controlPlane:
+  localAPIEndpoint:
+    advertiseAddress: ""
+{% endif %}
+discovery:
+  bootstrapToken:
+    apiServerEndpoint: {{ control_plane_endpoint }}
+    token: {{ token }}
+    unsafeSkipCAVerification: False
+    caCertHashes:
+    - {{ ca_cert_hash }}
+  timeout: 8m0s
+kind: JoinConfiguration
+nodeRegistration:
+#  criSocket: /var/run/crio/crio.sock
+  name: {{ ansible_hostname }}
+{% include "templates/kubelet.yml.j2" %}

@@ -1,0 +1,21 @@
+---
+- name: copy_init_conf
+  template:
+    src: init.conf.j2
+    dest: "{{ kubeadm_init_file }}"
+    owner: root
+    group: root
+    mode: 0440
+
+- name: run_kubeadm_init
+  command: "kubeadm init --config {{ kubeadm_init_file }} --skip-phases=\"{{ init_skip_phases }}\""
+  notify: create_init_witness_file
+  register: run_kubeadm_init
+
+- debug:
+    var: run_kubeadm_init.stdout_lines
+
+- meta: flush_handlers
+
+- include_tasks: init_check.yml
+  when: run_kubeadm_init is succeeded

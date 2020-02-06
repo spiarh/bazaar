@@ -1,0 +1,8 @@
+---
+- name: restart_systemd_networkd
+  service:
+    name: systemd-networkd
+    state: restarted
+
+- name: apply_netplan_configuration
+  shell: netplan apply

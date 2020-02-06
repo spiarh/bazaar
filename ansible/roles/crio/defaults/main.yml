@@ -1,0 +1,9 @@
+---
+crio_version: 1.15.3-dev
+crio_pkgs:
+  - name: cri-o-1.13=1.13.1-1~dev~ubuntu18.04~ppa2
+    state: absent
+  - name: cri-o-1.15=1.15.3-1~dev~ubuntu18.04~ppa4
+    state: present
+
+cgroup_manager: "systemd"

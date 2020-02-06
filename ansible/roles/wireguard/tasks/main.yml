@@ -1,0 +1,70 @@
+---
+# tasks file for wireguard
+- name: wireguard_add_apt_repos
+  apt_repository:
+    repo: "{{ item }}"
+    state: present
+  with_items:
+    - "{{ wireguard_apt_repos }}"
+
+- name: wireguard_install_packages
+  apt:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+  with_items:
+    - "{{ wireguard_pkgs }}"
+
+- name: wireguard_conf_dir
+  file:
+    path: /etc/wireguard
+    state: directory
+    owner: root
+    group: root
+    mode: 0750
+
+- name: wireguard_conf_files
+  template:
+    src: wg.conf.j2
+    dest: "/etc/wireguard/{{ item.key }}.conf"
+    owner: root
+    group: root
+    mode: 0440
+  vars:
+    conf: "{{ item }}"
+  loop: "{{ q('dict', wireguard) }}"
+  when:
+    - wireguard is defined
+    - item.value.state == "started"
+  register: wireguard_conf_files_updated
+  notify:
+    - restart_wireguard
+
+# Stopped service first
+- name: stop_disable_service_wireguard
+  service:
+    name: "wg-quick@{{ item.key }}"
+    state: stopped
+    enabled: False
+  loop: "{{ q('dict', wireguard) }}"
+  when:
+    - wireguard is defined
+    - item.value.state == "deleted"
+
+# Only then remove file
+- name: remove_wireguard_conf_files
+  file:
+    path: "/etc/wireguard/{{ item.key }}.conf"
+    state: absent
+  loop: "{{ q('dict', wireguard) }}"
+  when:
+    - wireguard is defined
+    - item.value.state == "deleted"
+
+- name: start_enable_service_wireguard
+  service:
+    name: "wg-quick@{{ item.key }}"
+    state: started
+    enabled: True
+  loop: "{{ q('dict', wireguard) }}"
+  when:
+    - item.value.state == "started"

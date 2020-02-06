@@ -1,0 +1,17 @@
+---
+# handlers file for deploy-cluster-kubeadm
+- name: create_init_witness_file
+  file:
+    path: "{{ init_witness_file }}"
+    state: touch
+    owner: root
+    group: root
+    mode: 0400
+
+- name: create_join_witness_file
+  file:
+    path: "{{ join_witness_file }}"
+    state: touch
+    owner: root
+    group: root
+    mode: 0400

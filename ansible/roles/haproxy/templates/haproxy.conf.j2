@@ -1,0 +1,21 @@
+defaults
+  timeout connect 10s
+  timeout client 86400s
+  timeout server 86400s
+
+listen stats
+  bind    *:9000
+  mode    http
+  stats   hide-version
+  stats   uri       /stats
+
+frontend apiserver
+  bind :6443
+  default_backend apiserver-backend
+
+backend apiserver-backend
+  option httpchk GET /healthz
+  http-check expect string ok
+  server master00.maison.lan 192.168.45.200:6443 check check-ssl verify none
+  server master01.maison.lan 192.168.45.201:6443 check check-ssl verify none
+  server master02.maison.lan 192.168.45.202:6443 check check-ssl verify none

@@ -1,0 +1,35 @@
+---
+# tasks file for deploy-cluster-kubeadm
+- import_tasks: certs.yml
+- import_tasks: prereq.yml
+
+# INIT
+- include_tasks: init_check.yml
+
+- name: init_cluster
+  import_tasks: init.yml
+  when:
+    - not kubeadm_init_already_done.stat.exists
+    - inventory_hostname == groups.masters[0]
+  run_once: yes
+
+# Check apiserver is responding
+- include_tasks: check_apiserver_is_responding.yml
+
+# JOIN
+- include_tasks: join_check.yml
+
+- name: join_cluster_masters
+  import_tasks: join.yml
+  when:
+    - not kubeadm_join_already_done.stat.exists
+    - inventory_hostname in groups.masters
+    - not inventory_hostname == groups.masters[0]
+
+- name: join_cluster_workers
+  import_tasks: join.yml
+  when:
+    - kubeadm_init_already_done.stat.exists
+    - not kubeadm_join_already_done.stat.exists
+    - not inventory_hostname in groups.masters
+

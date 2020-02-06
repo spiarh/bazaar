@@ -1,0 +1,4 @@
+---
+kubeconfig_admin: "/etc/kubernetes/admin.conf"
+addons_directoy: "/etc/kubernetes/addons"
+calico_version: "3.7.3"

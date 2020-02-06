@@ -1,0 +1,17 @@
+---
+apparmor_pkgs:
+  - name: apparmor
+    state: latest
+  - name: apparmor-profiles
+    state: latest
+  - name: apparmor-profiles-extra
+    state: latest
+  - name: apparmor-utils
+    state: latest
+  - name: apparmor-easyprof
+    state: latest
+
+# Only for ROCK64 boards
+default_kernel_options: "$APPEND root=LABEL=linux-root rootwait rootfstype=ext4"
+apparmor_kernel_options: "apparmor=1 security=apparmor"
+extlinux_kernel_options_file: "/etc/default/extlinux"
