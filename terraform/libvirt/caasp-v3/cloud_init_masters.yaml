@@ -1,0 +1,22 @@
+#cloud-config
+
+# set locale
+locale: en_US.UTF-8
+
+hostname: ${hostname}
+
+# set timezone
+timezone: Europe/Warsaw
+
+users:
+  - name: root
+    lock_passwd: true
+    ssh-authorized-keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDT2oHoPN6l6OEXqstBosIameObHqC2iC9VJrRs0eGLAIOhmjx3hO8jVDpWsvmkU5AjppOCqAlcqAZnO+Z5roClgXHs819/sfQg8euOFSO4m+F/8M87y5vpH015EYyIg5AN8KYMAhTxTVduTL8jj5mNbop8OsSwJ2RnrqzDOdX3cT0XcPJTSRROT3MJS8dIbrylnje8zFcdbVtz7iYdGjQVXMcKTczF+rhaQvdbvOIKvVXk03Ic2La8mGrVmV4sf/8uhKwj9/2QzzVa21kwjuYRASYa0shfc3mPBC+z8H+0LNgIJpf0iPzJvWAiXCBZWypsn5+cMiH0EgHr3seSWav/
+
+# set as admin node
+suse_caasp:
+  role: cluster
+  admin_node: ${admin_ip}
+
+final_message: "The system is finally up, after $UPTIME seconds"
