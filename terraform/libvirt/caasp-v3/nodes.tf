@@ -1,35 +1,70 @@
-variable "basename" {}
-variable "image" {}
+variable "basename" {
+}
 
-variable "admin_count" {}
-variable "admin_cloud_init_file" {}
-variable "admin_memory" {}
-variable "admin_vcpu" {}
-variable "admin_network" {}
+variable "image" {
+}
 
-variable "master_count" {}
-variable "master_cloud_init_file" {}
-variable "master_memory" {}
-variable "master_vcpu" {}
-variable "master_network" {}
+variable "admin_count" {
+}
 
-variable "worker_count" {}
-variable "worker_cloud_init_file" {}
-variable "worker_memory" {}
-variable "worker_vcpu" {}
-variable "worker_network" {}
+variable "admin_cloud_init_file" {
+}
 
-variable "storage_pool" {}
-variable "storage_format" {}
+variable "admin_memory" {
+}
 
-variable "ssh_privkey" {}
-variable "ssh_user" {}
+variable "admin_vcpu" {
+}
+
+variable "admin_network" {
+}
+
+variable "master_count" {
+}
+
+variable "master_cloud_init_file" {
+}
+
+variable "master_memory" {
+}
+
+variable "master_vcpu" {
+}
+
+variable "master_network" {
+}
+
+variable "worker_count" {
+}
+
+variable "worker_cloud_init_file" {
+}
+
+variable "worker_memory" {
+}
+
+variable "worker_vcpu" {
+}
+
+variable "worker_network" {
+}
+
+variable "storage_pool" {
+}
+
+variable "storage_format" {
+}
+
+variable "ssh_privkey" {
+}
+
+variable "ssh_user" {
+}
 
 # Provider
 provider "libvirt" {
   uri = "qemu:///system"
 }
-
 
 ###############
 ### VOLUMES ###
@@ -37,95 +72,90 @@ provider "libvirt" {
 
 resource "libvirt_volume" "admin" {
   name   = "vol-admin-${var.basename}-${count.index}"
-  source = "${var.image}"
-  count  = "${var.admin_count}"
-  pool   = "${var.storage_pool}"
-  format = "${var.storage_format}"
+  source = var.image
+  count  = var.admin_count
+  pool   = var.storage_pool
+  format = var.storage_format
 }
 
 resource "libvirt_volume" "master" {
   name   = "vol-master-${var.basename}-${count.index}"
-  source = "${var.image}"
-  count  = "${var.master_count}"
-  pool   = "${var.storage_pool}"
-  format = "${var.storage_format}"
+  source = var.image
+  count  = var.master_count
+  pool   = var.storage_pool
+  format = var.storage_format
 
-  depends_on = ["libvirt_domain.admin"]
+  depends_on = [libvirt_domain.admin]
 }
-
 
 resource "libvirt_volume" "worker" {
   name   = "vol-worker-${var.basename}-${count.index}"
-  source = "${var.image}"
-  count  = "${var.worker_count}"
-  pool   = "${var.storage_pool}"
-  format = "${var.storage_format}"
+  source = var.image
+  count  = var.worker_count
+  pool   = var.storage_pool
+  format = var.storage_format
 
-  depends_on = ["libvirt_domain.admin"]
+  depends_on = [libvirt_domain.admin]
 }
-
 
 ##################
 ### CLOUD-INIT ###
 ##################
 
 data "template_file" "admin_user_data" {
-  count    = "${var.admin_count}"
-  template = "${file("${var.admin_cloud_init_file}")}"
+  count    = var.admin_count
+  template = file(var.admin_cloud_init_file)
 
-  vars {
+  vars = {
     hostname = "admin-${var.basename}-${count.index}"
   }
 }
 
 resource "libvirt_cloudinit_disk" "admin_cloud_init" {
-  name           = "cloud-init-admin-${var.basename}.iso"
-  pool           = "${var.storage_pool}"
-  user_data      = "${data.template_file.admin_user_data.rendered}"
+  name      = "cloud-init-admin-${var.basename}.iso"
+  pool      = var.storage_pool
+  user_data = data.template_file.admin_user_data[0].rendered
 }
-
 
 data "template_file" "master_user_data" {
   # needed when 0 master nodes are defined
-  count    = "${var.master_count}"
-  template = "${file("${var.master_cloud_init_file}")}"
+  count    = var.master_count
+  template = file(var.master_cloud_init_file)
 
-  vars {
-    admin_ip = "${libvirt_domain.admin.network_interface.0.addresses[0]}"
+  vars = {
+    admin_ip = libvirt_domain.admin.network_interface.0.addresses[0]
     hostname = "master-${var.basename}-${count.index}"
   }
 
-  depends_on = ["libvirt_domain.admin"]
+  depends_on = [libvirt_domain.admin]
 }
 
 resource "libvirt_cloudinit_disk" "master_cloud_init" {
-  name           = "cloud-init-master-${var.basename}-${count.index}.iso"
-  count          = "${var.master_count}"
-  pool           = "${var.storage_pool}"
-  user_data      = "${element(data.template_file.master_user_data.*.rendered, count.index)}"
+  name      = "cloud-init-master-${var.basename}-${count.index}.iso"
+  count     = var.master_count
+  pool      = var.storage_pool
+  user_data = element(data.template_file.master_user_data.*.rendered, count.index)
 }
-
 
 data "template_file" "worker_user_data" {
   # needed when 0 master nodes are defined
-  count    = "${var.worker_count}"
-  template = "${file("${var.worker_cloud_init_file}")}"
+  count    = var.worker_count
+  template = file(var.worker_cloud_init_file)
 
-  vars {
-    admin_ip = "${libvirt_domain.admin.network_interface.0.addresses[0]}"
+  vars = {
+    admin_ip = libvirt_domain.admin.network_interface.0.addresses[0]
     hostname = "worker-${var.basename}-${count.index}"
   }
 
-  depends_on = ["libvirt_domain.admin"]
+  depends_on = [libvirt_domain.admin]
 }
 
 resource "libvirt_cloudinit_disk" "worker_cloud_init" {
-  name           = "cloud-init-worker-${var.basename}-${count.index}.iso"
-  count          = "${var.worker_count}"
-  pool           = "${var.storage_pool}"
-  user_data      = "${element(data.template_file.worker_user_data.*.rendered, count.index)}"
+  name      = "cloud-init-worker-${var.basename}-${count.index}.iso"
+  count     = var.worker_count
+  pool      = var.storage_pool
+  user_data = element(data.template_file.worker_user_data.*.rendered, count.index)
 }
-
 
 ################
 ### ADMIN VM ###
@@ -133,13 +163,13 @@ resource "libvirt_cloudinit_disk" "worker_cloud_init" {
 
 resource "libvirt_domain" "admin" {
   name   = "admin-${var.basename}-${count.index}"
-  memory = "${var.admin_memory}"
-  vcpu   = "${var.admin_vcpu}"
+  memory = var.admin_memory
+  vcpu   = var.admin_vcpu
 
-  cloudinit = "${libvirt_cloudinit_disk.admin_cloud_init.id}"
+  cloudinit = libvirt_cloudinit_disk.admin_cloud_init.id
 
   network_interface {
-    network_name = "${var.admin_network}"
+    network_name   = var.admin_network
     wait_for_lease = true
   }
 
@@ -159,7 +189,7 @@ resource "libvirt_domain" "admin" {
   }
 
   disk {
-    volume_id = "${libvirt_volume.admin.id}"
+    volume_id = libvirt_volume.admin[0].id
   }
 
   graphics {
@@ -167,38 +197,40 @@ resource "libvirt_domain" "admin" {
     listen_type = "address"
     autoport    = true
   }
-#
+
+  #
+  #
   connection {
-    type     = "ssh"
-    user     = "${var.ssh_user}"
-    agent    = "false"
-    private_key = "${file(var.ssh_privkey)}"
+    type        = "ssh"
+    user        = var.ssh_user
+    agent       = "false"
+    private_key = file(var.ssh_privkey)
   }
 
   # This ensures the VM is booted and SSH'able
+  # This ensures the VM is booted and SSH'able
   provisioner "remote-exec" {
     inline = [
-      "hostnamectl set-hostname admin-${var.basename}-${count.index}"
+      "hostnamectl set-hostname admin-${var.basename}-${count.index}",
     ]
   }
 }
-
 
 #################
 ### MASTER VM ###
 #################
 
 resource "libvirt_domain" "master" {
-  depends_on = ["libvirt_domain.admin"]
-  name   = "master-${var.basename}-${count.index}"
-  memory = "${var.master_memory}"
-  vcpu   = "${var.master_vcpu}"
-  count  = "${var.master_count}"
+  depends_on = [libvirt_domain.admin]
+  name       = "master-${var.basename}-${count.index}"
+  memory     = var.master_memory
+  vcpu       = var.master_vcpu
+  count      = var.master_count
 
-  cloudinit = "${element(libvirt_cloudinit_disk.master_cloud_init.*.id, count.index)}"
+  cloudinit = element(libvirt_cloudinit_disk.master_cloud_init.*.id, count.index)
 
   network_interface {
-    network_name = "${var.master_network}"
+    network_name   = var.master_network
     wait_for_lease = true
   }
 
@@ -218,7 +250,7 @@ resource "libvirt_domain" "master" {
   }
 
   disk {
-    volume_id = "${element(libvirt_volume.master.*.id, count.index)}"
+    volume_id = element(libvirt_volume.master.*.id, count.index)
   }
 
   graphics {
@@ -226,38 +258,40 @@ resource "libvirt_domain" "master" {
     listen_type = "address"
     autoport    = true
   }
-#
+
+  #
+  #
   connection {
-    type     = "ssh"
-    user     = "${var.ssh_user}"
-    agent    = "false"
-    private_key = "${file(var.ssh_privkey)}"
+    type        = "ssh"
+    user        = var.ssh_user
+    agent       = "false"
+    private_key = file(var.ssh_privkey)
   }
 
   # This ensures the VM is booted and SSH'able
+  # This ensures the VM is booted and SSH'able
   provisioner "remote-exec" {
     inline = [
-      "hostnamectl set-hostname master-${var.basename}-${count.index}"
+      "hostnamectl set-hostname master-${var.basename}-${count.index}",
     ]
   }
 }
-
 
 #################
 ### WORKER VM ###
 #################
 
 resource "libvirt_domain" "worker" {
-  depends_on = ["libvirt_domain.admin"]
-  name   = "worker-${var.basename}-${count.index}"
-  memory = "${var.worker_memory}"
-  vcpu   = "${var.worker_vcpu}"
-  count  = "${var.worker_count}"
+  depends_on = [libvirt_domain.admin]
+  name       = "worker-${var.basename}-${count.index}"
+  memory     = var.worker_memory
+  vcpu       = var.worker_vcpu
+  count      = var.worker_count
 
-  cloudinit = "${element(libvirt_cloudinit_disk.worker_cloud_init.*.id, count.index)}"
+  cloudinit = element(libvirt_cloudinit_disk.worker_cloud_init.*.id, count.index)
 
   network_interface {
-    network_name = "${var.worker_network}"
+    network_name   = var.worker_network
     wait_for_lease = true
   }
 
@@ -277,7 +311,7 @@ resource "libvirt_domain" "worker" {
   }
 
   disk {
-    volume_id = "${element(libvirt_volume.worker.*.id, count.index)}"
+    volume_id = element(libvirt_volume.worker.*.id, count.index)
   }
 
   graphics {
@@ -287,28 +321,30 @@ resource "libvirt_domain" "worker" {
   }
 
   connection {
-    type     = "ssh"
-    user     = "${var.ssh_user}"
-    agent    = "false"
-    private_key = "${file(var.ssh_privkey)}"
+    type        = "ssh"
+    user        = var.ssh_user
+    agent       = "false"
+    private_key = file(var.ssh_privkey)
   }
 
   # This ensures the VM is booted and SSH'able
+  # This ensures the VM is booted and SSH'able
   provisioner "remote-exec" {
     inline = [
-      "hostnamectl set-hostname worker-${var.basename}-${count.index}"
+      "hostnamectl set-hostname worker-${var.basename}-${count.index}",
     ]
   }
 }
 
 output "ip_admin" {
-  value = ["${libvirt_domain.admin.*.network_interface.0.addresses}"]
+  value = [libvirt_domain.admin.*.network_interface.0.addresses]
 }
 
 output "ip_masters" {
-  value = ["${libvirt_domain.master.*.network_interface.0.addresses}"]
+  value = [libvirt_domain.master.*.network_interface.0.addresses]
 }
 
 output "ip_workers" {
-  value = ["${libvirt_domain.worker.*.network_interface.0.addresses}"]
+  value = [libvirt_domain.worker.*.network_interface.0.addresses]
 }
+

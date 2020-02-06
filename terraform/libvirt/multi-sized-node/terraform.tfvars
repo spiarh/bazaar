@@ -1,6 +1,6 @@
 basename = "generic"
 
-image = "/home/lcavajani/ISOs/openSUSE-Leap-15.0-OpenStack.x86_64-0.0.4-Buildlp150.12.45.qcow2"
+image = "/home/lcavajani/ISOs/Fedora-Cloud-Base-31-1.9.x86_64.qcow2"
 cloud_init_network_config_file = "cloud_init_network-config.yaml"
 
 master_count = 1
@@ -19,3 +19,4 @@ storage_pool = "default"
 storage_format = "qcow2"
 
 ssh_privkey = "/home/lcavajani/.ssh/regular_id_rsa"
+ssh_user = "regular"
