@@ -1,0 +1,5 @@
+---
+# tasks file for users
+- import_tasks: users_groups.yml
+- import_tasks: authorized_keys.yml
+- import_tasks: sudo.yml

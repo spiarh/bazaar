@@ -1,0 +1,5 @@
+---
+# tasks file for common
+- import_tasks: hostname.yml
+- import_tasks: packages.yml
+- import_tasks: apparmor.yml

@@ -1,0 +1,20 @@
+# Default configuration
+{% for option, value in sshd_default_config.items() %}
+{{ option }} {{ value}}
+{% endfor %}
+
+{% for key in sshd_host_keys %}
+HostKey {{ key }}
+{% endfor %}
+
+# Extra configuration
+{% if sshd_extra_config is defined %}
+{% for option, value in sshd_extra_config.items() %}
+{{ option }} {{ value}}
+{% endfor %}
+{% endif %}
+
+# Allowed users
+{% for user in sshd_allowed_users %}
+AllowUsers {{ user }}
+{% endfor %}

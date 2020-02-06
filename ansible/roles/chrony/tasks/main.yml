@@ -1,0 +1,31 @@
+---
+- name: remove_ntp
+  package:
+    name: "{{ item }}"
+    state: absent
+    update_cache: yes
+  with_items:
+    - ntp
+    - openntpd
+
+- name: install_chrony
+  package:
+    name: chrony
+    state: latest
+    update_cache: yes
+
+- name: configure_chrony
+  template:
+    src: chrony.conf.j2
+    dest: /etc/chrony/chrony.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart_chrony
+
+- name: start_enable_service_chrony
+  service:
+    name: chrony
+    state: started
+    enabled: True

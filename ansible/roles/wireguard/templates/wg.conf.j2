@@ -1,0 +1,29 @@
+[Interface]
+Address = {{ conf.value.address }}
+ListenPort = {{ conf.value.port }}
+PrivateKey = {{ conf.value.priv_key }}
+
+{% for h in groups['all'] %}
+{% for k, v in hostvars[h]['wireguard'].items() %}
+{% if (k == conf.key) and (h != ansible_nodename) -%}
+
+[Peer]
+Endpoint = {{ hostvars[h]['ansible_default_ipv4']['address'] }}:{{ v.port }}
+PublicKey = {{ v.pub_key }}
+PresharedKey = {{ v.preshared_key }}
+AllowedIPs = {{ v.address | ipaddr('network/prefix') }}
+
+{% if 'external' in v %}
+{% for conf in v.external %}
+
+[Peer]
+PublicKey = {{ vars['wireguard_external'][conf]['pub_key'] }}
+PresharedKey = {{ vars['wireguard_external'][conf]['preshared_key'] }}
+AllowedIPs = {{ vars['wireguard_external'][conf]['address'] | ipaddr('network/prefix') }}
+
+{% endfor %}
+{% endif %}
+
+{%- endif %}
+{% endfor %}
+{% endfor -%}

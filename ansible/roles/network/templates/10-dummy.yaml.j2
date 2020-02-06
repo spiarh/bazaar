@@ -1,0 +1,8 @@
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+{% for d in dummy %}
+    {{ d.name }}:
+      addresses: {{ d.addresses }}
+{% endfor -%}

@@ -1,0 +1,11 @@
+---
+- name: install_apparmor
+  apt:
+    name: apparmor
+    state: latest
+
+- name: start_enable_service_apparmor
+  service:
+    name: apparmor
+    state: started
+    enabled: True

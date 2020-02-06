@@ -1,0 +1,29 @@
+---
+- name: install_packages
+  apt:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+  with_items:
+    - "{{ crio_pkgs }}"
+  register: crio_pkgs
+
+- name: configure_crio
+  template:
+    src: "crio-{{ crio_version }}.conf.j2"
+    dest: /etc/crio/crio.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart_crio
+
+- debug:
+    msg: "Restart crio if package is updated"
+  notify: restart_crio
+  when: crio_pkgs.changed
+
+- name: start_enable_service_crio
+  service:
+    name: crio
+    state: started
+    enabled: True

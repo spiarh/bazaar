@@ -1,0 +1,18 @@
+---
+- name: run_kubeadm_reset
+  command: "kubeadm reset --force"
+  register: run_kubeadm_reset
+
+- debug: var=run_kubeadm_reset.stdout_lines
+
+- name: run_clean_iptables
+  shell: "iptables -F && iptables -t nat -F && iptables -t mangle -F && iptables -X"
+
+- name: run_clean_etcd
+  shell: "rm -Rvf /var/lib/etcd"
+
+- name: run_remove_witness_init
+  shell: "rm -Rvf /etc/kubernetes/init_already_done"
+
+- name: run_remove_witness_join
+  shell: "rm -Rvf /etc/kubernetes/join_already_done"

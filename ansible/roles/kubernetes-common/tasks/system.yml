@@ -1,0 +1,37 @@
+---
+- name: disable_zram
+  service:
+    name: zram-config
+    state: stopped
+    enabled: False
+  notify:
+    - disable_swap
+  when:
+    - board_type is defined
+    - board_type == "rock64"
+
+- name: set_sysctl_prereq
+  template:
+    src: 90-sysctl-kubernetes.conf
+    dest: /etc/sysctl.d/90-kubernetes.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - reload_sysctl
+
+- name: set_modprobe_prereq
+  template:
+    src: modeprob-kubernetes.conf
+    dest: /etc/modules-load.d/kubernetes.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart_systemd_modules_load
+
+# just to be sure
+- name: run_sysctl_reload
+  command: "sysctl --system"
+- name: run_systemd_modules_load
+  command: "systemctl restart systemd-modules-load.service"

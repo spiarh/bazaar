@@ -1,0 +1,5 @@
+---
+# defaults file for common
+common_pkgs:
+  tree: latest
+  vim: latest

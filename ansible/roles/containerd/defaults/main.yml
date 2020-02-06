@@ -1,0 +1,9 @@
+---
+containerd_version: 1.2.6
+containerd_pkgs:
+  - name: containerd=1.2.6-0ubuntu1~18.04.2
+    state: present
+
+disable_apparmor: "false"
+cgroup_manager: "systemd"
+no_prometheus: "true"

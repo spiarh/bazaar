@@ -1,0 +1,5 @@
+---
+- name: restart_apparmor
+  service:
+    name: apparmor
+    state: restarted

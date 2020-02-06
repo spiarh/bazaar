@@ -1,0 +1,5 @@
+---
+# tasks file for kubernetes
+- import_tasks: kubernetes.yml
+- import_tasks: kubelet.yml
+- import_tasks: system.yml

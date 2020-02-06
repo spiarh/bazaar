@@ -1,0 +1,41 @@
+---
+- name: install_ssh_packages
+  package:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+  with_items:
+    - openssh-server
+    - openssh-client
+
+- name: configure_banner
+  template:
+    src: issue.net
+    dest: /etc/issue.net
+    owner: root
+    group: root
+    mode: 0644
+
+- name: configure_ssh
+  template:
+    src: ssh.conf.j2
+    dest: /etc/ssh/ssh_config
+    owner: root
+    group: root
+    mode: 0644
+
+- name: configure_sshd
+  template:
+    src: sshd.conf.j2
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart_sshd
+
+- name: start_enable_service_sshd
+  service:
+    name: sshd
+    state: started
+    enabled: True

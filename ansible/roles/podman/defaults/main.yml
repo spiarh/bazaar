@@ -1,0 +1,12 @@
+---
+# defaults file for podman
+podman_apt_keys:
+  - https://packages.cloud.google.com/apt/doc/apt-key.gpg
+
+podman_apt_repos:
+  - ppa:projectatomic/ppa
+  - "deb https://apt.kubernetes.io/ kubernetes-xenial main"
+
+podman_pkgs:
+  - name: podman
+    state: latest

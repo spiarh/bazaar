@@ -1,0 +1,19 @@
+- name: install_sudo
+  package:
+    name: sudo
+    state: latest
+    update_cache: yes
+
+- name: configure_sudoers
+  template:
+    src: sudoers.j2
+    dest: /etc/sudoers
+    owner: root
+    group: root
+    mode: 0440
+  vars:
+    users: "{{ item }}"
+  loop:
+    - "{{ q('dict', os_users) }}"
+#  with_items:
+#    - "{{ os_users }}"

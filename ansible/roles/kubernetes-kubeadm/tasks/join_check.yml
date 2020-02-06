@@ -1,0 +1,5 @@
+---
+- name: check_join_already_done
+  stat:
+    path: "{{ join_witness_file }}"
+  register: kubeadm_join_already_done

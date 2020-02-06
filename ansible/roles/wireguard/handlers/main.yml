@@ -1,0 +1,8 @@
+---
+# handlers file for wireguard
+- name: restart_wireguard
+  service:
+    name: "wg-quick@{{ item.item.key }}"
+    state: restarted
+  when: item.changed == true
+  loop: "{{ wireguard_conf_files_updated.results }}"

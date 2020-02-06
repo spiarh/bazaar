@@ -1,0 +1,8 @@
+---
+# defaults file for wireguard
+wireguard_apt_repos:
+  - ppa:wireguard/wireguard
+
+wireguard_pkgs:
+  - name: wireguard
+    state: latest

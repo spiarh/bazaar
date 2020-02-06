@@ -1,0 +1,37 @@
+---
+- name: install_packages
+  apt:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+  with_items:
+    - "{{ containerd_pkgs }}"
+  register: containerd_pkgs
+
+- name: create_containerd_dir
+  file:
+    path: "/etc/containerd"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: configure_containerd
+  template:
+    src: "containerd-{{ containerd_version }}.toml.j2"
+    dest: /etc/containerd/config.toml
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart_containerd
+
+- debug:
+    msg: "Restart containerd if package is updated"
+  notify: restart_containerd
+  when: containerd_pkgs.changed
+
+- name: start_enable_service_containerd
+  service:
+    name: containerd
+    state: started
+    enabled: True

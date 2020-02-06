@@ -1,0 +1,41 @@
+---
+- name: create_groups
+  group:
+    name: "{{ item.key }}"
+    gid: "{{ item.value.gid }}"
+    state: present
+  loop: "{{ q('dict', os_groups) }}"
+
+- name: create_users
+  user:
+    name: "{{ item.key }}"
+    password: "{{ vars['os_passwords'][item.key] }}"
+    uid: "{{ item.value.uid }}"
+    group: "{{ item.value.group }}"
+    shell: "{{ item.value.shell }}"
+    home: "{{ item.value.home }}"
+    create_home: True
+    state: present
+  loop: "{{ q('dict', os_users) }}"
+
+- name: delete_rock64_user
+  user:
+    name: rock64
+    uid: 1000
+    state: absent
+    remove: yes
+
+- name: manage_home
+  file:
+    path: "{{ item.value.home }}"
+    state: directory
+    owner: "{{ item.key }}"
+    group: "{{ item.value.group }}"
+    mode: 0700
+  loop: "{{ q('dict', os_users) }}"
+
+#- name: set_root_password
+#  user:
+#    name: root
+#    password: "{{ root_password }}"
+#    state: present

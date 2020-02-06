@@ -1,0 +1,31 @@
+---
+- name: create_pki_dir
+  file:
+#    path: /etc/kubernetes/pki/etcd
+    path: "{{ item }}"
+    state: directory
+#    recurse: yes
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - /etc/kubernetes/pki
+    - /etc/kubernetes/pki/etcd
+
+- name: copy_certs
+  template:
+    src: "pki/{{ item }}"
+    dest: "/etc/kubernetes/pki/{{ item }}"
+    owner: root
+    group: root
+    mode: 0440
+  with_items:
+    - ca.crt
+    - ca.key
+    - etcd/ca.crt
+    - etcd/ca.key
+    - front-proxy-ca.crt
+    - front-proxy-ca.key
+    - sa.key
+    - sa.pub
+  when: inventory_hostname in groups['masters']

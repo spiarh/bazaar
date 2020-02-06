@@ -1,0 +1,17 @@
+- name: manage_home_ssh
+  file:
+    path: "{{ item.value.home }}/.ssh"
+    state: directory
+    owner: "{{ item.key }}"
+    group: "{{ item.value.group }}"
+    mode: 0700
+  loop: "{{ q('dict', os_users) }}"
+
+- name: manage_ssh_keys
+  template:
+    src: authorized_keys.j2
+    dest: "{{ item.value.home }}/.ssh/authorized_keys"
+    owner: "{{ item.key }}"
+    group: "{{ item.value.group }}"
+    mode: 0400
+  loop: "{{ q('dict', os_users) }}"
