@@ -1,0 +1,20 @@
+# TOKEN=$(kubectl get secrets privileged-sa-token-28z4q -ojsonpath='{.data.token}' | base64 -d)
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: privileged-sa
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: privileged-sa
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: suse:caasp:psp:privileged
+subjects:
+- kind: ServiceAccount
+  name: privileged-sa
+  namespace: default

@@ -1,0 +1,50 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: busybox-test-pvc
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: busybox-test-pvc
+  namespace: busybox-test-pvc
+spec:
+  storageClassName: rook-ceph-block
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: busybox-test-pvc
+  namespace: busybox-test-pvc
+  labels:
+    name: busybox-test-pvc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: busybox-test-pvc
+  template:
+    metadata:
+      labels:
+        name: busybox-test-pvc
+    spec:
+      containers:
+      - name: busybox-test-pvc
+        image: busybox:latest
+        command:
+        - sh
+        - -c
+        - 'sleep 6000'
+        volumeMounts:
+        - mountPath: /test
+          name: busybox-test-pvc
+      volumes:
+      - name: busybox-test-pvc
+        persistentVolumeClaim:
+          claimName: busybox-test-pvc
