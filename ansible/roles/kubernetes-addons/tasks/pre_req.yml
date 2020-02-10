@@ -1,0 +1,10 @@
+---
+- name: mount_bpf_fs
+  mount:
+    path: /sys/fs/bpf
+    src: bpffs
+    fstype: bpf
+    opts: defaults
+    state: mounted
+  when:
+    - cni == "cilium"
