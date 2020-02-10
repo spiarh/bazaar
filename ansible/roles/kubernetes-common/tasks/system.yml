@@ -1,15 +1,4 @@
 ---
-- name: disable_zram
-  service:
-    name: zram-config
-    state: stopped
-    enabled: False
-  notify:
-    - disable_swap
-  when:
-    - board_type is defined
-    - board_type == "rock64"
-
 - name: set_sysctl_prereq
   template:
     src: 90-sysctl-kubernetes.conf
