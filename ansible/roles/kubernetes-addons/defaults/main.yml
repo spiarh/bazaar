@@ -1,4 +1,16 @@
 ---
 kubeconfig_admin: "/etc/kubernetes/admin.conf"
 addons_directoy: "/etc/kubernetes/addons"
-calico_version: "3.7.3"
+
+cni: "cilium"
+
+calico:
+  version: "3.7.3"
+
+cilium:
+  version: "v1.6.5"
+  debug: "false"
+  enable_ipv4: "true"
+  enable_ipv6: "false"
+  wait_bpf_mount: "true"
+  enable_node_port: "true"
