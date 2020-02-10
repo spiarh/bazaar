@@ -1,3 +1,4 @@
+---
 apiVersion: kubeadm.k8s.io/v1beta2
 bootstrapTokens:
 - groups:
@@ -9,7 +10,7 @@ bootstrapTokens:
   - authentication
 kind: InitConfiguration
 localAPIEndpoint:
-  advertiseAddress: ""
+  advertiseAddress: {{ (ansible_facts[apiserver_listen_interface | replace("-", "_")]['ipv4']['address']) | default(ansible_facts['default_ipv4']['address']) }}
   bindPort: 6443
 nodeRegistration:
   name: {{ ansible_hostname }}
@@ -21,13 +22,18 @@ apiServer:
   certSANs:
   - {{ control_plane_endpoint.split(":")[0] }}
   extraArgs:
+    advertise-address: {{ (ansible_facts[apiserver_listen_interface | replace("-", "_")]['ipv4']['address']) | default(ansible_facts['default_ipv4']['address']) }}
+    bind-address: {{ (ansible_facts[apiserver_listen_interface | replace("-", "_")]['ipv4']['address']) | default(ansible_facts['default_ipv4']['address']) }}
     enable-admission-plugins: {{ admission_plugins }}
   timeoutForControlPlane: 8m0s
 apiVersion: kubeadm.k8s.io/v1beta2
 certificatesDir: /etc/kubernetes/pki
 clusterName: {{ cluster_name }}
 controlPlaneEndpoint: {{ control_plane_endpoint }}
-controllerManager: {}
+controllerManager:
+  extraArgs:
+    address: {{ (ansible_facts[apiserver_listen_interface | replace("-", "_")]['ipv4']['address']) | default(ansible_facts['default_ipv4']['address']) }}
+    bind-address: {{ (ansible_facts[apiserver_listen_interface | replace("-", "_")]['ipv4']['address']) | default(ansible_facts['default_ipv4']['address']) }}
 dns:
   type: CoreDNS
 etcd:
@@ -40,6 +46,9 @@ networking:
   dnsDomain: cluster.local
   podSubnet: {{ pod_subnet_cidr }}
   serviceSubnet: {{ service_subnet }}
-scheduler: {}
+scheduler:
+  extraArgs:
+    address: {{ (ansible_facts[apiserver_listen_interface | replace("-", "_")]['ipv4']['address']) | default(ansible_facts['default_ipv4']['address']) }}
+    bind-address: {{ (ansible_facts[apiserver_listen_interface | replace("-", "_")]['ipv4']['address']) | default(ansible_facts['default_ipv4']['address']) }}
 useHyperKubeImage: false
 {% include "templates/kubelet.yml.j2" %}

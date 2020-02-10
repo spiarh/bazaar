@@ -7,6 +7,15 @@
     group: root
     mode: 0700
 
+- name: kubelet_extra_args
+  template:
+    src: etc_default_kubelet.j2
+    dest: /etc/default/kubelet
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart_kubelet
+
 - name: copy_kubeadm_args
   copy:
     content: "KUBELET_KUBEADM_ARGS='{{ kubelet_kubeadm_args }}'"

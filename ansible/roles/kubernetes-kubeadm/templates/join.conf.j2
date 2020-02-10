@@ -1,9 +1,10 @@
+---
 apiVersion: kubeadm.k8s.io/v1beta2
 caCertPath: /etc/kubernetes/pki/ca.crt
 {% if inventory_hostname in groups['masters'] %}
 controlPlane:
   localAPIEndpoint:
-    advertiseAddress: ""
+    advertiseAddress: {{ (ansible_facts[apiserver_listen_interface | replace("-", "_")]['ipv4']['address']) | default(ansible_facts['default_ipv4']['address']) }}
 {% endif %}
 discovery:
   bootstrapToken:
@@ -15,6 +16,5 @@ discovery:
   timeout: 8m0s
 kind: JoinConfiguration
 nodeRegistration:
-#  criSocket: /var/run/crio/crio.sock
   name: {{ ansible_hostname }}
 {% include "templates/kubelet.yml.j2" %}

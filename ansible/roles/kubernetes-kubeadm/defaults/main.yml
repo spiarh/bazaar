@@ -1,5 +1,6 @@
 ---
-# defaults file for deploy-cluster-kubeadm
+apiserver_listen_interface: ""
+kubelet_listen_interface: ""
 #kubelet_kubeadm_args: "--container-runtime=remote --container-runtime-endpoint=/var/run/crio/crio.sock --resolv-conf=/run/systemd/resolve/resolv.conf"
 kubelet_kubeadm_args: ""
 
@@ -36,6 +37,9 @@ kubelet_extra_configuration_kubereserved: |
     memory: 256Mi
     ephemeral-storage: 1024Mi
 
+# /etc/default/kubelet 
+kubelet_extra_args: ""
+
 # Split with comma "phase1,phase2"
 init_skip_phases: "addon/kube-proxy"
 join_skip_phases: ""
@@ -59,6 +63,3 @@ ca_cert_hash: !vault |
           30363837343061653632613665323237353232343934626437383965313566363162303163663233
           39656461346437363763623538653130343530326533393831653730306561393366663239333336
           66303930616236353538
-
-## cat /etc/default/kubelet 
-#KUBELET_EXTRA_ARGS="-v=4"

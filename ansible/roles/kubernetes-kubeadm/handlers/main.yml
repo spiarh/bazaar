@@ -1,5 +1,9 @@
 ---
-# handlers file for deploy-cluster-kubeadm
+- name: restart_kubelet
+  service:
+    name: kubelet
+    state: restarted
+
 - name: create_init_witness_file
   file:
     path: "{{ init_witness_file }}"
