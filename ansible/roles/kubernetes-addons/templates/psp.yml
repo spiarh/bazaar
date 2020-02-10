@@ -63,19 +63,6 @@ subjects:
   apiGroup: rbac.authorization.k8s.io
   name: system:nodes
 ---
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: psp:kube-system:calico
-roleRef:
-  kind: ClusterRole
-  name: psp:privileged
-  apiGroup: rbac.authorization.k8s.io
-subjects:
-- kind: ServiceAccount
-  name: calico-node
-  namespace: kube-system
----
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:

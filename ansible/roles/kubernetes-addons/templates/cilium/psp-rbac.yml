@@ -1,0 +1,66 @@
+---
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: psp.cilium
+  annotations:
+    seccomp.security.alpha.kubernetes.io/allowedProfileNames: '*'
+    seccomp.security.alpha.kubernetes.io/defaultProfileName: 'runtime/default'
+    apparmor.security.beta.kubernetes.io/allowedProfileName: '*'
+spec:
+  privileged: true
+  allowPrivilegeEscalation: true
+  allowedCapabilities:
+   - NET_ADMIN
+   - SYS_MODULE
+  volumes:
+    - configMap
+    - secret
+    - hostPath
+  allowedHostPaths:
+    - pathPrefix: /sys/fs/bpf
+    - pathPrefix: /var/run/cilium
+    - pathPrefix: /opt/cni/bin
+    - pathPrefix: /etc/cni/net.d
+    - pathPrefix: /lib/modules
+    - pathPrefix: /run/xtables.lock
+  hostNetwork: true
+  hostPorts:
+  - min: 0
+    max: 65535
+  hostIPC: false
+  hostPID: false
+  runAsUser:
+    rule: 'RunAsAny'
+  seLinux:
+    rule: 'RunAsAny'
+  supplementalGroups:
+    rule: 'RunAsAny'
+  fsGroup:
+    rule: 'RunAsAny'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: psp:cilium
+rules:
+  - apiGroups: ['extensions']
+    resources: ['podsecuritypolicies']
+    verbs: ['use']
+    resourceNames: ['psp.cilium']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: psp:cilium
+roleRef:
+  kind: ClusterRole
+  name: psp:cilium
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- kind: ServiceAccount
+  name: cilium
+  namespace: kube-system
+- kind: ServiceAccount
+  name: cilium-operator
+  namespace: kube-system

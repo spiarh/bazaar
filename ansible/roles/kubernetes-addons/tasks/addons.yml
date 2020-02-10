@@ -3,10 +3,12 @@
   file:
     path: "{{ addons_directoy }}"
     state: directory
-    recurse: yes
     owner: root
     group: root
     mode: 0755
+  with_items:
+    - "{{ addons_directoy }}"
+    - "{{ addons_directoy }}/{{ cni }}"
 
 - name: copy_addons_manifests
   template:
@@ -16,14 +18,16 @@
     group: root
     mode: 0644
   with_items:
-    - {src: "psp.yaml", dest: "psp.yaml"}
-#    - {src: "calico.yaml.j2", dest: "calico.yaml"}
+    - {src: "psp.yml", dest: "psp.yml"}
+    - {src: "{{ cni }}/{{ cni }}.yml.j2", dest: "{{ cni }}.yml"}
+    - {src: "{{ cni }}/psp-rbac.yml", dest: "psp-rbac.yml"}
 
 - name: apply_addons_manifests
-  command: "kubectl apply -f {{ item }} --kubeconfig={{ kubeconfig_admin }} -v4"
+  command: "kubectl apply -f {{ addons_directoy }}/{{ item }} --kubeconfig={{ kubeconfig_admin }} -v4"
   with_items:
-    - "{{ addons_directoy }}/psp.yaml"
-#    - "{{ addons_directoy }}/calico.yaml"
+    - "psp.yml"
+    - "{{ cni }}.yml"
+    - "psp-rbac.yml"
   register: addons_manifests_applied
 
 - debug:
