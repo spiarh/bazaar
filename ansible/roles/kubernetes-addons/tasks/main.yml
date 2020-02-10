@@ -1,5 +1,6 @@
 ---
-- include_tasks: addons.yml
-  when:
-    - inventory_hostname == groups.masters[0]
-  run_once: yes
+- include_tasks: pre_req.yml
+#- include_tasks: addons.yml
+#  when:
+#    - inventory_hostname == groups.masters[0]
+#  run_once: yes
