@@ -1,0 +1,39 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tblshoot
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: tblshoot
+  namespace: tblshoot
+  labels:
+    app: tblshoot
+spec:
+  selector:
+    matchLabels:
+      app: tblshoot
+  template:
+    metadata:
+      labels:
+        app: tblshoot
+    spec:
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
+      containers:
+      - name: tblshoot
+        image: r.spiarh.fr/tblshoot:latest
+        imagePullPolicy: IfNotPresent
+        args:
+        - sleep
+        - "60000"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 200m
+            memory: 200Mi
