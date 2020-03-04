@@ -66,9 +66,9 @@ get_vm_from_terraform_output() {
   if [[ -f "./terraform.tfstate" ]]; then
     JSON=$(terraform output -json)
     if [[ "$JSON" != "{}" ]]; then
-        LB=$(echo "$JSON" | jq -r '.ip_load_balancer.value[0]')
-        MASTERS=$(echo "$JSON" | jq -r '.ip_masters.value[]')
-        WORKERS=$(echo "$JSON" | jq -r '.ip_workers.value[]')
+        LB=$(echo "$JSON" | jq -r '.ip_load_balancer.value[]')
+        MASTERS="$(echo "$JSON" | jq -r '.ip_masters.value | to_entries[] | join (":")')"
+        WORKERS="$(echo "$JSON" | jq -r '.ip_workers.value | to_entries[] | join (":")')"
         ALL="$MASTERS $WORKERS"
     fi
   fi
@@ -97,7 +97,7 @@ skuba() {
   -v "$app_path":/app \
   -v "$(dirname "$SSH_AUTH_SOCK")":"$(dirname "$SSH_AUTH_SOCK")" \
   -e SSH_AUTH_SOCK="$SSH_AUTH_SOCK" \
-  skuba:$SKUBA_TAG "$@"
+  "skuba:$SKUBA_TAG" "$@"
   #-u "$(id -u)":"$(id -g)" \
 }
 
@@ -127,8 +127,10 @@ run_cmd() {
   define_node_group "$1"
   CMD="$2"
   for n in $GROUP; do
+    echo "$n"
+      get_ip_nodename "$n"
       log "Running '$CMD' on $n"
-      ssh2 "$n" "$CMD" || echo "run-cmd failed" && /bin/true
+      ssh2 "$IP" "$CMD" || echo "run-cmd failed" && /bin/true
       #(ssh2 "$n" "$CMD" || echo "run-cmd failed" && /bin/true) &
       #sleep 0.5
   done
@@ -142,36 +144,38 @@ use_scp() {
   local options="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -F /dev/null -o LogLevel=ERROR -r"
 
   for n in $GROUP; do
+    get_ip_nodename "$n"
     if [[ "$TYPE" == "to" ]]; then
       log "SCP-TO '$SRC' to '$DEST' on $n"
-      scp $options $SRC sles@$n:$DEST
+      scp $options "$SRC" "sles@$IP:$DEST"
     fi
     if [[ "$TYPE" == "FROM" ]]; then
       log "SCP-FROM '$SRC' to '$DEST' from $n"
-      scp $options sles@$n:$SRC $DEST
+      scp $options "sles@$IP:$SRC" "$DEST"
     fi
   done
 }
 
 show_images() {
-  $KUBECTL get pods --all-namespaces -o jsonpath="{.items[*].spec.containers[*].image}" | tr -s '[[:space:]]' '\n'
+  $KUBECTL get pods --all-namespaces -o jsonpath="{.items[*].spec.containers[*].image}" | tr -s ':space:' '\n'
 }
 
 updates() {
   define_node_group "$1"
   local action="$2"
   for n in $GROUP; do
+      get_ip_nodename "$n"
       log "$action skuba-update on $n"
-      ssh2 "$n" "sudo systemctl $action --now skuba-update.timer"
+      ssh2 "$IP" "sudo systemctl $action --now skuba-update.timer"
   done
 }
 
 install_suse_ca() {
   for n in $1; do
+      get_ip_nodename "$n"
       log "Installing SUSE CA on $n"
-      ssh2 "$n" "if ! zypper lr SUSE_CA > /dev/null 2>&1; then sudo zypper ar -f http://download.suse.de/ibs/SUSE:/CA/SLE_15_SP1/SUSE:CA.repo; fi"
-  #    ssh2 "$n" "if ! rpm -q ca-certificates-suse > /dev/null 2>&1; then sudo zypper in -y ca-certificates-suse; sudo systemctl restart crio; fi"
-      ssh2 "$n" "if ! rpm -q ca-certificates-suse > /dev/null 2>&1; then sudo zypper in -y ca-certificates-suse; sudo systemctl restart crio || /bin/true; fi"
+      ssh2 "$IP" "if ! zypper lr SUSE_CA > /dev/null 2>&1; then sudo zypper ar -f http://download.suse.de/ibs/SUSE:/CA/SLE_15_SP1/SUSE:CA.repo; fi"
+      ssh2 "$IP" "if ! rpm -q ca-certificates-suse > /dev/null 2>&1; then sudo zypper in -y ca-certificates-suse; sudo systemctl restart crio || /bin/true; fi"
   done
 }
 
@@ -186,8 +190,9 @@ add_repo() {
   define_node_group "$target"
   
   for n in $GROUP; do
+      get_ip_nodename "$n"
       log "Adding repo $repo_env on $n"
-      ssh2 "$n" "if ! zypper lr $repo_env > /dev/null 2>&1; then sudo zypper ar -f $repo $repo_env; fi"
+      ssh2 "$IP" "if ! zypper lr $repo_env > /dev/null 2>&1; then sudo zypper ar -f $repo $repo_env; fi"
   done
 }
 
@@ -198,18 +203,24 @@ init_control_plane() {
   fi
 }
 
+get_ip_nodename() {
+   NODE_NAME="$(echo $1|awk -F":" '{ print $1 }')"
+   IP="$(echo $1|awk -F":" '{ print $2 }')"
+}
+
 deploy_masters() {
 local i=0
 for n in $1; do
-    local j="$(printf "%03g" $i)"
+    #local j="$(printf "%03g" $i)"
+    get_ip_nodename "$n"
     if [[ $i -eq 0 ]]; then
-      log "Boostrapping first master node, master$j: $n"
-      skuba node bootstrap --user sles --sudo --target "$n" "master$j" -v "$LOG_LEVEL"
+      log "Boostrapping first master node, $n"
+      skuba node bootstrap --user sles --sudo --target "$IP" "$NODE_NAME" -v "$LOG_LEVEL"
     fi
 
     if [[ $i -ne 0 ]]; then
-      log "Boostrapping other master nodes, master$j: $n"
-      skuba node join --role master --user sles --sudo --target  "$n" "master$j" -v "$LOG_LEVEL"
+      log "Boostrapping other master nodes, $n"
+      skuba node join --role master --user sles --sudo --target  "$IP" "$NODE_NAME" -v "$LOG_LEVEL"
     fi
     ((++i))
 done
@@ -218,11 +229,12 @@ done
 deploy_workers() {
   local i=0
   for n in $1; do
-      local j="$(printf "%03g" $i)"
-      log "Deploying workers, worker$j: $n"
-      (skuba node join --role worker --user sles --sudo --target  "$n" "worker$j" -v "$LOG_LEVEL") &
-      sleep 3
-      ((++i))
+    #local j="$(printf "%03g" $i)"
+    get_ip_nodename "$n"
+    log "Deploying workers, $n"
+    (skuba node join --role worker --user sles --sudo --target  "$IP" "$NODE_NAME" -v "$LOG_LEVEL") &
+    sleep 3
+    ((++i))
   done
 }
 
@@ -270,49 +282,49 @@ node_upgrade() {
 
   local i=0
   for n in $GROUP; do
-    local node_name="$($KUBECTL get nodes  -o json | jq ".items[] | {name: .metadata.name, ip: .status.addresses[] | select(.type==\"InternalIP\") | select(.address==\"$n\")}" | jq -r '.name')"
+    get_ip_nodename "$n"
+    #local node_name="$($KUBECTL get nodes  -o json | jq ".items[] | {name: .metadata.name, ip: .status.addresses[] | select(.type==\"InternalIP\") | select(.address==\"$n\")}" | jq -r '.name')"
     if [[ "$action" = "plan" ]]; then
-      log "Planning upgrade on $node_name, $n"
-      skuba node upgrade plan $node_name -v "$LOG_LEVEL" 
+      log "Planning upgrade on $NODE_NAME, $n"
+      skuba node upgrade plan "$NODE_NAME" -v "$LOG_LEVEL" 
     fi  
 
     if [[ "$action" = "apply" ]]; then
-      log "Upgrading node $node_name/$n"
+      log "Upgrading node $n"
 
-
-      if ! skuba node upgrade plan $node_name -v "$LOG_LEVEL" | grep "Node $node_name is up to date"; then
+      if ! skuba node upgrade plan "$NODE_NAME" -v "$LOG_LEVEL" | grep "Node $NODE_NAME is up to date"; then
         if [[ "$mode" == "safe" ]]; then
-          log "Draining node $node_name/$n"
+          log "Draining node $n"
           date
-          kubectl get po -A --field-selector spec.nodeName="$node_name"
-          kubectl drain "$node_name" --grace-period=600 --timeout=900s --ignore-daemonsets --delete-local-data
+          kubectl get po -A --field-selector spec.nodeName="$NODE_NAME"
+          kubectl drain "$NODE_NAME" --grace-period=600 --timeout=900s --ignore-daemonsets --delete-local-data
         fi
 
-        skuba node upgrade apply --user sles --sudo --target "$n" -v "$LOG_LEVEL" 
+        skuba node upgrade apply --user sles --sudo --target "$IP" -v "$LOG_LEVEL" 
 
         if [[ "$mode" == "safe" ]]; then
           log "Sleep 1 min as a workaround for the crio panic version bug..."
           sleep 60
-          log "Uncordoning $node_name"
-          kubectl uncordon $node_name
+          log "Uncordoning $NODE_NAME"
+          kubectl uncordon "$NODE_NAME"
         fi
       fi
     fi
 
     if [[ "$action" = "fake" ]]; then
-      log "Running fake upgrade on node $node_name/$n"
-      log "Draining node $node_name/$n"
-      kubectl get po -A --field-selector spec.nodeName="$node_name"
-      kubectl drain "$node_name" --grace-period=600 --timeout=900s --ignore-daemonsets --delete-local-data
+      log "Running fake upgrade on node $n"
+      log "Draining node $n"
+      kubectl get po -A --field-selector spec.nodeName="$NODE_NAME"
+      kubectl drain "$NODE_NAME" --grace-period=600 --timeout=900s --ignore-daemonsets --delete-local-data
 
       log "Restart crio and Kubelet"
-      run_cmd "$n" "sudo systemctl stop crio kubelet && sudo systemctl start crio kubelet"
+      run_cmd "$IP" "sudo systemctl stop crio kubelet && sudo systemctl start crio kubelet"
 
       log "Sleep 2 min as if it was an upgrade"
       sleep 120
 
-      log "Uncordoning $node_name"
-      kubectl uncordon $node_name
+      log "Uncordoning $NODE_NAME"
+      kubectl uncordon "$NODE_NAME"
     fi
     new_line
   done
@@ -323,8 +335,9 @@ is_reachable() {
 
   local i=0
   for n in $GROUP; do
+    get_ip_nodename "$n"
     log "Pinging $n"
-    if ping -c1 -W2 $n > /dev/null 2>&1; then
+    if ping -c1 -W2 "$IP" > /dev/null 2>&1; then
       echo "YES"
     else
       echo "NOOOOOOOOOOOOO"
