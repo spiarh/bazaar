@@ -130,7 +130,7 @@ run_cmd() {
     echo "$n"
       get_ip_nodename "$n"
       log "Running '$CMD' on $n"
-      ssh2 "$IP" "$CMD" || echo "run-cmd failed" && /bin/true
+      ssh2 "$NODE_IP" "$CMD" || echo "run-cmd failed" && /bin/true
       #(ssh2 "$n" "$CMD" || echo "run-cmd failed" && /bin/true) &
       #sleep 0.5
   done
@@ -147,11 +147,11 @@ use_scp() {
     get_ip_nodename "$n"
     if [[ "$TYPE" == "to" ]]; then
       log "SCP-TO '$SRC' to '$DEST' on $n"
-      scp $options "$SRC" "sles@$IP:$DEST"
+      scp $options "$SRC" "sles@$NODE_IP:$DEST"
     fi
     if [[ "$TYPE" == "FROM" ]]; then
       log "SCP-FROM '$SRC' to '$DEST' from $n"
-      scp $options "sles@$IP:$SRC" "$DEST"
+      scp $options "sles@$NODE_IP:$SRC" "$DEST"
     fi
   done
 }
@@ -166,7 +166,7 @@ updates() {
   for n in $GROUP; do
       get_ip_nodename "$n"
       log "$action skuba-update on $n"
-      ssh2 "$IP" "sudo systemctl $action --now skuba-update.timer"
+      ssh2 "$NODE_IP" "sudo systemctl $action --now skuba-update.timer"
   done
 }
 
@@ -174,8 +174,8 @@ install_suse_ca() {
   for n in $1; do
       get_ip_nodename "$n"
       log "Installing SUSE CA on $n"
-      ssh2 "$IP" "if ! zypper lr SUSE_CA > /dev/null 2>&1; then sudo zypper ar -f http://download.suse.de/ibs/SUSE:/CA/SLE_15_SP1/SUSE:CA.repo; fi"
-      ssh2 "$IP" "if ! rpm -q ca-certificates-suse > /dev/null 2>&1; then sudo zypper in -y ca-certificates-suse; sudo systemctl restart crio || /bin/true; fi"
+      ssh2 "$NODE_IP" "if ! zypper lr SUSE_CA > /dev/null 2>&1; then sudo zypper ar -f http://download.suse.de/ibs/SUSE:/CA/SLE_15_SP1/SUSE:CA.repo; fi"
+      ssh2 "$NODE_IP" "if ! rpm -q ca-certificates-suse > /dev/null 2>&1; then sudo zypper in -y ca-certificates-suse; sudo systemctl restart crio || /bin/true; fi"
   done
 }
 
@@ -192,7 +192,7 @@ add_repo() {
   for n in $GROUP; do
       get_ip_nodename "$n"
       log "Adding repo $repo_env on $n"
-      ssh2 "$IP" "if ! zypper lr $repo_env > /dev/null 2>&1; then sudo zypper ar -f $repo $repo_env; fi"
+      ssh2 "$NODE_IP" "if ! zypper lr $repo_env > /dev/null 2>&1; then sudo zypper ar -f $repo $repo_env; fi"
   done
 }
 
@@ -205,7 +205,7 @@ init_control_plane() {
 
 get_ip_nodename() {
    NODE_NAME="$(echo $1|awk -F":" '{ print $1 }')"
-   IP="$(echo $1|awk -F":" '{ print $2 }')"
+   NODE_IP="$(echo $1|awk -F":" '{ print $2 }')"
 }
 
 deploy_masters() {
@@ -215,12 +215,12 @@ for n in $1; do
     get_ip_nodename "$n"
     if [[ $i -eq 0 ]]; then
       log "Boostrapping first master node, $n"
-      skuba node bootstrap --user sles --sudo --target "$IP" "$NODE_NAME" -v "$LOG_LEVEL"
+      skuba node bootstrap --user sles --sudo --target "$NODE_IP" "$NODE_NAME" -v "$LOG_LEVEL"
     fi
 
     if [[ $i -ne 0 ]]; then
       log "Boostrapping other master nodes, $n"
-      skuba node join --role master --user sles --sudo --target  "$IP" "$NODE_NAME" -v "$LOG_LEVEL"
+      skuba node join --role master --user sles --sudo --target  "$NODE_IP" "$NODE_NAME" -v "$LOG_LEVEL"
     fi
     ((++i))
 done
@@ -232,7 +232,7 @@ deploy_workers() {
     #local j="$(printf "%03g" $i)"
     get_ip_nodename "$n"
     log "Deploying workers, $n"
-    (skuba node join --role worker --user sles --sudo --target  "$IP" "$NODE_NAME" -v "$LOG_LEVEL") &
+    (skuba node join --role worker --user sles --sudo --target  "$NODE_IP" "$NODE_NAME" -v "$LOG_LEVEL") &
     sleep 3
     ((++i))
   done
@@ -283,7 +283,7 @@ node_upgrade() {
   local i=0
   for n in $GROUP; do
     get_ip_nodename "$n"
-    #local node_name="$($KUBECTL get nodes  -o json | jq ".items[] | {name: .metadata.name, ip: .status.addresses[] | select(.type==\"InternalIP\") | select(.address==\"$n\")}" | jq -r '.name')"
+    #local node_name="$($KUBECTL get nodes  -o json | jq ".items[] | {name: .metadata.name, ip: .status.addresses[] | select(.type==\"InternalNODE_IP\") | select(.address==\"$n\")}" | jq -r '.name')"
     if [[ "$action" = "plan" ]]; then
       log "Planning upgrade on $NODE_NAME, $n"
       skuba node upgrade plan "$NODE_NAME" -v "$LOG_LEVEL" 
@@ -300,7 +300,7 @@ node_upgrade() {
           kubectl drain "$NODE_NAME" --grace-period=600 --timeout=900s --ignore-daemonsets --delete-local-data
         fi
 
-        skuba node upgrade apply --user sles --sudo --target "$IP" -v "$LOG_LEVEL" 
+        skuba node upgrade apply --user sles --sudo --target "$NODE_IP" -v "$LOG_LEVEL" 
 
         if [[ "$mode" == "safe" ]]; then
           log "Sleep 1 min as a workaround for the crio panic version bug..."
@@ -318,7 +318,7 @@ node_upgrade() {
       kubectl drain "$NODE_NAME" --grace-period=600 --timeout=900s --ignore-daemonsets --delete-local-data
 
       log "Restart crio and Kubelet"
-      run_cmd "$IP" "sudo systemctl stop crio kubelet && sudo systemctl start crio kubelet"
+      run_cmd "$NODE_IP" "sudo systemctl stop crio kubelet && sudo systemctl start crio kubelet"
 
       log "Sleep 2 min as if it was an upgrade"
       sleep 120
@@ -337,7 +337,7 @@ is_reachable() {
   for n in $GROUP; do
     get_ip_nodename "$n"
     log "Pinging $n"
-    if ping -c1 -W2 "$IP" > /dev/null 2>&1; then
+    if ping -c1 -W2 "$NODE_IP" > /dev/null 2>&1; then
       echo "YES"
     else
       echo "NOOOOOOOOOOOOO"
