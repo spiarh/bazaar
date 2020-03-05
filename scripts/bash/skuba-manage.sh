@@ -11,6 +11,19 @@ LOG_LEVEL="8"
 CLUSTER_NAME="my-cluster"
 KUBECONFIG="$PWD/$CLUSTER_NAME/admin.conf"
 KUBECTL="kubectl --kubeconfig=$KUBECONFIG"
+HOST_USER="sles"
+
+DIR="$( cd "$( dirname "$0" )" && pwd )"
+SALT_DIR="$DIR/salt"
+SALT_TMP_DIR="tmp"
+SALT_CONFIG_DIR="etc/salt"
+SALT_FILES="srv/salt"
+SALT_PILLARS="srv/pillar"
+SALT_MASTER_CONF="etc/salt/master"
+SALT_ROSTER="roster"
+SALT_ROSTER_SALTFILE="Saltfile"
+SALT_SSH_LOGFILE="$SALT_TMP_DIR/salt-ssh.log"
+
 
 USAGE=$(cat <<USAGE
 Usage:
@@ -36,6 +49,9 @@ Usage:
     --reboots enable
 
 --install-suse-ca
+--install-prereq-storage <target>
+--enable-swapaccount <target>
+--configure-salt-ssh
 
 --add-repo <target> <env>
     --add-repo masters devel
@@ -56,7 +72,7 @@ Usage:
 
 --show-images
 
---run-cmd "sudo ..."
+--run-cmd <target> "sudo ..."
 USAGE
 )
 
@@ -108,7 +124,7 @@ ssh2() {
       -o StrictHostKeyChecking=no \
       -F /dev/null \
       -o LogLevel=ERROR \
-      "sles@$host" "$@"
+      "$HOST_USER@$host" "$@"
 }
 
 reboots() {
@@ -127,7 +143,6 @@ run_cmd() {
   define_node_group "$1"
   CMD="$2"
   for n in $GROUP; do
-    echo "$n"
       get_ip_nodename "$n"
       log "Running '$CMD' on $n"
       ssh2 "$NODE_IP" "$CMD" || echo "run-cmd failed" && /bin/true
@@ -157,7 +172,7 @@ use_scp() {
 }
 
 show_images() {
-  $KUBECTL get pods --all-namespaces -o jsonpath="{.items[*].spec.containers[*].image}" | tr -s ':space:' '\n'
+  $KUBECTL get pods --all-namespaces -o jsonpath="{.items[*].spec.containers[*].image}" | tr -s '[[:space:]]' '\n'
 }
 
 updates() {
@@ -204,14 +219,16 @@ init_control_plane() {
 }
 
 get_ip_nodename() {
-   NODE_NAME="$(echo $1|awk -F":" '{ print $1 }')"
-   NODE_IP="$(echo $1|awk -F":" '{ print $2 }')"
+  if [[ -z "NODE_NAME" ]]; then
+    NODE_NAME="$(echo $1|awk -F":" '{ print $1 }')"
+  fi
+  if [[ -z "NODE_IP" ]]; then
+    NODE_IP="$(echo $1|awk -F":" '{ print $2 }')"
+  fi
 }
 
 deploy_masters() {
-local i=0
 for n in $1; do
-    #local j="$(printf "%03g" $i)"
     get_ip_nodename "$n"
     if [[ $i -eq 0 ]]; then
       log "Boostrapping first master node, $n"
@@ -222,19 +239,15 @@ for n in $1; do
       log "Boostrapping other master nodes, $n"
       skuba node join --role master --user sles --sudo --target  "$NODE_IP" "$NODE_NAME" -v "$LOG_LEVEL"
     fi
-    ((++i))
 done
 }
 
 deploy_workers() {
-  local i=0
   for n in $1; do
-    #local j="$(printf "%03g" $i)"
     get_ip_nodename "$n"
     log "Deploying workers, $n"
     (skuba node join --role worker --user sles --sudo --target  "$NODE_IP" "$NODE_NAME" -v "$LOG_LEVEL") &
     sleep 3
-    ((++i))
   done
 }
 
@@ -279,8 +292,8 @@ node_upgrade() {
   local mode="$1"
   define_node_group "$2"
   local action="$3"
-
   local i=0
+
   for n in $GROUP; do
     get_ip_nodename "$n"
     #local node_name="$($KUBECTL get nodes  -o json | jq ".items[] | {name: .metadata.name, ip: .status.addresses[] | select(.type==\"InternalNODE_IP\") | select(.address==\"$n\")}" | jq -r '.name')"
@@ -330,10 +343,20 @@ node_upgrade() {
   done
 }
 
+enable_swapaccount() {
+  local script
+  script="IyEvYmluL2Jhc2gKZ3JlcCAic3dhcGFjY291bnQ9MSIgL2V0Yy9kZWZhdWx0L2dydWIgfHwgc3VkbyBzZWQgLWkgLXIgJ3N8XihHUlVCX0NNRExJTkVfTElOVVhfREVGQVVMVD0pXCIoLiouKVwifFwxXCJcMiBzd2FwYWNjb3VudD0xIFwifCcgL2V0Yy9kZWZhdWx0L2dydWIKZ3J1YjItbWtjb25maWcgLW8gL2Jvb3QvZ3J1YjIvZ3J1Yi5jZmcKcmVib290Cg=="
+  run_cmd "$1" "echo $script | base64 -d > /tmp/enable_swappacount.sh"
+  run_cmd "$1" "sudo bash /tmp/enable_swappacount.sh"
+}
+
+install_prereq_storage() {
+    run_cmd "$1" "sudo zypper in -y ceph-common xfsprogs"
+}
+
+
 is_reachable() {
   define_node_group "$1"
-
-  local i=0
   for n in $GROUP; do
     get_ip_nodename "$n"
     log "Pinging $n"
@@ -379,6 +402,67 @@ redeploy() {
   sdeploy
 }
 
+# SALT
+create_salt_conf() {
+  # Create salt master configuration
+  echo "$SALT_DIR/$SALT_MASTER_CONF"
+  cat > "$SALT_DIR/$SALT_MASTER_CONF" <<CONF
+root_dir: .
+file_roots:
+  base:
+    - $SALT_FILES
+  pillar_roots:
+    base:
+      - $SALT_PILLARS
+
+pki_dir: $SALT_TMP_DIR
+cachedir: $SALT_TMP_DIR
+CONF
+
+  # Create Saltfile
+  echo "$SALT_DIR/$SALT_ROSTER_SALTFILE"
+  cat > "$SALT_DIR/$SALT_ROSTER_SALTFILE" <<CONF
+salt-ssh:
+  config_dir: $SALT_CONFIG_DIR
+  ssh_log_file: $SALT_SSH_LOGFILE
+  ignore_host_keys: True
+  roster_file: $SALT_ROSTER
+CONF
+}
+
+create_roster_file() {
+  # $1 = group of hosts
+  # $2 = node prefix
+  rm -f "$SALT_DIR/$SALT_ROSTER"
+  echo "$SALT_DIR/$SALT_ROSTER"
+  for n in $ALL; do
+    get_ip_nodename "$n"
+    cat >> "$SALT_DIR/$SALT_ROSTER" <<CONF
+$NODE_NAME:
+    host: $NODE_IP
+    user: $HOST_USER
+    sudo: true
+    priv: agent-forwarding
+CONF
+  done
+}
+
+create_salt_dirs() {
+  mkdir -pv "$SALT_DIR/$SALT_TMP_DIR"
+  mkdir -pv "$SALT_DIR/$SALT_CONFIG_DIR"
+  mkdir -pv "$SALT_DIR/$SALT_FILES"
+  mkdir -pv "$SALT_DIR/$SALT_PILLARS"
+}
+
+configure_salt_ssh() {
+  create_salt_dirs
+  create_salt_conf
+  create_roster_file "$LB" lb
+  create_roster_file "$MASTERS" master
+  create_roster_file "$WORKERS" worker
+}
+
+
 get_vm_from_terraform_output
 
 # Parse options
@@ -421,10 +505,18 @@ while [[ $# -gt 0 ]] ; do
       redeploy
       ;;
     --node-upgrade)
-      MODE="${2}"
-      TARGET="${3}"
-      ACTION="${4}"
+      MODE="$2"
+      TARGET="$3"
+      ACTION="$4"
       node_upgrade "$MODE" "$TARGET" "$ACTION"
+      ;;
+    --install-prereq-storage)
+      TARGET="$2"
+      install_prereq_storage "$TARGET"
+      ;;
+    --enable-swapaccount)
+      TARGET="$2"
+      enable_swapaccount "$TARGET"
       ;;
     --is-reachable)
       TARGET="$2"
@@ -435,36 +527,39 @@ while [[ $# -gt 0 ]] ; do
       my_test "$TARGET"
       ;;
     --updates)
-      TARGET="${2}"
-      ACTION="${3}"
+      TARGET="$2"
+      ACTION="$3"
       updates "$TARGET" "$ACTION"
       ;;
     --reboots)
-      ACTION="${2}"
+      ACTION="$2"
       reboots "$ACTION"
       ;;
     --install-suse-ca)
       install_suse_ca "$ALL"
       ;;
     --add-repo)
-      TARGET="${2}"
+      TARGET="$2"
       REPO="$3"
       add_repo "$TARGET" "$REPO"
       ;;
+    --configure-salt-ssh)
+      configure_salt_ssh
+      ;;
     --run-cmd)
-      TARGET="${2}"
+      TARGET="$2"
       CMD="$3"
       run_cmd "$TARGET" "$CMD"
       ;;
     --scp-from)
-      TARGET="${2}"
+      TARGET="$2"
       SRC="$3"
       DEST="$4"
       TYPE="from"
       use_scp "$TARGET" "$SRC" "$DEST" "$TYPE"
       ;;
     --scp-to)
-      TARGET="${2}"
+      TARGET="$2"
       SRC="$3"
       DEST="$4"
       TYPE="to"
