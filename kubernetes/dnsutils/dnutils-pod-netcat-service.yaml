@@ -7,6 +7,7 @@ metadata:
   name: dnsutils-netcat
   namespace: default
 spec:
+  clusterIP: 10.100.100.100
   ports:
   - name: nc
     port: 1111
