@@ -1,0 +1,81 @@
+#cloud-config
+
+# set locale
+locale: en_US.UTF-8
+
+# set timezone
+timezone: Etc/UTC
+
+# set root password
+chpasswd:
+  list: |
+    root:linux
+    sles:linux
+  expire: False
+
+ssh_authorized_keys:
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC2G7k0zGAjd+0LzhbPcGLkdJrJ/LbLrFxtXe+LPAkrphizfRxdZpSC7Dvr5Vewrkd/kfYObiDc6v23DHxzcilVC2HGLQUNeUer/YE1mL4lnXC1M3cb4eU+vJ/Gyr9XVOOReDRDBCwouaL7IzgYNCsm0O5v2z/w9ugnRLryUY180/oIGeE/aOI1HRh6YOsIn7R3Rv55y8CYSqsbmlHWiDC6iZICZtvYLYmUmCgPX2Fg2eT+aRbAStUcUERm8h246fs1KxywdHHI/6o3E1NNIPIQ0LdzIn5aWvTCd6D511L4rf/k5zbdw/Gql0AygHBR/wnngB5gSDERLKfigzeIlCKf Unsafe Shared Key
+
+bootcmd:
+  - ip link set dev eth0 mtu 1400
+
+# need to disable gpg checks because the cloud image has an untrusted repo
+zypper:
+  repos:
+    - id: caasp_40_devel_sle15sp1
+      name: caasp_40_devel_sle15sp1
+      baseurl: http://download.suse.de/ibs/Devel:/CaaSP:/4.0/SLE_15_SP1/
+      enabled: 1
+      autorefresh: 1
+      gpgcheck: 0
+    - id: sle15sp1_pool
+      name: sle15sp1_pool
+      baseurl: http://download.suse.de/ibs/SUSE:/SLE-15-SP1:/GA/standard/
+      enabled: 1
+      autorefresh: 1
+      gpgcheck: 0
+    - id: sle15sp1_update
+      name: sle15sp1_update
+      baseurl: http://download.suse.de/ibs/SUSE:/SLE-15-SP1:/Update/standard/
+      enabled: 1
+      autorefresh: 1
+      gpgcheck: 0
+    - id: sle15_pool
+      name: sle15_pool
+      baseurl: http://download.suse.de/ibs/SUSE:/SLE-15:/GA/standard/
+      enabled: 1
+      autorefresh: 1
+      gpgcheck: 0
+    - id: sle15_update
+      name: sle15_update
+      baseurl: http://download.suse.de/ibs/SUSE:/SLE-15:/Update/standard/
+      enabled: 1
+      autorefresh: 1
+      gpgcheck: 0
+    - id: suse_
+      name: suse_ca
+      baseurl: http://download.suse.de/ibs/SUSE:/CA/SLE_15_SP1/
+      enabled: 1
+      autorefresh: 1
+      gpgcheck: 0
+  config:
+    gpgcheck: "off"
+    solver.onlyRequires: "true"
+    download.use_deltarpm: "true"
+
+# need to remove the standard docker packages that are pre-installed on the
+# cloud image because they conflict with the kubic- ones that are pulled by
+# the kubernetes packages
+packages:
+  - ca-certificates-suse
+  - kubernetes-kubeadm
+  - kubernetes-kubelet
+  - kubernetes-client
+
+runcmd:
+  - [ systemctl, disable, --now, --no-block, firewalld]
+
+
+final_message: "The system is finally up, after $UPTIME seconds"
+
+

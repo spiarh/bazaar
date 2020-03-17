@@ -1,0 +1,125 @@
+#cloud-config
+
+# set locale
+locale: en_US.UTF-8
+
+# set timezone
+timezone: Etc/UTC
+
+# configure ssh
+ssh_authorized_keys:
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC2G7k0zGAjd+0LzhbPcGLkdJrJ/LbLrFxtXe+LPAkrphizfRxdZpSC7Dvr5Vewrkd/kfYObiDc6v23DHxzcilVC2HGLQUNeUer/YE1mL4lnXC1M3cb4eU+vJ/Gyr9XVOOReDRDBCwouaL7IzgYNCsm0O5v2z/w9ugnRLryUY180/oIGeE/aOI1HRh6YOsIn7R3Rv55y8CYSqsbmlHWiDC6iZICZtvYLYmUmCgPX2Fg2eT+aRbAStUcUERm8h246fs1KxywdHHI/6o3E1NNIPIQ0LdzIn5aWvTCd6D511L4rf/k5zbdw/Gql0AygHBR/wnngB5gSDERLKfigzeIlCKf Unsafe Shared Key
+
+bootcmd:
+  - ip link set dev eth0 mtu 1400
+
+# need to disable gpg checks because the cloud image has an untrusted repo
+zypper:
+  repos:
+    - id: caasp_40_devel_sle15sp1
+      name: caasp_40_devel_sle15sp1
+      baseurl: http://download.suse.de/ibs/Devel:/CaaSP:/4.0/SLE_15_SP1/
+      enabled: 1
+      autorefresh: 1
+      gpgcheck: 0
+    - id: sle15sp1_pool
+      name: sle15sp1_pool
+      baseurl: http://download.suse.de/ibs/SUSE:/SLE-15-SP1:/GA/standard/
+      enabled: 1
+      autorefresh: 1
+      gpgcheck: 0
+    - id: sle15sp1_update
+      name: sle15sp1_update
+      baseurl: http://download.suse.de/ibs/SUSE:/SLE-15-SP1:/Update/standard/
+      enabled: 1
+      autorefresh: 1
+      gpgcheck: 0
+    - id: sle15_pool
+      name: sle15_pool
+      baseurl: http://download.suse.de/ibs/SUSE:/SLE-15:/GA/standard/
+      enabled: 1
+      autorefresh: 1
+      gpgcheck: 0
+    - id: sle15_update
+      name: sle15_update
+      baseurl: http://download.suse.de/ibs/SUSE:/SLE-15:/Update/standard/
+      enabled: 1
+      autorefresh: 1
+      gpgcheck: 0
+    - id: suse_ca
+      name: suse_ca
+      baseurl: http://download.suse.de/ibs/SUSE:/CA/SLE_15_SP1/
+      enabled: 1
+      autorefresh: 1
+      gpgcheck: 0
+  config:
+    gpgcheck: "off"
+    solver.onlyRequires: "true"
+    download.use_deltarpm: "true"
+
+packages:
+  - haproxy
+
+write_files:
+- path: /etc/haproxy/haproxy.cfg
+  content: |
+    global 
+      log /dev/log local0 debug
+      user haproxy
+      group haproxy
+      daemon
+    
+    defaults
+      mode      tcp
+      log       global
+      option    tcplog
+      option    redispatch
+      option    tcpka
+      retries   2
+      http-check     expect status 200
+      default-server check check-ssl verify none
+      timeout connect 5s
+      timeout client 5s
+      timeout server 5s
+      timeout tunnel 86400s
+    
+    listen stats
+      bind    *:9000
+      mode    http
+      stats   hide-version
+      stats   uri       /stats
+    
+    listen apiserver
+      bind    *:6443
+      option  httpchk GET /healthz
+SET_MASTERS_BACKENDS
+    
+    listen dex
+      bind    *:32000
+      option  httpchk GET /healthz
+SET_MASTERS_BACKENDS
+    
+    listen gangway
+      bind    *:32001
+      option httpchk GET /
+SET_MASTERS_BACKENDS
+
+runcmd:
+  # Since we are currently inside of the cloud-init systemd unit, trying to
+  # start another service by either `enable --now` or `start` will create a
+  # deadlock. Instead, we have to use the `--no-block-` flag.
+  # The template machine should have been cleaned up, so no machine-id exists
+  - [ dbus-uuidgen, --ensure ]
+  - [ systemd-machine-id-setup ]
+  # With a new machine-id generated the journald daemon will work and can be restarted
+  # Without a new machine-id it should be in a failed state
+  - [ systemctl, restart, systemd-journald ]
+  # LB firewall is not disabled via skuba, so we need to manually disable it
+  - [ systemctl, disable, firewalld, --now ]
+
+
+bootcmd:
+  # Hostnames from DHCP - otherwise localhost will be used
+  - /usr/bin/sed -ie "s#DHCLIENT_SET_HOSTNAME=\"no\"#DHCLIENT_SET_HOSTNAME=\"yes\"#" /etc/sysconfig/network/dhcp
+
+final_message: "The system is finally up, after $UPTIME seconds"
