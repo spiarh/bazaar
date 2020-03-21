@@ -1,6 +1,4 @@
 ---
-# Set hostname based on macadress
 - name: set_hostname
   hostname:
-    name: "{{ hostname }}"
-  when: ansible_default_ipv4.macaddress == mac
+    name: "{{ inventory_hostname }}"
