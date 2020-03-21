@@ -8,9 +8,12 @@ calico:
   version: "3.7.3"
 
 cilium:
-  version: "v1.6.5"
+  version: "latest"
   debug: "false"
+  prepend_iptables_chains: "false"
   enable_ipv4: "true"
   enable_ipv6: "false"
   wait_bpf_mount: "true"
+  kube_proxy_replacement: "strict"
   enable_node_port: "true"
+  enable_host_port: "false"

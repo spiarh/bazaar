@@ -59,6 +59,9 @@ subjects:
 - kind: ServiceAccount
   name: kube-proxy
   namespace: kube-system
+- kind: ServiceAccount
+  name: haproxy-ingress
+  namespace: kube-system
 - kind: Group
   apiGroup: rbac.authorization.k8s.io
   name: system:nodes
