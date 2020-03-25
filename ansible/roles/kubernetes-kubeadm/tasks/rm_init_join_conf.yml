@@ -1,0 +1,8 @@
+---
+- name: remove_conf
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+  - "{{ kubeadm_init_file }}"
+  - "{{ kubeadm_join_file }}"
