@@ -1,0 +1,15 @@
+---
+- name: set_modprobe_prereq
+  template:
+    src: modeprob-dmcrypt.conf
+    dest: /etc/modules-load.d/modeprob-dmcrypt.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart_systemd_modules_load
+
+- name: install_cryptsetup
+  apt:
+    name: cryptsetup
+    state: present
