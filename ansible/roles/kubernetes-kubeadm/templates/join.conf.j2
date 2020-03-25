@@ -12,7 +12,7 @@ discovery:
     token: {{ token }}
     unsafeSkipCAVerification: False
     caCertHashes:
-    - {{ ca_cert_hash }}
+    - sha256:{{ ca_cert_hash }}
   timeout: 8m0s
 kind: JoinConfiguration
 nodeRegistration:
