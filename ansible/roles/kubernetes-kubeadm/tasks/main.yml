@@ -33,3 +33,4 @@
     - not kubeadm_join_already_done.stat.exists
     - not inventory_hostname in groups.masters
 
+- include_tasks: rm_init_join_conf.yml

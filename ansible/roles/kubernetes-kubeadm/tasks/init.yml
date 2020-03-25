@@ -19,3 +19,5 @@
 
 - include_tasks: init_check.yml
   when: run_kubeadm_init is succeeded
+
+- include_tasks: rm_init_join_conf
