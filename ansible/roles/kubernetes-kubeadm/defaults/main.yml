@@ -49,3 +49,6 @@ token: "{{lookup('file', 'templates/kubeadm/token')}}"
 
 # openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'
 ca_cert_hash: "{{lookup('file', 'templates/kubeadm/ca_cert_hash')}}"
+
+reset:
+  clean_iptables: false
