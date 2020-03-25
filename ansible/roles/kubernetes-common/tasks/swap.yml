@@ -16,7 +16,7 @@
     state: unmounted
 
 - name: is_swap_in_fstab
-  shell: "grep -Eqv '^#' /etc/fstab | grep -q swap"
+  shell: "grep -Ev '^#' /etc/fstab | grep -q swap"
   register: is_swap_in_fstab
   ignore_errors: true
 
