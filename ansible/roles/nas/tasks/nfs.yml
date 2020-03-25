@@ -1,0 +1,14 @@
+---
+- name: install_nfs_packages
+  apt:
+    name: "{{ item.key }}"
+    state: "{{ item.value }}"
+    update_cache: yes
+  with_dict:
+    - "{{ nfs_pkgs }}"
+
+- name: start_enable_service_nfs
+  service:
+    name: nfs-kernel-server
+    state: started
+    enabled: True

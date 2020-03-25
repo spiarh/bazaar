@@ -1,0 +1,4 @@
+---
+# defaults file for nas
+nfs_pkgs:
+  nfs-kernel-server: latest
