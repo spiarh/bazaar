@@ -76,16 +76,14 @@ metadata:
     seccomp.security.alpha.kubernetes.io/defaultProfileName:  'runtime/default'
     apparmor.security.beta.kubernetes.io/defaultProfileName:  'runtime/default'
 spec:
-  # Privileged
   privileged: false
-  # Privilege Escalation
+  # Required to prevent escalations to root.
   allowPrivilegeEscalation: false
-  defaultAllowPrivilegeEscalation: false
-  # Capabilities
-  allowedCapabilities: []
-  defaultAddCapabilities: []
-  requiredDropCapabilities: []
-  # Volumes and File Systems
+  # This is redundant with non-root + disallow privilege escalation,
+  # but we can provide it for defense in depth.
+  requiredDropCapabilities:
+    - ALL
+  # Allow core volume types.
   volumes:
     # Kubernetes Pseudo Volume Types
     - configMap
@@ -101,30 +99,29 @@ spec:
     - glusterfs
     - iscsi
   allowedHostPaths:
-    # Note: We don't allow hostPath volumes above, but set this to a path we
-    # control anyway as a belt+braces protection. /dev/null may be a better
-    # option, but the implications of pointing this towards a device are
-    # unclear.
     - pathPrefix: /opt/kubernetes-hostpath-volumes
-  readOnlyRootFilesystem: false
-  # Users and groups
-  runAsUser:
-    rule: RunAsAny
-  supplementalGroups:
-    rule: RunAsAny
-  fsGroup:
-    rule: RunAsAny
-  # Host namespaces
-  hostPID: false
-  hostIPC: false
   hostNetwork: false
-  hostPorts:
-  - min: 0
-    max: 65535
-  # SELinux
+  hostIPC: false
+  hostPID: false
+  runAsUser:
+    # Require the container to run without root privileges.
+    rule: 'MustRunAsNonRoot'
   seLinux:
-    # SELinux is unsed in CaaSP
+    # This policy assumes the nodes are using AppArmor rather than SELinux.
     rule: 'RunAsAny'
+  supplementalGroups:
+    rule: 'MustRunAs'
+    ranges:
+      # Forbid adding the root group.
+      - min: 1
+        max: 65535
+  fsGroup:
+    rule: 'MustRunAs'
+    ranges:
+      # Forbid adding the root group.
+      - min: 1
+        max: 65535
+  readOnlyRootFilesystem: false
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
