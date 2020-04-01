@@ -1,0 +1,41 @@
+#kind: PersistentVolumeClaim
+#apiVersion: v1
+#metadata:
+#  name: dbench-pv-claim
+#spec:
+#  storageClassName: ssd
+#  # storageClassName: gp2
+#  # storageClassName: local-storage
+#  # storageClassName: ibmc-block-bronze
+#  # storageClassName: ibmc-block-silver
+#  # storageClassName: ibmc-block-gold
+#  accessModes:
+#    - ReadWriteOnce
+#  resources:
+#    requests:
+#      storage: 1000Gi
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: dbench
+spec:
+  template:
+    spec:
+      containers:
+      - name: dbench
+        image: logdna/dbench:latest
+        imagePullPolicy: Always
+        env:
+          - name: DBENCH_MOUNTPOINT
+            value: /tmp
+          - name: DBENCH_QUICK
+            value: "yes"
+          - name: FIO_SIZE
+            value: 2G
+          # - name: FIO_OFFSET_INCREMENT
+          #   value: 256M
+          - name: FIO_DIRECT
+            value: "1"
+      restartPolicy: Never
+  backoffLimit: 4
