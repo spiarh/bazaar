@@ -1,4 +1,6 @@
-FROM r.spiarh.fr/alpine:latest
+ARG REGISTRY
+
+FROM ${REGISTRY}/alpine:latest
 
 LABEL maintainer="_me@spiarh.fr"
 
