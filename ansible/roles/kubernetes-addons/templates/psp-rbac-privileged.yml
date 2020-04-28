@@ -2,37 +2,25 @@
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
-  name: psp.calico
+  name: psp.privileged
   annotations:
     seccomp.security.alpha.kubernetes.io/allowedProfileNames: '*'
     seccomp.security.alpha.kubernetes.io/defaultProfileName: 'runtime/default'
     apparmor.security.beta.kubernetes.io/allowedProfileName: '*'
+    apparmor.security.beta.kubernetes.io/defaultProfileName: 'runtime/default'
 spec:
   privileged: true
   allowPrivilegeEscalation: true
   allowedCapabilities:
-   - NET_ADMIN
-   - SYS_MODULE
+  - '*'
   volumes:
-    - configMap
-    - secret
-    - hostPath
-  allowedHostPaths:
-    - pathPrefix: /etc/cni/net.d
-    - pathPrefix: /lib/modules
-    - pathPrefix: /opt/cni/bin
-    - pathPrefix: /run/xtables.lock
-    - pathPrefix: /usr/libexec/kubernetes/kubelet-plugins/volume/exec/
-    - pathPrefix: /var/lib/calico
-    - pathPrefix: /var/lib/cni/networks
-    - pathPrefix: /var/run/calico
-    - pathPrefix: /var/run/nodeagent
+  - '*'
   hostNetwork: true
   hostPorts:
   - min: 0
     max: 65535
-  hostIPC: false
-  hostPID: false
+  hostIPC: true
+  hostPID: true
   runAsUser:
     rule: 'RunAsAny'
   seLinux:
@@ -45,36 +33,26 @@ spec:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: psp:calico
+  name: psp:privileged
 rules:
   - apiGroups: ['extensions']
     resources: ['podsecuritypolicies']
     verbs: ['use']
-    resourceNames: ['psp.calico']
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: psp:calico
-roleRef:
-  kind: ClusterRole
-  name: psp:calico
-  apiGroup: rbac.authorization.k8s.io
-subjects:
-- kind: ServiceAccount
-  name: calico-node
-  namespace: kube-system
+    resourceNames: ['psp.privileged']
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: psp:calico-kube-controllers
+  name: psp-default:privileged
   namespace: kube-system
 roleRef:
   kind: ClusterRole
-  name: psp:relaxed
+  name: psp:privileged
   apiGroup: rbac.authorization.k8s.io
 subjects:
 - kind: ServiceAccount
-  name: calico-kube-controllers
+  name: kube-proxy
   namespace: kube-system
+- kind: Group
+  apiGroup: rbac.authorization.k8s.io
+  name: system:nodes

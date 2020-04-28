@@ -3,12 +3,21 @@ kubeconfig_admin: "/etc/kubernetes/admin.conf"
 addons_directoy: "/etc/kubernetes/addons"
 
 cni: "cilium"
+#cni: "calico"
+
+flannel:
+  version: "v0.12.0-amd64"
+  cni_conf_name: "10-flannel.conflist"
 
 calico:
-  version: "3.7.3"
+  version: "v3.9.5"
+  cni_conf_name: "10-calico.conflist"
+  mtu: "1420"
 
 cilium:
   version: "latest"
+  cni_conf_name: "05-cilium.conf"
+  mtu: "1420"
   debug: "false"
   prepend_iptables_chains: "false"
   enable_ipv4: "true"
