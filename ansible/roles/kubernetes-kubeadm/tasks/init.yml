@@ -7,13 +7,15 @@
     group: root
     mode: 0440
 
+- include_tasks: kubeadm_reset.yml
+
 - name: run_kubeadm_init
-  command: "kubeadm init --config {{ kubeadm_init_file }} --skip-phases=\"{{ init_skip_phases }}\""
+  command: "kubeadm init --config {{ kubeadm_init_file }} --skip-phases=\"{{ init_skip_phases }}\" -v{{ kubeadm_log_level }}"
   notify: create_init_witness_file
   register: run_kubeadm_init
 
 - debug:
-    var: run_kubeadm_init.stdout_lines
+    var: run_kubeadm_init
 
 - meta: flush_handlers
 

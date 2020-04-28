@@ -22,8 +22,11 @@
   with_items:
     - "{{ kubernetes_pkgs }}"
 
-#- name: start_enable_service_kubelet
-#  service:
-#    name: kubelet
-#    state: started
-#    enabled: True
+- name: add_default_args_kubelet
+  template:
+    src: default_kubelet.j2
+    dest: /etc/default/kubelet
+    owner: root
+    group: root
+    mode: 0644
+  when: kubelet_default_args != ""

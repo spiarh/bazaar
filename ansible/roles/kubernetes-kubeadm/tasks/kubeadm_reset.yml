@@ -1,0 +1,8 @@
+---
+- name: run_kubeadm_reset
+  command: "kubeadm reset --force -v{{ kubeadm_log_level }}"
+  register: run_kubeadm_reset
+
+- debug:
+    var: run_kubeadm_reset
+

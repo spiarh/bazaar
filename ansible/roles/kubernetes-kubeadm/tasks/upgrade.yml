@@ -11,24 +11,22 @@
     mode: 0440
 
 - name: run_kubeadm_upgrade
-  command: "kubeadm upgrade apply -v5 v{{ kubernetes_version }} --yes"
-#  command: /bin/true
-#  notify: create_init_witness_file
+  command: "kubeadm upgrade apply -v{{ kubeadm_log_level }} v{{ kubernetes_version }} --yes"
   register: run_kubeadm_upgrade
   when:
     - inventory_hostname == groups.masters[0]
 
 - name: run_kubeadm_node_upgrade
-  command: "kubeadm upgrade node -v4"
+  command: "kubeadm upgrade node -v{{ kubeadm_log_level }}"
   register: run_kubeadm_node_upgrade
   when:
     - inventory_hostname != groups.masters[0]
 
 - debug:
-    var: run_kubeadm_upgrade.stdout_lines
+    var: run_kubeadm_upgrade
 
 - debug:
-    var: run_kubeadm_node_upgrade.stdout_lines
+    var: run_kubeadm_node_upgrade
 
 - meta: flush_handlers
 

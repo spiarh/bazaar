@@ -3,7 +3,7 @@
   command: "kubeadm reset --force"
   register: run_kubeadm_reset
 
-- debug: var=run_kubeadm_reset.stdout_lines
+- debug: var=run_kubeadm_reset
 
 - name: run_clean_iptables
   shell: "iptables -F && iptables -t nat -F && iptables -t mangle -F && iptables -X"
