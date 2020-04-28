@@ -1,9 +1,15 @@
 ---
-containerd_version: 1.2.6
+containerd_version: 1.3.3
 containerd_pkgs:
-  - name: containerd=1.2.6-0ubuntu1~18.04.2
+  - name: containerd=1.3.3-0ubuntu1~18.04.2
     state: present
 
-disable_apparmor: "false"
-cgroup_manager: "systemd"
+runtime_endpoint: "/run/containerd/containerd.sock"
+image_endpoint: "/run/containerd/containerd.sock"
 no_prometheus: "true"
+disable_apparmor: "false"
+systemd_cgroup: "true"
+
+crictl:
+  debug: "false"
+  timeout: "8"
