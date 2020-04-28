@@ -21,3 +21,6 @@ cgroup_manager: "systemd"
 
 #kubelet_default_args: "--runtime-cgroups=/systemd/system.slice --kubelet-cgroups=/systemd/system.slice"
 kubelet_default_args: ""
+
+kubernetes_common_prereq: True
+kubernetes_common_install: True
