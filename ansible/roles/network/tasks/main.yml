@@ -1,2 +1,65 @@
 ---
-- import_tasks: dummy.yml
+- name: create_dummy_interfaces
+  template:
+    src: netdev.j2
+    dest: "/etc/systemd/network/10-{{ item.name }}.netdev"
+    owner: root
+    group: root
+    mode: 0644
+  with_items: 
+    - "{{ network.dummy }}"
+  vars:
+    kind: dummy
+  when: 
+    - network.dummy is defined
+  notify:
+    - restart_systemd_networkd
+
+
+- name: create_macvlan_interfaces
+  template:
+    src: netdev.j2
+    dest: "/etc/systemd/network/10-{{ item.name }}.netdev"
+    owner: root
+    group: root
+    mode: 0644
+  vars:
+    kind: macvlan
+  with_items: 
+    - "{{ network.macvlan }}"
+  when: 
+    - network.macvlan is defined
+  notify:
+    - restart_systemd_networkd
+
+
+- name: add_netplan_ip_interfaces
+  template:
+    src: network.j2
+    dest: "/etc/systemd/network/10-{{ item.name }}.network"
+    owner: root
+    group: root
+    mode: 0644
+  with_items: 
+    - "{{ network.macvlan }}"
+  when: 
+    - network.macvlan is defined
+  notify:
+    - restart_systemd_networkd
+
+
+- name: add_netplan_ip_interfaces
+  template:
+    src: netplan.yaml.j2
+    dest: "/etc/netplan/10-{{ item.name }}.yaml"
+    owner: root
+    group: root
+    mode: 0644
+  with_items: 
+    - "{{ network.dummy }}"
+    - "{{ network.macvlan }}"
+  when:
+    - (network.dummy is defined) or (network.macvlan is defined)
+    - item.addresses is defined
+  notify:
+    - apply_netplan_configuration
