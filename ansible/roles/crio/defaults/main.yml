@@ -6,4 +6,10 @@ crio_pkgs:
   - name: cri-o-1.15=1.15.3-1~dev~ubuntu18.04~ppa4
     state: present
 
+runtime_endpoint: "/run/crio/crio.sock"
+image_endpoint: "/run/crio/crio.sock"
 cgroup_manager: "systemd"
+
+crictl:
+  debug: "false"
+  timeout: "8"

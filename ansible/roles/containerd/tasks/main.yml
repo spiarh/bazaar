@@ -25,6 +25,14 @@
   notify:
     - restart_containerd
 
+- name: configure_crictl
+  template:
+    src: "crictl.yaml.j2"
+    dest: /etc/crictl.yaml
+    owner: root
+    group: root
+    mode: 0644
+
 - debug:
     msg: "Restart containerd if package is updated"
   notify: restart_containerd
