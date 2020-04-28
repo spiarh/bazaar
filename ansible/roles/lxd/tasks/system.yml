@@ -1,0 +1,30 @@
+---
+- name: set_sysctl_prod
+  template:
+    src: sysctl-98-lxd.conf
+    dest: /etc/sysctl.d/98-lxd.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - reload_sysctl
+
+- name: set_limits_d_prod
+  template:
+    src: limits-lxd.conf
+    dest: /etc/security/limits.d/lxd.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: configure_pam_limits
+  lineinfile:
+    path: /etc/pam.d/common-session
+    regexp: "^session required pam_limits.so$"
+    line: "session required pam_limits.so"
+    state: present
+
+# just to be sure
+- name: run_sysctl_reload
+  command: "sysctl --system"
+  changed_when: false
