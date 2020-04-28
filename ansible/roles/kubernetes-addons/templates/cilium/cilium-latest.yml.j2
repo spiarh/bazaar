@@ -338,6 +338,7 @@ spec:
       containers:
       - args:
         - --config-dir=/tmp/cilium/config-map
+        - --mtu={{ cilium.mtu | default('1500') }}
         command:
         - cilium-agent
         livenessProbe:
@@ -366,6 +367,8 @@ spec:
           successThreshold: 1
           timeoutSeconds: 5
         env:
+        #- name: MTU
+        #  value: "{{ cilium.mtu | default('1500') }}"
         - name: KUBERNETES_SERVICE_HOST
           value: "{{ control_plane_endpoint.split(":")[0] }}"
         - name: KUBERNETES_SERVICE_PORT

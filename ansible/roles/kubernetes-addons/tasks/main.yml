@@ -1,5 +1,5 @@
 ---
-- include_tasks: pre_req.yml
+- include_tasks: prereq.yml
 - include_tasks: addons.yml
   when:
     - inventory_hostname == groups.masters[0]
