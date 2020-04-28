@@ -1,0 +1,6 @@
+---
+- import_tasks: system.yml
+- import_tasks: lxd.yml
+- import_tasks: lxcbr0.yml
+  when:
+    - disable_lxcbr0

@@ -1,0 +1,8 @@
+---
+- name: reload_sysctl
+  command: /sbin/sysctl -p --system
+
+- name: restart_systemd_modules_load
+  service:
+    name: systemd-modules-load
+    state: restarted
