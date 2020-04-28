@@ -41,6 +41,7 @@ PersistentKeepalive = {{ vars['wireguard_external'][conf]['persistent_keepalive'
 {% endif %}
 
 {% for h in groups['all'] %}
+{% if hostvars[h]['wireguard'] is defined %}
 {% for k, v in hostvars[h]['wireguard'].items() %}
 {% if (k == conf.key) and (h != ansible_nodename) %}
 
@@ -60,4 +61,5 @@ PersistentKeepalive = {{ v.persistent_keepalive }}
 
 {%- endif %}
 {% endfor %}
+{% endif %}
 {% endfor -%}
