@@ -48,7 +48,7 @@
     - restart_systemd_networkd
 
 
-- name: add_netplan_ip_interfaces
+- name: add_netplan_dummy_ip_interfaces
   template:
     src: netplan.yaml.j2
     dest: "/etc/netplan/10-{{ item.name }}.yaml"
@@ -57,9 +57,23 @@
     mode: 0644
   with_items: 
     - "{{ network.dummy }}"
+  when:
+    - network.dummy is defined
+    - item.addresses is defined
+  notify:
+    - apply_netplan_configuration
+
+- name: add_netplan_macvlan_ip_interfaces
+  template:
+    src: netplan.yaml.j2
+    dest: "/etc/netplan/10-{{ item.name }}.yaml"
+    owner: root
+    group: root
+    mode: 0644
+  with_items: 
     - "{{ network.macvlan }}"
   when:
-    - (network.dummy is defined) or (network.macvlan is defined)
+    - network.macvlan is defined
     - item.addresses is defined
   notify:
     - apply_netplan_configuration
