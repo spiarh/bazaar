@@ -1,12 +1,11 @@
 ---
-crio_apt_repos:
-  - ppa:projectatomic/ppa
+crio_repo_base: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_"
 
-crio_version: 1.15.3-dev
+crio_version: 1.17.0
 crio_pkgs:
-  - name: cri-o-1.13=1.13.1-1~dev~ubuntu18.04~ppa2
+  - name: cri-o-1.16.0
     state: absent
-  - name: cri-o-1.15=1.15.3-1~dev~ubuntu18.04~ppa4
+  - name: cri-o-1.17.0
     state: present
 
 runtime_endpoint: "/run/crio/crio.sock"
