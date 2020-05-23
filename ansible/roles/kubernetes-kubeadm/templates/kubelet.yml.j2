@@ -1,6 +1,6 @@
 ---
 apiVersion: kubelet.config.k8s.io/v1beta1
 kind: KubeletConfiguration
-address: {{ (ansible_facts[kubelet_listen_interface | replace("-", "_")]['ipv4']['address']) | default(ansible_facts['default_ipv4']['address']) }}
+#address: {{ ansible_facts[kubelet_listen_interface | replace("-", "_")]['ipv4']['address'] | default(ansible_facts['default_ipv4']['address']) }}
 {{ kubelet_extra_configuration_default }}
 {{ kubelet_extra_configuration_kubereserved }}
