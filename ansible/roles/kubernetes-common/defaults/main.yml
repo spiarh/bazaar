@@ -1,10 +1,9 @@
 ---
 # defaults file for kubernetes
-apt_keys:
+k8s_apt_keys:
   - https://packages.cloud.google.com/apt/doc/apt-key.gpg
 
-apt_repos:
-  - ppa:projectatomic/ppa
+k8s_apt_repos:
   - "deb https://apt.kubernetes.io/ kubernetes-xenial main"
 
 kubernetes_pkgs:

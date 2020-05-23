@@ -5,14 +5,14 @@
     url: "{{ item }}"
     state: present
   with_items:
-    - "{{ apt_keys }}"
+    - "{{ k8s_apt_keys }}"
 
 - name: add_apt_repos
   apt_repository:
     repo: "{{ item }}"
     state: present
   with_items:
-    - "{{ apt_repos }}"
+    - "{{ k8s_apt_repos }}"
 
 - name: install_packages
   apt:
