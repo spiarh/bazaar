@@ -1,11 +1,9 @@
 ---
-#- name: install_packages
-#  apt:
-#    name: "{{ item.name }}"
-#    state: "{{ item.state }}"
-#    update_cache: true
-#  with_items:
-#    - "{{ lxd_pkgs }}"
+- name: install_snap_package
+  snap:
+    name: lxd
+    state: present
+    channel: latest/stable
 
 - name: create_lxd_config
   template:
@@ -16,12 +14,11 @@
     mode: 0400
 
 - name: configure_lxd
-#  shell: "lxd init --preseed < {{ lxd_config_path }}"
   shell: "/snap/bin/lxd init --preseed < {{ lxd_config_path }}"
   changed_when: false
 
-#- name: start_enable_service_lxd
-#  service:
-#    name: lxd
-#    state: started
-#    enabled: true
+- name: start_enable_service_lxd
+  service:
+    name: snap.lxd.daemon.service
+    state: started
+    enabled: true
