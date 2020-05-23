@@ -1,12 +1,5 @@
 ---
-lxd_pkgs:
-  - name: lxd
-    state: present
-  - name: lxd-client
-    state: present
-
-#lxd_config_path: /var/lib/lxd/lxd-config-full.yaml
-lxd_config_path: /tmp/lxd-config-full.yaml
+lxd_config_path: /var/snap/lxd/lxd-config-full.yaml
 
 # Daemon settings
 lxc_config: {}
@@ -16,7 +9,7 @@ lxc_storage_pools:
   - name: default
     driver: dir
     config:     
-      source: /var/lib/lxd/storage-pools/default
+      source: /var/snap/lxd/common/lxd/storage-pools/default
   
 # Network devices
 lxc_networks:
@@ -41,39 +34,5 @@ lxc_profiles: |
         path: /
         pool: default
         type: disk          
-  - name: k8s
-    description: "Kubernetes Nodes profile"
-    config:
-      boot.autostart: "true"
-      limits.memory.swap: "false"
-      linux.kernel_modules: ip_tables,ip6_tables,netlink_diag,nf_nat,overlay,br_netfilter,vxlan,cls_bpf,xt_bpf,bpfilter
-      raw.lxc: |-
-        lxc.apparmor.profile=unconfined
-        lxc.cap.drop=
-        lxc.cgroup.devices.allow=a
-        lxc.mount.auto=proc:rw sys:rw cgroup:rw
-        lxc.mount.entry = /sys/fs/bpf sys/fs/bpf none bind,rslave 0 0
-        lxc.mount.entry = /boot boot none bind,rslave 0 0
-      security.nesting: "true"
-      security.privileged: "true"
-    devices:
-      aadisable:
-        path: /dev/kmsg
-        source: /dev/kmsg
-        type: unix-char
-      root:
-        path: /
-        pool: default
-        type: disk
-      lib-modules:
-        path: /lib/modules
-        readonly: "true"
-        source: /lib/modules
-        type: disk
-      linux-headers:
-        path: /usr/src
-        readonly: "true"
-        source: /usr/src
-        type: disk
 
-disable_lxcbr0: true
+disable_lxcbr0: false
