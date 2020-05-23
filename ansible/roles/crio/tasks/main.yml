@@ -1,4 +1,11 @@
 ---
+- name: add_apt_repos
+  apt_repository:
+    repo: "{{ item }}"
+    state: present
+  with_items:
+    - "{{ crio_apt_repos }}"
+
 - name: install_packages
   apt:
     name: "{{ item.name }}"

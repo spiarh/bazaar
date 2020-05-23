@@ -1,4 +1,7 @@
 ---
+crio_apt_repos:
+  - ppa:projectatomic/ppa
+
 crio_version: 1.15.3-dev
 crio_pkgs:
   - name: cri-o-1.13=1.13.1-1~dev~ubuntu18.04~ppa2
