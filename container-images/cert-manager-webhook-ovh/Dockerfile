@@ -17,6 +17,6 @@ RUN apk add --no-cache ca-certificates
 
 COPY --from=builder /go/bin/webhook /usr/local/bin/webhook
 
-USER regular
+#USER regular
 
 ENTRYPOINT ["/usr/local/bin/webhook"]
