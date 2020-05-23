@@ -2,25 +2,30 @@
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
-  name: psp.privileged
+  name: psp.kube-proxy
   annotations:
     seccomp.security.alpha.kubernetes.io/allowedProfileNames: '*'
     seccomp.security.alpha.kubernetes.io/defaultProfileName: 'runtime/default'
     apparmor.security.beta.kubernetes.io/allowedProfileName: '*'
-    apparmor.security.beta.kubernetes.io/defaultProfileName: 'runtime/default'
 spec:
   privileged: true
   allowPrivilegeEscalation: true
   allowedCapabilities:
-  - '*'
+   - NET_ADMIN
+   - SYS_MODULE
   volumes:
-  - '*'
+    - configMap
+    - secret
+    - hostPath
+  allowedHostPaths:
+    - pathPrefix: /lib/modules
+    - pathPrefix: /run/xtables.lock
   hostNetwork: true
   hostPorts:
   - min: 0
     max: 65535
-  hostIPC: true
-  hostPID: true
+  hostIPC: false
+  hostPID: false
   runAsUser:
     rule: 'RunAsAny'
   seLinux:
@@ -33,23 +38,22 @@ spec:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: psp:privileged
+  name: psp:kube-proxy
 rules:
   - apiGroups: ['extensions']
     resources: ['podsecuritypolicies']
     verbs: ['use']
-    resourceNames: ['psp.privileged']
+    resourceNames: ['psp.kube-proxy']
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: ClusterRoleBinding
 metadata:
-  name: psp-default:privileged
-  namespace: kube-system
+  name: psp:kube-proxy
 roleRef:
   kind: ClusterRole
-  name: psp:privileged
+  name: psp:kube-proxy
   apiGroup: rbac.authorization.k8s.io
 subjects:
-- kind: Group
-  apiGroup: rbac.authorization.k8s.io
-  name: system:nodes
+- kind: ServiceAccount
+  name: kube-proxy
+  namespace: kube-system
