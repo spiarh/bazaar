@@ -8,6 +8,8 @@
     mode: 0440
 
 - include_tasks: kubeadm_reset.yml
+# reimport cert wipe by kubeadm reset...
+- import_tasks: certs.yml
 
 - name: run_kubeadm_join
   command: "kubeadm join --config {{ kubeadm_join_file }}  --skip-phases=\"{{ join_skip_phases }}\" -v{{ kubeadm_log_level }}"
