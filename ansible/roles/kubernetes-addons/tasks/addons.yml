@@ -21,6 +21,7 @@
     - {src: "psp-rbac-privileged.yml", dest: "psp-rbac-privileged.yml"}
     - {src: "psp-rbac-relaxed.yml", dest: "psp-rbac-relaxed.yml"}
     - {src: "psp-rbac-restricted.yml", dest: "psp-rbac-restricted.yml"}
+    - {src: "psp-rbac-kube-proxy.yml", dest: "psp-rbac-kube-proxy.yml"}
     - {src: "{{ cni }}/{{ cni }}-{{ vars[cni]['version'] }}.yml.j2", dest: "{{ cni }}-{{ vars[cni]['version'] }}.yml"}
     - {src: "{{ cni }}/psp-rbac.yml", dest: "psp-rbac-{{ cni }}.yml"}
 
@@ -30,6 +31,7 @@
     - psp-rbac-privileged.yml
     - psp-rbac-relaxed.yml
     - psp-rbac-restricted.yml
+    - psp-rbac-kube-proxy.yml
     - "{{ cni }}-{{ vars[cni]['version'] }}.yml"
     - "psp-rbac-{{ cni }}.yml"
   register: addons_manifests_applied
