@@ -219,15 +219,17 @@ init_control_plane() {
 }
 
 get_ip_nodename() {
-  if [[ -z "NODE_NAME" ]]; then
-    NODE_NAME="$(echo $1|awk -F":" '{ print $1 }')"
+  if [[ -z "$NODE_NAME" ]]; then
+    NODE_NAME="$(echo "$1"|awk -F":" '{ print $1 }')"
   fi
-  if [[ -z "NODE_IP" ]]; then
-    NODE_IP="$(echo $1|awk -F":" '{ print $2 }')"
+  if [[ -z "$NODE_IP" ]]; then
+    NODE_IP="$(echo "$1"|awk -F":" '{ print $2 }')"
   fi
 }
 
 deploy_masters() {
+local i=0
+
 for n in $1; do
     get_ip_nodename "$n"
     if [[ $i -eq 0 ]]; then
@@ -239,6 +241,8 @@ for n in $1; do
       log "Boostrapping other master nodes, $n"
       skuba node join --role master --user sles --sudo --target  "$NODE_IP" "$NODE_NAME" -v "$LOG_LEVEL"
     fi
+
+   ((++i))
 done
 }
 
