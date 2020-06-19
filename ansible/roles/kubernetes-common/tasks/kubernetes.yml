@@ -19,6 +19,15 @@
     name: "{{ item.name }}"
     state: "{{ item.state }}"
     update_cache: yes
+    dpkg_options: "force-confold,force-confdef,force-hold"
+    force: yes
+  with_items:
+    - "{{ kubernetes_pkgs }}"
+
+- name: apt_mark_packages_hold
+  dpkg_selections:
+    name: "{{ item.name.split('=')[0] }}"
+    selection: hold
   with_items:
     - "{{ kubernetes_pkgs }}"
 

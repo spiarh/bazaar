@@ -3,9 +3,18 @@
   apt:
     name: "{{ item.name }}"
     state: "{{ item.state }}"
+    dpkg_options: "force-confold,force-confdef,force-hold"
+    force: yes
   with_items:
     - "{{ containerd_pkgs }}"
-  register: containerd_pkgs
+  register: containerd_pkgs_install
+
+- name: apt_mark_packages_hold
+  dpkg_selections:
+    name: "{{ item.name.split('=')[0] }}"
+    selection: hold
+  with_items:
+    - "{{ containerd_pkgs }}"
 
 - name: create_containerd_dir
   file:
@@ -36,7 +45,7 @@
 - debug:
     msg: "Restart containerd if package is updated"
   notify: restart_containerd
-  when: containerd_pkgs.changed
+  when: containerd_pkgs_install.changed
 
 - name: start_enable_service_containerd
   service:
