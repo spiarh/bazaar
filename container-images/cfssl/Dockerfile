@@ -4,6 +4,8 @@ LABEL maintainer="_me@spiarh.fr"
 
 RUN apk add --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/testing cfssl
 
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+
 WORKDIR /app
 
-USER regular
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
