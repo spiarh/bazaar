@@ -2,7 +2,9 @@ FROM docker.io/spiarh/alpine:latest
 
 RUN addgroup -g 2211 -S haproxy && adduser -u 2211 -s /bin/false -S -D -G haproxy haproxy
 
-RUN apk add --no-cache haproxy
+# allow bind on ports below 1024
+RUN apk add --no-cache haproxy libcap && \
+    setcap CAP_NET_BIND_SERVICE=+ep /usr/sbin/haproxy
 
 RUN mkdir -p /run/haproxy && \
     touch /run/haproxy/haproxy.pid && \

@@ -12,7 +12,17 @@ init_dbus() {
     sleep 1
 }
 
-init_dbus
+if [ "${1#-}" != "$1" ]; then
+    echo ">>> Starting Ganesha-NFS"
+    init_dbus
+    set -- ganesha.nfsd "$@"
+fi
 
-echo ">>> Starting Ganesha-NFS"
-exec /usr/bin/ganesha.nfsd -F -L /dev/stdout -f /etc/ganesha/ganesha.conf
+if [ "$1" = "ganesha.nfsd" ]; then
+    echo ">>> Starting Ganesha-NFS"
+    init_dbus
+    shift
+    set -- ganesha.nfsd "$@"
+fi
+
+exec "$@"

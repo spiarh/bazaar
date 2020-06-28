@@ -1,4 +1,4 @@
-ARG VERSION=3.11.4
+ARG VERSION=3.12.0
 
 FROM scratch
 
