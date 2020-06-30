@@ -14,8 +14,10 @@ LABEL maintainer="_me@spiarh.fr"
 
 COPY --from=builder /go/bin/gopass /usr/local/bin/gopass
 
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+
 RUN apk add --no-cache gnupg
 
 WORKDIR /root
 
-ENTRYPOINT ["/usr/local/bin/gopass"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
