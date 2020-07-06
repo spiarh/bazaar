@@ -6,10 +6,10 @@ set -o nounset
 # Constants
 HOSTNAME="$(hostname -s)"
 AUTH_SKIP_TLS="${AUTH_SKIP_TLS:-false}"
-AUTH_SKIP_TLS_FLAG=""
-if [ "${AUTH_SKIP_TLS}" = "true" ]; then AUTH_SKIP_TLS_FLAG="--insecure-skip-tls-verify"; fi
-AUTH_OPTIONS="--user root:$ETCD_ROOT_PASSWORD $AUTH_SKIP_TLS_FLAG"
-ETCDCTL="etcdctl $AUTH_OPTIONS"
+ETCDCTL_FLAGS=""
+if [ "${AUTH_SKIP_TLS}" = "true" ]; then ETCDCTL_FLAGS="$ETCDCTL_FLAGS --insecure-skip-tls-verify"; fi
+if [ -n "${ETCD_ROOT_PASSWORD:-}" ]; then ETCDCTL_FLAGS="$ETCDCTL_FLAGS --user root:$ETCD_ROOT_PASSWORD"; fi
+ETCDCTL="etcdctl $ETCDCTL_FLAGS"
 ETCD_MEMBER_ID_FILE="$ETCD_DATA_DIR/member_id"
 ETCD_NEW_MEMBERS_ENVS_FILE="$ETCD_DATA_DIR/new_member_envs"
 ETCD_MEMBER_REMOVAL_LOG="$(dirname "$ETCD_DATA_DIR")/member_removal.log"
@@ -19,7 +19,7 @@ ETCD_MEMBERS_COUNT="$(echo "$ETCD_ENDPOINTS_LIST" | wc -w)"
 export ROOT_PASSWORD="${ETCD_ROOT_PASSWORD:-}"
 if [ -n "${ETCD_ROOT_PASSWORD:-}" ]; then  unset ETCD_ROOT_PASSWORD; fi
 
-log() { (>&2 echo ">>> [setup.sh] $*"); }
+log() { (>&2 echo ">>> [entrypoint.sh] $*"); }
 
 # Store member id for later member replacement
 store_member_id() {
@@ -32,11 +32,13 @@ store_member_id() {
 configure_rbac() {
     # Only configure RBAC on the first pod
     if [ -n "${ROOT_PASSWORD:-}" ] && [ "$HOSTNAME" = "etcd-0" ]; then
-        log "Configuring RBAC authentication!"
+        log "Configuring RBAC authentication"
         etcd &
         ETCD_PID=$!
         while ! $ETCDCTL member list; do sleep 1; done
+        log "Configuring root password"
         echo "$ROOT_PASSWORD" | $ETCDCTL user add root --interactive=false
+        log "Enabling auth"
         $ETCDCTL auth enable
         kill "$ETCD_PID"
         sleep 5
@@ -69,7 +71,7 @@ delete_etcd_data_dir() {
 # Check wether the member was succesfully removed from the cluster
 should_add_new_member() {
     return_value=1
-    if grep -qE "^Member[[:space:]]+[a-z0-9]+\s+removed\s+from\s+cluster\s+[a-z0-9]+$" "$ETCD_MEMBER_REMOVAL_LOG"; then
+    if grep -qE "^Member[[:space:]]+[a-z0-9]+\s+removed\s+from\s+cluster\s+[a-z0-9]+$" "$ETCD_MEMBER_REMOVAL_LOG" > /dev/null 2>&1; then
         delete_etcd_data_dir && return_value=0    
     fi
 
@@ -84,21 +86,20 @@ should_add_new_member() {
 if [ ! -d "$ETCD_DATA_DIR" ]; then
     log "Creating data dir..."
     mkdir -vp "$ETCD_DATA_DIR"
-    log "There is no data at all. Initializing a new member of the cluster..."
     store_member_id &
     configure_rbac
 else
-    log "Detected data from previous deployments..."
+    log "Detected data from previous deployments"
     is_disastrous_failure
     if should_add_new_member; then
-        log "Adding new member to existing cluster..."
+        log "Adding new member to existing cluster"
         $ETCDCTL member add "$HOSTNAME" --peer-urls="https://${HOSTNAME}.etcd-headless.prod.svc.cluster.local:2380" | grep "^ETCD_" > "$ETCD_NEW_MEMBERS_ENVS_FILE"
-        log "Loading env vars of existing cluster..."
+        log "Loading env vars of existing cluster"
         # shellcheck source=/dev/null
         set -a && . "$ETCD_NEW_MEMBERS_ENVS_FILE" && set +a
         store_member_id &
     else
-        log "Updating member in existing cluster..."
+        log "Updating member in existing cluster"
         $ETCDCTL member update "$(cat "$ETCD_MEMBER_ID_FILE")" --peer-urls="https://${HOSTNAME}.etcd-headless.prod.svc.cluster.local:2380"
     fi
 fi
