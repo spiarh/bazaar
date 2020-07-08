@@ -25,6 +25,6 @@ RUN set -ex && \
 RUN apk add --no-cache \
     busybox-extras mariadb-client \
     openssl openssh etcd-ctl \
-    file jq util-linux vim
+    file git jq util-linux vim
 
 ENTRYPOINT ["bash", "-l"]
