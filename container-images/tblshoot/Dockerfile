@@ -27,4 +27,4 @@ RUN apk add --no-cache \
     openssl openssh etcd-ctl \
     file jq util-linux vim
 
-CMD ["bash", "-l"]
+ENTRYPOINT ["bash", "-l"]
