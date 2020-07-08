@@ -17,7 +17,7 @@ RUN set -ex && \
     libc6-compat liboping \
     mtr \
     net-snmp-tools netcat-openbsd nftables \
-    ngrep nmap nmap-nping \
+    ngrep nmap nmap-nping nmap-scripts \
     scapy socat strace \
     tcpdump tcptraceroute
 
