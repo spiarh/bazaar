@@ -11,7 +11,6 @@ if [ "${AUTH_SKIP_TLS}" = "true" ]; then ETCDCTL_FLAGS="$ETCDCTL_FLAGS --insecur
 if [ -n "${ETCD_ROOT_PASSWORD:-}" ]; then ETCDCTL_FLAGS="$ETCDCTL_FLAGS --user root:$ETCD_ROOT_PASSWORD"; fi
 ETCDCTL="etcdctl $ETCDCTL_FLAGS"
 ETCD_MEMBER_ID_FILE="$ETCD_DATA_DIR/member_id"
-ETCD_NEW_MEMBERS_ENVS_FILE="$ETCD_DATA_DIR/new_member_envs"
 ETCD_MEMBER_REMOVAL_LOG="$(dirname "$ETCD_DATA_DIR")/member_removal.log"
 ETCD_ENDPOINTS_LIST="$(echo "$ETCDCTL_ENDPOINTS" | sed 's/,/ /g')"
 ETCD_MEMBERS_COUNT="$(echo "$ETCD_ENDPOINTS_LIST" | wc -w)"
@@ -19,7 +18,7 @@ ETCD_MEMBERS_COUNT="$(echo "$ETCD_ENDPOINTS_LIST" | wc -w)"
 export ROOT_PASSWORD="${ETCD_ROOT_PASSWORD:-}"
 if [ -n "${ETCD_ROOT_PASSWORD:-}" ]; then  unset ETCD_ROOT_PASSWORD; fi
 
-log() { (>&2 echo ">>> [entrypoint.sh] $*"); }
+log() { (>&2 printf "\n>>> [entrypoint.sh] %s" "$*"); }
 
 # Store member id for later member replacement
 store_member_id() {
@@ -85,23 +84,12 @@ should_add_new_member() {
 
 if [ ! -d "$ETCD_DATA_DIR" ]; then
     log "Creating data dir..."
-    mkdir -vp "$ETCD_DATA_DIR"
+    mkdir -vp "$ETCD_DATA_DIR" && chmod 700 "$ETCD_DATA_DIR"
     store_member_id &
     configure_rbac
 else
     log "Detected data from previous deployments"
     is_disastrous_failure
-    if should_add_new_member; then
-        log "Adding new member to existing cluster"
-        $ETCDCTL member add "$HOSTNAME" --peer-urls="https://${HOSTNAME}.etcd-headless.prod.svc.cluster.local:2380" | grep "^ETCD_" > "$ETCD_NEW_MEMBERS_ENVS_FILE"
-        log "Loading env vars of existing cluster"
-        # shellcheck source=/dev/null
-        set -a && . "$ETCD_NEW_MEMBERS_ENVS_FILE" && set +a
-        store_member_id &
-    else
-        log "Updating member in existing cluster"
-        $ETCDCTL member update "$(cat "$ETCD_MEMBER_ID_FILE")" --peer-urls="https://${HOSTNAME}.etcd-headless.prod.svc.cluster.local:2380"
-    fi
 fi
 # shellcheck disable=SC2086
 exec etcd $ETCD_FLAGS
