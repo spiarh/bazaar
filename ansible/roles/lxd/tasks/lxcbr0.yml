@@ -1,0 +1,18 @@
+---
+- name: disable_lxcbr0
+  lineinfile:
+    path: /etc/default/lxc-net
+    regexp: '^USE_LXC_BRIDGE="true"'
+    line: 'USE_LXC_BRIDGE="false"'
+    state: present
+
+- name: test_lxcbr0_exists
+  shell: "ip link show lxcbr0"
+  ignore_errors: true
+  changed_when: lxcbr0_exists.rc == 0
+  register: lxcbr0_exists
+
+- name: del_lxcbr0
+  shell: "ip link set lxcbr0 down && ip link del lxcbr0"
+  when:
+    - lxcbr0_exists.rc == 0

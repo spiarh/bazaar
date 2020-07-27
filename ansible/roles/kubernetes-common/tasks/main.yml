@@ -1,6 +1,10 @@
 ---
 # tasks file for kubernetes
-- import_tasks: kubernetes.yml
-- import_tasks: kubelet.yml
 - import_tasks: swap.yml
+  when: kubernetes_common_prereq
+
 - import_tasks: system.yml
+  when: kubernetes_common_prereq
+
+- import_tasks: kubernetes.yml
+  when: kubernetes_common_install

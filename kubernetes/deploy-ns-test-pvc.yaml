@@ -38,9 +38,9 @@ spec:
       - name: busybox-test-pvc
         image: busybox:latest
         command:
-        - sh
-        - -c
-        - 'sleep 6000'
+          - tail
+          - -f
+          - /dev/null
         volumeMounts:
         - mountPath: /test
           name: busybox-test-pvc

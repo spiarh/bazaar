@@ -1,11 +1,8 @@
 ---
-# defaults file for podman
-podman_apt_keys:
-  - https://packages.cloud.google.com/apt/doc/apt-key.gpg
+podman_repo_base: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_"
 
-podman_apt_repos:
-  - ppa:projectatomic/ppa
-  - "deb https://apt.kubernetes.io/ kubernetes-xenial main"
+kubernetes_apt_key: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+kubernetes_apt_repo: "deb https://apt.kubernetes.io/ kubernetes-xenial main"
 
 podman_pkgs:
   - name: podman

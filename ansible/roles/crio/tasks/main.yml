@@ -1,4 +1,19 @@
 ---
+- set_fact:
+    crio_apt_key: "{{ crio_repo_base }}{{ ansible_facts['lsb']['release'] }}/Release.key"
+    crio_apt_repo: "deb {{ crio_repo_base }}{{ ansible_facts['lsb']['release'] }} /"
+    cacheable: yes
+
+- name: crio_add_apt_keys
+  apt_key:
+    url: "{{ crio_apt_key }}"
+    state: present
+
+- name: add_apt_repos
+  apt_repository:
+    repo: "{{ crio_apt_repo }}"
+    state: present
+
 - name: install_packages
   apt:
     name: "{{ item.name }}"
@@ -16,6 +31,14 @@
     mode: 0644
   notify:
     - restart_crio
+
+- name: configure_crictl
+  template:
+    src: "crictl.yaml.j2"
+    dest: /etc/crictl.yaml
+    owner: root
+    group: root
+    mode: 0644
 
 - debug:
     msg: "Restart crio if package is updated"

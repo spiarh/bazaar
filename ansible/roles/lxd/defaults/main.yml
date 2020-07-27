@@ -1,0 +1,38 @@
+---
+lxd_config_path: /var/snap/lxd/lxd-config-full.yaml
+
+# Daemon settings
+lxc_config: {}
+  
+# Storage pools
+lxc_storage_pools:
+  - name: default
+    driver: dir
+    config:     
+      source: /var/snap/lxd/common/lxd/storage-pools/default
+  
+# Network devices
+lxc_networks:
+  - name: lxdbr0
+    type: bridge
+    config:
+      ipv4.address: 10.144.158.1/24
+      ipv4.nat: "true"
+      ipv6.address: none
+
+# Profiles - Must be defined in string block
+lxc_profiles: |
+  - name: default
+    description: "Default profile"
+    devices:
+      eth0:
+        name: eth0
+        nictype: bridged
+        parent: lxdbr0
+        type: nic
+      root:
+        path: /
+        pool: default
+        type: disk          
+
+disable_lxcbr0: false

@@ -5,25 +5,37 @@
     url: "{{ item }}"
     state: present
   with_items:
-    - "{{ apt_keys }}"
+    - "{{ k8s_apt_keys }}"
 
 - name: add_apt_repos
   apt_repository:
     repo: "{{ item }}"
     state: present
   with_items:
-    - "{{ apt_repos }}"
+    - "{{ k8s_apt_repos }}"
 
 - name: install_packages
   apt:
     name: "{{ item.name }}"
     state: "{{ item.state }}"
     update_cache: yes
+    dpkg_options: "force-confold,force-confdef,force-hold"
+    force: yes
   with_items:
     - "{{ kubernetes_pkgs }}"
 
-#- name: start_enable_service_kubelet
-#  service:
-#    name: kubelet
-#    state: started
-#    enabled: True
+- name: apt_mark_packages_hold
+  dpkg_selections:
+    name: "{{ item.name.split('=')[0] }}"
+    selection: hold
+  with_items:
+    - "{{ kubernetes_pkgs }}"
+
+- name: add_default_args_kubelet
+  template:
+    src: default_kubelet.j2
+    dest: /etc/default/kubelet
+    owner: root
+    group: root
+    mode: 0644
+  when: kubelet_default_args != ""

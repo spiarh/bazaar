@@ -1,6 +1,6 @@
 FROM scratch
 
-ARG VERSION=3.11.4
+ARG VERSION=3.12.0
 
 LABEL maintainer="_me@spiarh.fr"
 

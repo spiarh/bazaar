@@ -1,13 +1,80 @@
 ---
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: psp.calico
+  annotations:
+    seccomp.security.alpha.kubernetes.io/allowedProfileNames: '*'
+    seccomp.security.alpha.kubernetes.io/defaultProfileName: 'runtime/default'
+    apparmor.security.beta.kubernetes.io/allowedProfileName: '*'
+spec:
+  privileged: true
+  allowPrivilegeEscalation: true
+  allowedCapabilities:
+   - NET_ADMIN
+   - SYS_MODULE
+  volumes:
+    - configMap
+    - secret
+    - hostPath
+  allowedHostPaths:
+    - pathPrefix: /etc/cni/net.d
+    - pathPrefix: /lib/modules
+    - pathPrefix: /opt/cni/bin
+    - pathPrefix: /run/xtables.lock
+    - pathPrefix: /usr/libexec/kubernetes/kubelet-plugins/volume/exec/
+    - pathPrefix: /var/lib/calico
+    - pathPrefix: /var/lib/cni/networks
+    - pathPrefix: /var/run/calico
+    - pathPrefix: /var/run/nodeagent
+  hostNetwork: true
+  hostPorts:
+  - min: 0
+    max: 65535
+  hostIPC: false
+  hostPID: false
+  runAsUser:
+    rule: 'RunAsAny'
+  seLinux:
+    rule: 'RunAsAny'
+  supplementalGroups:
+    rule: 'RunAsAny'
+  fsGroup:
+    rule: 'RunAsAny'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: psp:calico
+rules:
+  - apiGroups: ['extensions']
+    resources: ['podsecuritypolicies']
+    verbs: ['use']
+    resourceNames: ['psp.calico']
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: psp:kube-system:calico
+  name: psp:calico
 roleRef:
   kind: ClusterRole
-  name: psp:privileged
+  name: psp:calico
   apiGroup: rbac.authorization.k8s.io
 subjects:
 - kind: ServiceAccount
   name: calico-node
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: psp:calico-kube-controllers
+  namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: psp:relaxed
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- kind: ServiceAccount
+  name: calico-kube-controllers
   namespace: kube-system
