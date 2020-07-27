@@ -1,6 +1,6 @@
-ARG VERSION=2.7.1
-
 FROM golang:1.14-alpine AS builder
+
+ARG VERSION=2.7.1
 
 ENV GOPATH=/go
 ENV GO_REGISTRY=src/github.com/docker
@@ -26,7 +26,7 @@ COPY --from=builder /go/bin/registry /usr/local/bin/registry
 
 EXPOSE 5000
 
-USER nobody
+USER 1871
 
 ENTRYPOINT ["/usr/local/bin/registry"]
 

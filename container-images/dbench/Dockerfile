@@ -2,7 +2,7 @@ FROM r.spiarh.fr/fio:latest
 
 LABEL maintainer="_me@spiarh.fr"
 
-RUN apk add --no-cache ioping 
+RUN apk add --no-cache ioping
 
 VOLUME /tmp
 WORKDIR /tmp
