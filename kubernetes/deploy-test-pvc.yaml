@@ -33,9 +33,9 @@ spec:
       - name: alpine-test-pvc
         image: alpine:latest
         command:
-        - sh
-        - -c
-        - 'sleep 6000'
+          - tail
+          - -f
+          - /dev/null
         volumeMounts:
         - mountPath: /test
           name: alpine-test-pvc

@@ -6,7 +6,7 @@ metadata:
   labels:
     app: tblshoot
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: tblshoot
@@ -17,16 +17,17 @@ spec:
     spec:
       containers:
       - name: tblshoot
-        image: r.spiarh.fr/tblshoot:latest
+        image: docker.io/spiarh/tblshoot-large:latest
         imagePullPolicy: IfNotPresent
-        args:
-        - sleep
-        - "60000"
-        resources:
-          requests:
-            cpu: 100m
-            memory: 100Mi
-          limits:
-            cpu: 200m
-            memory: 200Mi
+        command:
+          - tail
+          - -f
+          - /dev/null
+        #resources:
+        #  requests:
+        #    cpu: 100m
+        #    memory: 100Mi
+        #  limits:
+        #    cpu: 2000m
+        #    memory: 2048Mi
       terminationGracePeriodSeconds: 0

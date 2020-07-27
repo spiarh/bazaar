@@ -17,7 +17,12 @@ spec:
   containers:
   - name: cephfs-rw
     image: alpine
-    command: ['sh', '-c', 'sleep 6000']
+    command:
+      - sh
+      - -c
+      - tail
+      - -f
+      - /dev/null
     volumeMounts:
     - mountPath: "/mnt/cephfs"
       name: cephfs

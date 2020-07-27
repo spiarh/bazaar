@@ -1,0 +1,80 @@
+node 1: hpc10s33-ops-01 \
+	attributes standby=on maintenance=on
+node 2: hpc10s34-ops-02 \
+	attributes standby=on maintenance=on
+node 3: hpa12s22-ops-03 \
+	attributes standby=on maintenance=on
+primitive p_dlm ocf:pacemaker:controld \
+	op monitor interval=60 timeout=60
+primitive p_drbd-r0 ocf:linbit:drbd \
+	params drbd_resource=r0 \
+	op start interval=0 timeout=240 \
+	op stop interval=0 timeout=100 \
+	op monitor interval=20 role=Master timeout=20 \
+	op monitor interval=30 role=Slave timeout=20
+primitive p_ocfs2 Filesystem \
+	params device="/dev/drbd/by-res/r0/0" directory="/data/drbd" fstype=ocfs2 options=acl \
+	op monitor interval=20 timeout=40 \
+	op start timeout=60 interval=0 \
+	op stop timeout=60 interval=0
+primitive p_stonith-sbd stonith:external/sbd \
+	params pcmk_delay_max=40 \
+	meta target-role=Stopped
+primitive p_vip-01-br0 IPaddr2 \
+	params ip=10.84.43.11 cidr_netmask=28 nic=br0 \
+	op start interval=0 timeout=60 \
+	op monitor interval=5 timeout=20 \
+	op stop interval=0 timeout=60 \
+	meta target-role=Stopped
+primitive p_vip-01-brvlan806 IPaddr2 \
+	params ip=10.84.44.11 cidr_netmask=23 nic=brvlan806 \
+	op start interval=0 timeout=60 \
+	op monitor interval=5 timeout=20 \
+	op stop interval=0 timeout=60 \
+	meta target-role=Stopped
+primitive p_vip-02-br0 IPaddr2 \
+	params ip=10.84.43.12 cidr_netmask=28 nic=br0 \
+	op start interval=0 timeout=60 \
+	op monitor interval=5 timeout=20 \
+	op stop interval=0 timeout=60 \
+	meta target-role=Stopped
+primitive p_vip-03-br0 IPaddr2 \
+	params ip=10.84.43.13 cidr_netmask=28 nic=br0 \
+	op start interval=0 timeout=60 \
+	op monitor interval=5 timeout=20 \
+	op stop interval=0 timeout=60 \
+	meta target-role=Stopped
+ms ms_drbd-r0 p_drbd-r0 \
+	meta resource-stickiness=100 notify=true master-max=2 clone-max=2 notify=true target-role=Stopped
+clone cl_p_dlm p_dlm \
+	params clone-max=2 clone-node-max=1 \
+	meta interleave=true target-role=Stopped
+clone cl_p_ocfs2 p_ocfs2 \
+	meta interleave=true target-role=Stopped
+colocation c_cl_p_ocfs2 inf: cl_p_ocfs2 ms_drbd-r0:Master
+location l_ops-03_no-cl_p_dlm cl_p_dlm -inf: hpa12s22-ops-03
+location l_ops-03_no-cl_p_ocfs2 cl_p_ocfs2 -inf: hpa12s22-ops-03
+location l_ops-03_no-ms_drbd-r0 ms_drbd-r0 -inf: hpa12s22-ops-03
+location l_ops-03_no-p_stonith-sbd p_stonith-sbd -inf: hpa12s22-ops-03
+location l_p_vip-01-br0 p_vip-01-br0 50: hpc10s34-ops-02
+location l_p_vip-01-brvlan806 p_vip-01-brvlan806 50: hpc10s34-ops-02
+location l_p_vip-02-br0 p_vip-02-br0 50: hpc10s34-ops-02
+location l_p_vip-03-br0 p_vip-03-br0 50: hpc10s34-ops-02
+order o_drbd-r0_ocfs2 Serialize: ms_drbd-r0:promote cl_p_ocfs2:start
+property cib-bootstrap-options: \
+	have-watchdog=false \
+	cluster-infrastructure=corosync \
+	cluster-name=opscluster \
+	stonith-enabled=true \
+	placement-strategy=balanced \
+	stonith-watchdog-timeout=0 \
+	dc-version="2.0.1+20190417.13d370ca9-3.6.1-2.0.1+20190417.13d370ca9" \
+	stonith-timeout=60s \
+	no-quorum-policy=ignore \
+	last-lrm-refresh=1568982907
+rsc_defaults rsc-options: \
+	resource-stickiness=1 \
+	migration-threshold=3
+op_defaults op-options: \
+	timeout=600 \
+	record-pending=true

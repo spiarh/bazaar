@@ -24,10 +24,15 @@ PostDown = {{ conf.value.post_down }}
 {% if conf.value.external is defined %}
 {% for conf in conf.value.external %}
 
+{% set allowedIps = [(vars['wireguard_external'][conf]['address'] | ipaddr('network/prefix'))] %}
+{% if vars['wireguard_external'][conf]['extra_allowed_ips'] is defined %}
+{% set allowedIps = allowedIps + vars['wireguard_external'][conf]['extra_allowed_ips'] %}
+{% endif %}
+
 [Peer]
 PublicKey = {{ vars['wireguard_external'][conf]['pub_key'] }}
 PresharedKey = {{ vars['wireguard_external'][conf]['preshared_key'] }}
-AllowedIPs = {{ vars['wireguard_external'][conf]['address'] | ipaddr('network/prefix') }}
+AllowedIPs = {{ allowedIps|join(",") }}
 {% if vars['wireguard_external'][conf]['persistent_keepalive'] is defined %}
 PersistentKeepalive = {{ vars['wireguard_external'][conf]['persistent_keepalive'] }}
 {% endif %}
@@ -36,18 +41,25 @@ PersistentKeepalive = {{ vars['wireguard_external'][conf]['persistent_keepalive'
 {% endif %}
 
 {% for h in groups['all'] %}
+{% if hostvars[h]['wireguard'] is defined %}
 {% for k, v in hostvars[h]['wireguard'].items() %}
 {% if (k == conf.key) and (h != ansible_nodename) %}
+
+{% set allowedIps = [(v.address | ipaddr('network/prefix'))] %}
+{% if v.extra_allowed_ips is defined %}
+{% set allowedIps = allowedIps + v.extra_allowed_ips %}
+{% endif %}
 
 [Peer]
 Endpoint = {{ hostvars[h]['ansible_default_ipv4']['address'] }}:{{ v.port }}
 PublicKey = {{ v.pub_key }}
 PresharedKey = {{ v.preshared_key }}
-AllowedIPs = {{ v.address | ipaddr('network/prefix') }}
+AllowedIPs = {{ allowedIps|join(",") }}
 {% if v.persistent_keepalive is defined %}
 PersistentKeepalive = {{ v.persistent_keepalive }}
 {% endif %}
 
 {%- endif %}
 {% endfor %}
+{% endif %}
 {% endfor -%}

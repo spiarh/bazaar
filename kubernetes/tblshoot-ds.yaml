@@ -28,8 +28,9 @@ spec:
         image: r.spiarh.fr/tblshoot:latest
         imagePullPolicy: IfNotPresent
         args:
-        - sleep
-        - "60000"
+        - tail
+        - -f
+        - /dev/null
         resources:
           requests:
             cpu: 100m

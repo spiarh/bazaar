@@ -1,10 +1,9 @@
 ---
 # defaults file for kubernetes
-apt_keys:
+k8s_apt_keys:
   - https://packages.cloud.google.com/apt/doc/apt-key.gpg
 
-apt_repos:
-  - ppa:projectatomic/ppa
+k8s_apt_repos:
   - "deb https://apt.kubernetes.io/ kubernetes-xenial main"
 
 kubernetes_pkgs:
@@ -21,3 +20,6 @@ cgroup_manager: "systemd"
 
 #kubelet_default_args: "--runtime-cgroups=/systemd/system.slice --kubelet-cgroups=/systemd/system.slice"
 kubelet_default_args: ""
+
+kubernetes_common_prereq: True
+kubernetes_common_install: True

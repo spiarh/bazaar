@@ -1,0 +1,11 @@
+[NetDev]
+Name={{ item.name }}
+Kind={{ kind }}
+{% if item.mtu is defined %}
+MTUBytes={{ item.mtu }}
+{% endif %}
+
+{% if kind == "macvlan" %}
+[MACVLAN]
+Mode={{ item.mode }}
+{% endif %}
