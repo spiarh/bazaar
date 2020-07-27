@@ -1,6 +1,6 @@
-ARG VERSION=1.5.0
-
 FROM golang:1.14-alpine AS builder
+
+ARG VERSION=1.5.0
 
 RUN set -ex && apk add --no-cache git make py2-pip && \
     pip install GitPython
@@ -18,7 +18,7 @@ COPY --from=builder /go/docker_auth/auth_server/auth_server /usr/local/bin/auth_
 
 EXPOSE 5001
 
-USER nobody
+USER 1871
 
 ENTRYPOINT ["/usr/local/bin/auth_server"]
 
