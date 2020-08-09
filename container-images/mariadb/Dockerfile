@@ -24,7 +24,8 @@ RUN mkdir /entrypoint-initdb.d && \
     chown -R mysql:mysql /var/log/mysql && \
     chown mysql:mysql /tmp/mysql.sock /run/mysqld/mysql.sock && \
     ln -sf /dev/stdout /var/log/mysql/access.log && \
-    ln -sf /dev/stderr /var/log/mysql/error.log
+    ln -sf /dev/stderr /var/log/mysql/error.log && \
+    rm -f /etc/my.cnf.d/mariadb-server.cnf
 
 VOLUME ["/etc/my.cnf.d", "/var/lib/mysql"]
 WORKDIR /var/lib/mysql
