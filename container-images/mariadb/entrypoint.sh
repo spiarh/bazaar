@@ -10,7 +10,7 @@ MARIADB_PASSWORD=${MARIADB_PASSWORD:-""}
 
 USER_EXTRA_FLAGS=${USER_EXTRA_FLAGS:-""}
 
-DEFAULT_FLAGS="--console --skip-name-resolve --skip-networking"
+DEFAULT_FLAGS="--console --skip-name-resolve"
 
 MARIADB_REPLICATION_USER=${MARIADB_REPLICATION_USER:-"replication"}
 MARIADB_REPLICATION_PASSWORD=${MARIADB_REPLICATION_PASSWORD:-""}
@@ -19,12 +19,12 @@ POD_NETWORK=${POD_NETWORK:-"%"}
 POD_NUM=$(echo "$HOSTNAME" | awk -F'-' '{ print $2 }')
 MASTER_HOSTNAME=$(echo "$MASTER_FQDN" | awk -F'.' '{ print $1 }')
 SERVER_ID="1$POD_NUM"
-REPLICATION_FLAGS="--server-id=$SERVER_ID --log-bin=mariadb-bin --log-basename=mariadb --binlog-format=mixed"
+REPLICATION_FLAGS="--server-id=$SERVER_ID --log-bin --relay-log=mariadb --log-basename=mariadb --binlog-format=mixed"
 SLAVE_FLAGS="--log-slave-updates=ON --relay-log-recovery"
 
 
 log() {
-  (>&2 echo "\n>>> [mysqld] ($(date '+%Y-%m-%d %H:%M:%S')) $*");
+  (>&2 printf "\n>>> [mysqld] ($(date '+%Y-%m-%d %H:%M:%S')) $*\n");
 }
 
 if [ -z "$MARIADB_ROOT_PASSWORD" ]; then
@@ -51,7 +51,7 @@ execute_pre_exec_scripts() {
 
 start_tmp_server() {
 	log "Start temporary server"
-    mysqld $DEFAULT_FLAGS --skip-grant-tables --socket="$MYSQLD_SOCKET" &
+    mysqld $DEFAULT_FLAGS --skip-grant-tables --socket="$MYSQLD_SOCKET" $DEFAULT_FLAGS $REPLICATION_FLAGS $USER_EXTRA_FLAGS &
 	for i in $(seq 0 30); do
 		if mysqladmin -uroot --socket="$MYSQLD_SOCKET" status > /dev/null 2>&1; then
 			log "Temporary server started"
@@ -60,7 +60,7 @@ start_tmp_server() {
 		sleep 1
 	done
 	if [ "$i" = 30 ]; then
-    	log "Unable to start temporary server" && exit 1
+	    log "Unable to start temporary server" && exit 1
 	fi
 }
 
@@ -68,7 +68,7 @@ stop_tmp_server() {
 	log "Stop temporary server"
     if ! mysqladmin -uroot -p"$MARIADB_ROOT_PASSWORD" --socket="$MYSQLD_SOCKET" shutdown > /dev/null 2>&1; then
     	log "Unable to stop temporary server" && exit 1
-	fi
+    fi
 }
 
 # execute any pre-init scripts
