@@ -93,6 +93,8 @@ if [ "$1" = "php-fpm7" ] || [ "${NEXTCLOUD_UPDATE:-0}" -eq 1 ]; then
 
         for dir in config data custom_apps themes; do
             if [ ! -d "/var/www/html/$dir" ] || directory_empty "/var/www/html/$dir"; then
+                echo "Set data dir to 0770 and owner to nginx:nginx"
+                mkdir -p "/var/www/html/$dir" && chmod -Rf 0770 "/var/www/html/$dir" && chown -Rf nginx:nginx "/var/www/html/$dir"
                 rsync $rsync_options --include "/$dir/" --exclude '/*' /usr/src/nextcloud/ /var/www/html/
             fi
         done
@@ -187,5 +189,5 @@ if [ "$1" = "php-fpm7" ] || [ "${NEXTCLOUD_UPDATE:-0}" -eq 1 ]; then
     fi
 fi
 
-echo "Running: $@"
+echo "Running: $*"
 exec "$@"
