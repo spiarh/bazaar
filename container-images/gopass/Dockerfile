@@ -1,6 +1,6 @@
-ARG VERSION=1.9.2
-
 FROM golang:1.14-alpine AS builder
+
+ARG VERSION=1.9.2
 
 RUN apk add --no-cache git make curl gcc libc-dev
 

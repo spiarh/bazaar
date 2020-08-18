@@ -33,10 +33,10 @@ RUN mkdir -p /usr/src/nextcloud && \
     rm -f $DIST && \
     mkdir -p /usr/src/nextcloud/data /usr/src/nextcloud/custom_apps && \
     mkdir -p /var/www/html/data && \
-    chown -R nginx:nginx /usr/src/nextcloud /var/www && \
+    chown -Rf nginx:nginx /usr/src/nextcloud /var/www && \
     chmod +x /usr/src/nextcloud/occ
 
-VOLUME /var/ww/html
+VOLUME /var/www/html
 
 WORKDIR /usr/src/nextcloud
 USER 2111
