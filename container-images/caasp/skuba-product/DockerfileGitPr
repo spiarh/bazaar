@@ -1,0 +1,29 @@
+ARG GO_VERSION=1.14
+
+FROM golang:${GO_VERSION}-alpine AS builder
+
+ARG KUBECTL_VERSION=1.17.4
+ARG MAKE_ARGS
+ARG PR_ID
+ARG PR_NAME
+
+RUN apk update && apk add --no-cache git make
+
+RUN git clone https://github.com/SUSE/skuba && \
+    cd skuba && \
+    git fetch origin pull/${PR_ID}/head:${PR_NAME} && \
+    git checkout ${PR_NAME} && \
+    make ${MAKE_ARGS}
+
+FROM r.spiarh.fr/alpine:latest
+
+COPY --from=builder /go/bin/skuba /usr/local/bin/skuba
+
+RUN wget https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -O /usr/local/bin/kubectl && \
+    chmod +x /usr/local/bin/kubectl
+
+VOLUME ["/app"]
+
+WORKDIR /app
+
+ENTRYPOINT ["/usr/local/bin/skuba"]
