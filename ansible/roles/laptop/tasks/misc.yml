@@ -1,0 +1,20 @@
+---
+- name: create_user_local_bin_dir
+  file:
+    path: "{{ '/home/' + current_user + '/.local/bin' }}"
+    state: directory
+    owner: "{{ current_user }}"
+    group: "{{ current_user }}"
+    mode: 0700
+
+- name: add_user_to_libvirt
+  user:
+    name: "{{ current_user }}"
+    groups: libvirt
+    append: yes
+
+- name: set_sudo_timestamp
+  replace:
+    path: /etc/sudoers
+    regexp: '^Defaults(\s.*)env_reset.*'
+    replace: "{{ 'Defaults    env_reset,timestamp_timeout=' + sudo.timeout|string }}"

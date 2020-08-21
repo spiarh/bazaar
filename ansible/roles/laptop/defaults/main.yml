@@ -1,0 +1,190 @@
+---
+packages_to_remove:
+  - openvswitch
+
+packages_from_default_repos:
+  - ansible
+  - bat
+  - chromium
+  - curl
+  - thunderbird-enigmail
+  - filezilla
+  - freerdp
+  - gcc
+  - gcc-gdb-plugin
+  - git
+  - go
+  - grubby
+  - htop
+  - httrack
+  - icedtea-web
+  - iftop
+  - ipcalc
+  - ipmitool
+  - jq
+  - lshw
+  - minicom
+  - mlocate
+  - mtr
+  - mumble
+  - nmap
+  - nmap-ncat
+  - openvpn
+  - openssh-askpass
+  - podman
+  - python3-pip
+  - python3-virtualenv
+  - python3-virtualenvwrapper
+  - pssh
+  - qemu-audio-alsa
+  - qemu-audio-oss
+  - qemu-audio-pa
+  - qemu-audio-sdl
+  - qemu-block-curl
+  - qemu-block-dmg
+  - qemu-block-gluster
+  - qemu-block-iscsi
+  - qemu-block-nfs
+  - qemu-block-rbd
+  - qemu-block-ssh
+  - qemu-common
+  - qemu-guest-agent
+  - qemu-img
+  - qemu-kvm
+  - qemu-system-x86
+  - qemu-system-x86-core
+  - qemu-ui-curses
+  - qemu-ui-gtk
+  - qemu-ui-sdl
+  - qemu-ui-spice-app
+  - libguestfs-tools
+  - libvirt-client
+  - libvirt-daemon
+  - libvirt-daemon-driver-interface
+  - libvirt-daemon-driver-network
+  - libvirt-daemon-driver-nodedev
+  - libvirt-daemon-driver-nwfilter
+  - libvirt-daemon-driver-qemu
+  - libvirt-daemon-driver-secret
+  - libvirt-daemon-driver-storage
+  - libvirt-daemon-driver-storage-core
+  - libvirt-daemon-driver-storage-disk
+  - libvirt-daemon-driver-storage-gluster
+  - libvirt-daemon-driver-storage-iscsi
+  - libvirt-daemon-driver-storage-iscsi-direct
+  - libvirt-daemon-driver-storage-logical
+  - libvirt-daemon-driver-storage-mpath
+  - libvirt-daemon-driver-storage-rbd
+  - libvirt-daemon-driver-storage-scsi
+  - libvirt-daemon-driver-storage-sheepdog
+  - libvirt-daemon-driver-storage-zfs
+  - libvirt-daemon-kvm
+  - light-locker # fix issue with lock/suspend
+  - pass
+  - rdesktop
+  - ruby
+  - ruby-devel
+  - rhythmbox
+  - salt-master
+  - salt-ssh
+  - ShellCheck
+  - shutter
+  - sshuttle
+  - tcpdump
+  - terminator
+  - tree
+  - youtube-dl
+  - vim
+  - virt-install
+  - virt-manager
+  - wireguard-tools
+
+packages_from_external_repos:
+  - brave-browser-beta
+  - code
+  - kubectl
+  - terraform
+
+#rpm_keys_to_remove:
+
+#rpm_keys_to_add:
+#  - https://packages.microsoft.com/keys/microsoft.asc
+#  - https://brave-browser-rpm-beta.s3.brave.com/brave-core-nightly.asc
+
+yum_repo_to_del:
+  - fedora-cisco-openh264
+
+yum_repo_to_add:
+  - name: brave
+    description: "Brave browser repository"
+    file: brave.repo
+    baseurl: https://brave-browser-rpm-beta.s3.brave.com/x86_64/
+    enabled: yes
+    gpgcheck: yes
+    repo_gpgcheck: 1
+    gpgkey: https://brave-browser-rpm-beta.s3.brave.com/brave-core-nightly.asc
+  - name: vscode
+    description: "Visual Studio Code"
+    file: vscode.repo
+    baseurl: https://packages.microsoft.com/yumrepos/vscode
+    enabled: yes
+    gpgcheck: yes
+    repo_gpgcheck: 1
+    gpgkey: https://packages.microsoft.com/keys/microsoft.asc
+  - name: kubernetes
+    description: "Kubernetes repository"
+    file: kubernetes.repo
+    baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+    enabled: yes
+    gpgcheck: yes
+    repo_gpgcheck: 1
+    gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+  - name: hashicorp
+    description: "Hashicorp"
+    file: hashicorp.repo
+    baseurl: https://rpm.releases.hashicorp.com/fedora/$releasever/$basearch/stable
+    enabled: yes
+    gpgcheck: yes
+    repo_gpgcheck: 1
+    gpgkey: https://rpm.releases.hashicorp.com/gpg
+  - name: hashicorp-test
+    description: "Hashicorp Test"
+    file: hashicorp-test.repo
+    baseurl: https://rpm.releases.hashicorp.com/fedora/$releasever/$basearch/test
+    enabled: yes
+    gpgcheck: yes
+    repo_gpgcheck: 1
+    gpgkey: https://rpm.releases.hashicorp.com/gpg
+
+services_to_disable:
+  - iscsid.socket
+  - ModemManager.service
+
+services_to_enable:
+  - libvirtd
+
+sudo:
+  timeout: 30
+
+#scat
+#password-store
+#iozone
+#lxd
+#python3-flake8
+#python3-neutronclient
+#python3-openstackclient
+#python3-yamllint
+#aws-cli
+#unrar
+#rar
+#libcap-progs
+#glibc-devel-static
+#go-doc
+#cf-cli
+#terraform-provider-susepubliccloud
+
+#
+#
+#
+#yum_repos_to_add:
+#
