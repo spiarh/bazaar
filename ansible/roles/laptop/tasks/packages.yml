@@ -1,0 +1,51 @@
+---
+- name: remove_rpm_keys
+  rpm_key:
+    state: absent
+    key: "{{ item }}"
+  with_items:
+    - "{{ rpm_keys_to_remove | default([]) }}"
+
+- name: add_rpm_keys
+  rpm_key:
+    state: present
+    key: "{{ item }}"
+  with_items:
+    - "{{ rpm_keys_to_add | default([]) }}"
+
+
+#- name: yum_clean_metadata
+#  command: yum clean metadata
+#  args:
+#    warn: no
+
+- name: remove_yum_repos
+  yum_repository:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ yum_repo_to_del }}"
+#  notify: yum-clean-metadata
+
+- name: add_yum_repos
+  yum_repository:
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    file: "{{ item.file }}"
+    baseurl: "{{ item.baseurl }}"
+    enabled: "{{ item.enabled }}"
+    gpgcheck: "{{ item.gpgcheck }}"
+    repo_gpgcheck: "{{ item.repo_gpgcheck | default('no') }}"
+    gpgkey: "{{ item.gpgkey | default('') }}"
+  with_items:
+    - "{{ yum_repo_to_add }}"
+
+- name: remove_packages
+  dnf:
+    name: "{{ packages_to_remove }}"
+    state: absent
+
+- name: install_packages
+  dnf:
+    name: "{{ packages_from_default_repos + packages_from_external_repos }}"
+    state: latest
