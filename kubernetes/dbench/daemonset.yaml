@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: dbench
+  labels:
+    app: dbench
+spec:
+  selector:
+    matchLabels:
+      app: dbench
+  template:
+    metadata:
+      labels:
+        app: dbench
+    spec:
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
+      containers:
+      - name: dbench
+        args:
+        - tail
+        - "-f"
+        - /dev/null
+        image: docker.io/spiarh/dbench:latest
+        imagePullPolicy: Always
+        env:
+          - name: WORKLOAD_TYPE
+            value: daemonset
+          - name: DBENCH_MOUNTPOINT
+            value: /tmp
+          - name: DBENCH_QUICK
+            value: "yes"
+          - name: FIO_SIZE
+            value: 2G
+          # - name: FIO_OFFSET_INCREMENT
+          #   value: 256M
+          - name: FIO_DIRECT
+            value: "1"
+      #restartPolicy: Never
+      terminationGracePeriodSeconds: 0
