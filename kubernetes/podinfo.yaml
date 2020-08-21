@@ -1,0 +1,74 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: podinfo-deployment
+  labels:
+    app: podinfo
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: podinfo
+  template:
+    metadata:
+      labels:
+        app: podinfo
+    spec:
+      containers:
+      - name: podinfo
+        image: stefanprodan/podinfo:latest
+        command:
+        - ./podinfo
+        - --level=debug
+        ports:
+          - name: http
+            containerPort: 9898
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 9898
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 9898
+#---
+#kind: Service
+#apiVersion: v1
+#metadata:
+#  name: podinfo
+#spec:
+##  externalTrafficPolicy: Local
+#  externalIPs:
+#  - 10.84.73.92 
+#  - 10.84.72.251
+#  type: ClusterIP
+#  clusterIP: None
+#  selector:
+#    app: podinfo
+#  ports:
+#    - name: http
+#  #    nodePort: 30080
+#  #    port: 30080
+#      port: 80
+#      protocol: TCP
+#      targetPort: http
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: podinfo
+spec:
+  externalTrafficPolicy: Local
+#  externalIPs:
+#  - 10.84.73.92 
+#  - 10.84.72.251
+  type: NodePort
+  selector:
+    app: podinfo
+  ports:
+    - name: http
+      nodePort: 30080
+      port: 9898
+      protocol: TCP
+      targetPort: http

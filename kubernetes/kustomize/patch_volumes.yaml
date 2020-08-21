@@ -1,0 +1,30 @@
+- op: add
+  path: /spec/template/spec/containers/0/volumeMounts
+  value:
+    - mountPath: /config
+      name: config
+      readOnly: true
+    - mountPath: /secret
+      name: secret
+      readOnly: true
+
+- op: add
+  path: /spec/template/spec/volumes
+  value:
+    - configMap:
+        items:
+        - key: ceph.conf
+          path: ceph.conf
+        name: ceph-conf
+      name: config
+    - name: secret
+      secret:
+        items:
+        - key: kubeconfig
+          path: kubeconfig
+        - key: ceph.client.admin.keyring
+          path: ceph.client.admin.keyring
+        - key: jenkins-worker-ops-ssh-privkey
+          path: jenkins-worker-ops-ssh-privkey
+        secretName: infra-secrets
+

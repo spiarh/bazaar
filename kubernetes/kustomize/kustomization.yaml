@@ -1,0 +1,30 @@
+nameSuffix: -ops-users
+namespace: ops
+
+commonLabels:
+  jenkins-worker: user-management
+
+images:
+- name: localhost/jenkins-worker
+  newName: localhost/jenkins-worker-ops-user-management
+  newTag: latest
+
+configMapGenerator:
+- name: ceph-conf
+  behavior: create
+  files:
+  - config/ceph.conf
+- name: jenkins-worker-labels
+  behavior: merge
+  env: config/jenkins-worker-labels.env
+
+patchesJson6902:
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: jenkins-worker
+  path: patch_volumes.yaml
+
+bases:
+- ../../base

@@ -1,0 +1,137 @@
+---
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  #annotations:
+  #  apparmor.security.beta.kubernetes.io/defaultProfileName: runtime/default
+  #  seccomp.security.alpha.kubernetes.io/allowedProfileNames: '*'
+  #  seccomp.security.alpha.kubernetes.io/defaultProfileName: runtime/default
+  name: root-priv
+spec:
+  allowPrivilegeEscalation: true
+  allowedCapabilities:
+  - '*'
+  defaultAllowPrivilegeEscalation: true
+  fsGroup:
+    rule: RunAsAny
+  hostIPC: true
+  hostNetwork: true
+  hostPID: true
+  hostPorts:
+  - max: 65535
+    min: 0
+  privileged: true
+  runAsUser:
+    rule: RunAsAny
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny
+  volumes:
+  - configMap
+  - secret
+  - emptyDir
+  - downwardAPI
+  - projected
+  - persistentVolumeClaim
+  - hostPath
+  - nfs
+  - rbd
+  - cephFS
+  - glusterfs
+  - fc
+  - iscsi
+  - cinder
+  - gcePersistentDisk
+  - awsElasticBlockStore
+  - azureDisk
+  - azureFile
+  - vsphereVolume
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: root-priv
+rules:
+- apiGroups:
+  - policy
+  resourceNames:
+  - root-priv
+  resources:
+  - podsecuritypolicies
+  verbs:
+  - use
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: root-priv
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: root-priv
+subjects:
+- kind: ServiceAccount
+  name: root-priv
+  namespace: default
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: root-priv
+  namespace: default
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: root-priv
+  namespace: default
+  labels:
+    app: root-priv
+spec:
+  selector:
+    matchLabels:
+      app: root-priv
+  template:
+    metadata:
+      labels:
+        app: root-priv
+    spec:
+      containers:
+      - name: root
+        image: docker.io/spiarh/alpine:latest
+        imagePullPolicy: Always
+        command:
+        - nsenter
+        - --mount=/proc/1/ns/mnt
+        - --
+        - /bin/bash
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 200m
+            memory: 200Mi
+        stdin: true
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        tty: true
+        securityContext:
+          allowPrivilegeEscalation: true
+          privileged: true
+      hostPID: true
+      hostNetwork: true
+      securityContext: {}
+      serviceAccount: root-priv
+      serviceAccountName: root-priv
+      terminationGracePeriodSeconds: 0
+      tolerations:
+      - effect: NoExecute
+        key: node.kubernetes.io/not-ready
+        operator: Exists
+        tolerationSeconds: 3600
+      - effect: NoExecute
+        key: node.kubernetes.io/unreachable
+        operator: Exists
+        tolerationSeconds: 3600
