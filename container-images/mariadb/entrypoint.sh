@@ -20,7 +20,7 @@ POD_NUM=$(echo "$HOSTNAME" | awk -F'-' '{ print $2 }')
 MASTER_HOSTNAME=$(echo "$MASTER_FQDN" | awk -F'.' '{ print $1 }')
 SERVER_ID="1$POD_NUM"
 REPLICATION_FLAGS="--server-id=$SERVER_ID --log-bin --relay-log=mariadb --log-basename=mariadb --binlog-format=mixed"
-SLAVE_FLAGS="--log-slave-updates=ON --relay-log-recovery"
+SLAVE_FLAGS="--log-slave-updates=ON --relay-log-recovery --read-only"
 
 
 log() {

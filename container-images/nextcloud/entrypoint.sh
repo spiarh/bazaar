@@ -1,4 +1,6 @@
 #!/bin/sh
+DB_PASSSWORD=""
+
 set -euo pipefail
 
 # version_greater A B returns whether A > B
@@ -93,6 +95,7 @@ if [ "$1" = "php-fpm7" ] || [ "${NEXTCLOUD_UPDATE:-0}" -eq 1 ]; then
 
         for dir in config data custom_apps themes; do
             if [ ! -d "/var/www/html/$dir" ] || directory_empty "/var/www/html/$dir"; then
+                mkdir -p "/var/www/html/$dir" && chmod -Rf 0770 "/var/www/html/$dir" && chown -Rf nginx:nginx "/var/www/html/$dir"
                 rsync $rsync_options --include "/$dir/" --exclude '/*' /usr/src/nextcloud/ /var/www/html/
             fi
         done
@@ -133,11 +136,13 @@ if [ "$1" = "php-fpm7" ] || [ "${NEXTCLOUD_UPDATE:-0}" -eq 1 ]; then
                     install=true
                 elif [ -n "${MYSQL_DATABASE+x}" ] && [ -n "${MYSQL_USER+x}" ] && [ -n "${MYSQL_PASSWORD+x}" ] && [ -n "${MYSQL_HOST+x}" ]; then
                     echo "Installing with MySQL database"
+                    DB_PASSWORD="$MYSQL_PASSWORD"
                     # shellcheck disable=SC2016
                     install_options="$install_options --database mysql --database-name $MYSQL_DATABASE --database-user $MYSQL_USER --database-pass $MYSQL_PASSWORD --database-host $MYSQL_HOST"
                     install=true
                 elif [ -n "${POSTGRES_DB+x}" ] && [ -n "${POSTGRES_USER+x}" ] && [ -n "${POSTGRES_PASSWORD+x}" ] && [ -n "${POSTGRES_HOST+x}" ]; then
                     echo "Installing with PostgreSQL database"
+                    DB_PASSWORD="$POSTGRES_PASSWORD"
                     # shellcheck disable=SC2016
                     install_options="$install_options --database pgsql --database-name $POSTGRES_DB --database-user $POSTGRES_USER --database-pass $POSTGRES_PASSWORD --database-host $POSTGRES_HOST"
                     install=true
@@ -147,7 +152,7 @@ if [ "$1" = "php-fpm7" ] || [ "${NEXTCLOUD_UPDATE:-0}" -eq 1 ]; then
                     echo "starting nextcloud installation"
                     max_retries=10
                     try=0
-                    echo "$install_options"
+                    echo "php /var/www/html/occ maintenance:install $install_options" | sed -E "s/$NEXTCLOUD_ADMIN_PASSWORD|$DB_PASSWORD/**REDACTED**/g"
                     until php /var/www/html/occ maintenance:install $install_options || [ "$try" -gt "$max_retries" ]; do
                         echo "retrying install..."
                         try=$((try+1))
@@ -182,7 +187,6 @@ if [ "$1" = "php-fpm7" ] || [ "${NEXTCLOUD_UPDATE:-0}" -eq 1 ]; then
             echo "The following apps have been disabled:"
             diff /tmp/list_before /tmp/list_after | grep '<' | cut -d- -f2 | cut -d: -f1
             rm -f /tmp/list_before /tmp/list_after
-
         fi
     fi
 fi

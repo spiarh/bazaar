@@ -4,10 +4,10 @@ FROM ${REGISTRY}/php7-fpm:latest
 
 LABEL maintainer="_me@spiarh.fr"
 
-ARG VERSION=18.0.3
+ARG VERSION=19.0.1
 ARG DIST=nextcloud-${VERSION}.tar.bz2
 ARG URL=https://download.nextcloud.com/server/releases/$DIST
-ARG SHA512=b1f433dee2e7eea800de8cd8131332530050b6194460a397081a134f63b236f65e33758c60cd8e97a43570d0b6a1baac9e0503535d85a9a34cd63abd50041292
+ARG SHA512=aa4db108bff2b452123e5513bde03fe4c2f1da58c1987d74a246a69714fedf121ca9ed6151609d87c91dd6109419b764ba02c5c3c1669c5ddd5a49118e68f0c0
 
 USER root
 RUN apk add --no-cache \
