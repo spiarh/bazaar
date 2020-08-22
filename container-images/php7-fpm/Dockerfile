@@ -51,7 +51,7 @@ RUN apk add --no-cache \
     php7-zip
 
 RUN mkdir -p /run/php && \
-    chown -Rf nginx:nginx /run/php
+    chown -Rf nginx:nginx /run/php /var/lib/php7
 
 COPY ./php-fpm.conf /etc/php7/php-fpm.conf
 COPY ./php.ini /etc/php7/php.ini
