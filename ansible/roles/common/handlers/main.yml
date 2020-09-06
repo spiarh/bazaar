@@ -1,0 +1,6 @@
+---
+- name: restart_unattended_upgrade
+  systemd:
+    name: unattended-upgrade.service
+    state: restarted
+    daemon_reload: yes

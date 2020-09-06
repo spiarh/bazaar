@@ -1,4 +1,5 @@
 ---
-# tasks file for common
 - import_tasks: hostname.yml
 - import_tasks: packages.yml
+- import_tasks: unattended_upgrades.yml
+  when: unattended_upgrades.enabled
