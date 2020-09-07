@@ -3,17 +3,50 @@ packages_to_remove:
   - openvswitch
 
 packages_from_default_repos:
+  - akmod-nvidia
   - ansible
+  - acpid
+  - awscli
   - bat
+  - buildah
   - chromium
   - curl
-  - thunderbird-enigmail
+  - cmake
+  - deja-dup
+  - dkms
+  - faketime
   - filezilla
   - freerdp
+  - fwupd
   - gcc
+  - gcc-c++
   - gcc-gdb-plugin
   - git
-  - go
+  - golang
+  - golang-x-tools-benchcmp
+  - golang-x-tools-bundle
+  - golang-x-tools-callgraph
+  - golang-x-tools-compilebench
+  - golang-x-tools-cover
+  - golang-x-tools-devel
+  - golang-x-tools-digraph
+  - golang-x-tools-eg
+  - golang-x-tools-fiximports
+  - golang-x-tools-getgo
+  - golang-x-tools-go-contrib-init
+  - golang-x-tools-godex
+  - golang-x-tools-goimports
+  - golang-x-tools-gomvpkg
+  - golang-x-tools-gopls
+  - golang-x-tools-gorename
+  - golang-x-tools-goyacc
+  - golang-x-tools-guru
+  - golang-x-tools-present
+  - golang-x-tools-splitdwarf
+  - golang-x-tools-ssadump
+  - golang-x-tools-stress
+  - golang-x-tools-stringer
+  - golang-x-tools-toolstash
   - grubby
   - htop
   - httrack
@@ -23,15 +56,22 @@ packages_from_default_repos:
   - ipmitool
   - jq
   - lshw
+  - libglvnd-glx
+  - libglvnd-opengl
+  - libglvnd-devel
   - minicom
   - mlocate
   - mtr
   - mumble
   - nmap
   - nmap-ncat
+  - nodejs
   - openvpn
   - openssh-askpass
   - podman
+  - pkgconfig
+  - pylint
+  - python3-devel
   - python3-pip
   - python3-virtualenv
   - python3-virtualenvwrapper
@@ -57,6 +97,9 @@ packages_from_default_repos:
   - qemu-ui-gtk
   - qemu-ui-sdl
   - qemu-ui-spice-app
+  - kernel-devel
+  - kernel-headers
+  - kernel-tools
   - libguestfs-tools
   - libvirt-client
   - libvirt-daemon
@@ -79,7 +122,6 @@ packages_from_default_repos:
   - libvirt-daemon-driver-storage-sheepdog
   - libvirt-daemon-driver-storage-zfs
   - libvirt-daemon-kvm
-  - light-locker # fix issue with lock/suspend
   - pass
   - rdesktop
   - ruby
@@ -90,13 +132,18 @@ packages_from_default_repos:
   - ShellCheck
   - shutter
   - sshuttle
+  - strace
   - tcpdump
   - terminator
+  - thunderbird-enigmail
   - tree
+  - yarnpkg
   - youtube-dl
   - vim
+  - vim-X11
   - virt-install
   - virt-manager
+  - xss-lock # xss-lock -- mate-screensaver-command --lock
   - wireguard-tools
 
 packages_from_external_repos:
@@ -157,8 +204,14 @@ yum_repo_to_add:
     gpgkey: https://rpm.releases.hashicorp.com/gpg
 
 services_to_disable:
+  - bluetooth.service
+  - iscsi.service
   - iscsid.socket
+  - iscsiuio.socket
+  - multipathd.socket
+  - multipathd.service
   - ModemManager.service
+  - sssd.service
 
 services_to_enable:
   - libvirtd
@@ -174,7 +227,6 @@ sudo:
 #python3-neutronclient
 #python3-openstackclient
 #python3-yamllint
-#aws-cli
 #unrar
 #rar
 #libcap-progs
