@@ -4,9 +4,6 @@ variable "basename" {
 variable "image" {
 }
 
-variable "node_count" {
-}
-
 variable "cloud_init_file" {
 }
 
@@ -45,9 +42,8 @@ provider "libvirt" {
 
 # adapt the build number 
 resource "libvirt_volume" "node" {
-  name   = "vol-${var.basename}-${count.index}"
+  name   = "vol-${var.basename}"
   source = var.image
-  count  = var.node_count
   pool   = var.storage_pool
   format = var.storage_format
 }
@@ -60,11 +56,16 @@ data "template_file" "user_data" {
   template = file(var.cloud_init_file)
 }
 
+data "template_file" "network_config" {
+  template = file(var.cloud_init_network_config_file)
+}
+
+
 resource "libvirt_cloudinit_disk" "cloud_init" {
   name           = "cloud_init_${var.basename}.iso"
   pool           = var.storage_pool
   user_data      = data.template_file.user_data.rendered
-  network_config = file(var.cloud_init_network_config_file)
+  network_config = data.template_file.network_config.rendered
 }
 
 ##########
@@ -73,10 +74,9 @@ resource "libvirt_cloudinit_disk" "cloud_init" {
 
 # Create the machine
 resource "libvirt_domain" "node" {
-  name   = "${var.basename}-${count.index}"
+  name   = var.basename
   memory = var.memory
   vcpu   = var.vcpu
-  count  = var.node_count
 
   cloudinit = libvirt_cloudinit_disk.cloud_init.id
 
@@ -101,7 +101,7 @@ resource "libvirt_domain" "node" {
   }
 
   disk {
-    volume_id = element(libvirt_volume.node.*.id, count.index)
+    volume_id = libvirt_volume.node.id
   }
 
   graphics {
@@ -112,29 +112,25 @@ resource "libvirt_domain" "node" {
 }
 
 resource "null_resource" "node" {
-  count = var.node_count
 
   connection {
-    type = "ssh"
-    host = element(
-      libvirt_domain.node.*.network_interface.0.addresses.0,
-      count.index,
-    )
+    type        = "ssh"
+    host        = libvirt_domain.node.network_interface.0.addresses.0
     user        = var.ssh_user
-    agent       = "false"
+    agent       = "true"
     private_key = fileexists(var.ssh_privkey) ? file(var.ssh_privkey) : null
   }
 
   # This ensures the VM is booted and SSH'able
   provisioner "remote-exec" {
     inline = [
-      "sudo hostnamectl set-hostname ${var.basename}-${count.index}",
+      "sudo hostnamectl set-hostname ${var.basename}",
     ]
   }
 }
 
 # IPs: use wait_for_lease true or after creation use terraform refresh and terraform show for the ips of domain
 output "ip_nodes" {
-  value = [libvirt_domain.node.*.network_interface.0.addresses]
+  value = [libvirt_domain.node.network_interface.0.addresses]
 }
 

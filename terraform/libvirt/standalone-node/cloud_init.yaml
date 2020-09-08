@@ -1,0 +1,27 @@
+#cloud-config
+
+# set locale
+ locale: en_US.UTF-8
+
+ # set timezone
+ timezone: Europe/Berlin
+
+ users:
+ #  - default
+   - name: root
+     lock_passwd: true
+   - name: regular
+     lock_passwd: true
+     sudo: ALL=(ALL) NOPASSWD:ALL
+     ssh_authorized_keys:
+       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFHUkbmn1u0EPaf1Nqnx8KSn9sfcgLxsaDSyPy+xmHJ1
+       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDvBiyxnCaL3zU8VUDdFyrCdU9HgRzzD5Jp76bhwsulMDAd0CbmX+RIwRTL+IkEK7y6OmEMmBY8zKpwwoE70CFtUHLKjKlsJGu6miw3IQx7rJ+Bn0AbUxoq5ho/ovysiKNZjn4cUH/XbKQENfX1LVjnh2fBNfgMvGaOJ5pPxu+Ky5mWkFXCONOQRvYeQ/gSMeKOJAuYUx/Tf1svrm14+HUr3evNbYlGOwbK5bNhS54EX1ZodA7RrOrPSJjIsLoRPm6bre5VxovHc4q8AMgTJ5KM7VnuQqKLbMQZBJGCu01W/hXAjM7JC/gz3ahEHeDEVDoVq9k3qywMEpaEkfNNKd6e9TCqBSTtjjtkD2MEmkXXQsupStPSh+pny/tu+4J2ITyoqh8H+bgSPCH/nGjsGF3wKFyKoNgeztQmqkHxIdqVeIjNnIavNuH9vuURJbTl7Igckd1Jja02xA5bo1q4zoyPcd5P8Fz6sdmiFYV2sg1SUw9gl9N1KCXYmOwLVRq+OQBaeWn6TymA56gZ1c6co0RDFGzaI7XQYRYydyQt7fPshkQXonOmWTqtNvOON4QGGWX2Qso/9Xe8RGlGTMPeCghGICYlUWicahRUqp3zkqUQIT0JLuVgUduHmM8g24URqbHDM1nOfJfRG0PWLEzcdYzkltfbVj8w9trVHXd7DaV1nw==
+       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCa2z2RsFiV9HInYLDKL6nbskATslA/3iqL3CvjD7uK6dVoI2m4QjUylyn+OFuGLGC9BmgJ4dgznrUUYlMnzUN4P1hDoR2R/TNl7WfYgZweW71+9fB3kvXkTBrssrQsFfE6RVssimbdPVxouqlhS3NgGYpcQepkFk1FLjTV8DUWwNEbihGBoQxP+FFK4NsuNmw/CCN3Gp5bq07npedfhE+VBW9GZvWC0SUKAdSSsod/Eqy2TUHI47um2ezXF3bgGC8OY6696PawXRGXsYi47MLlwBoALzpI+zJ7Af2UEWJ1L0nHM8Y2kHMJcRmcUBZS4HUk51YIpcyKleOqcMCDHq8pyWJ3htujArXLaB6dm3zS47/xZVy6p7MZosH9PVcXrwruzf+2hA8oikxEHpXdiRG4DvA1d9aEa9IguLry/P/GwZxoFoebvKLOZe7rKZXJpkV/VvCsvlmTvOIT4iq/poMEOQCUcnv72VbgDH5GZga8Eexa6wGnTOJLEoC6eXHeEm1p7NVdw65Lgg3PsmyIJUPum0wy50fvg1gfpS2EI5Qk91II+f3hv+QwZ+eiV6P+xDz6zNeWjQc4RIFgfH35ilR81ZQderzZHF/qG+TiHx6j1I4kqS0CZBLoeHPebXVRB+y4XQifH1DovbdmFjRd6q6kgU4+hLsaJsl9h16wMEwLqQ== regular
+
+ # setup and enable ntp
+ ntp:
+   enabled: true
+   ntp_client: chrony
+   pools: [0.pool.ntp.org, 1.pool.ntp.org, 2.pool.ntp.org]
+
+ final_message: "The system is up, after $UPTIME seconds"
