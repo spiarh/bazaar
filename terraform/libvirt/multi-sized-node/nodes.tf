@@ -149,12 +149,12 @@ resource "null_resource" "master" {
   connection {
     type = "ssh"
     host = element(
-        libvirt_domain.master.*.network_interface.0.addresses.0,
-        count.index,
+      libvirt_domain.master.*.network_interface.0.addresses.0,
+      count.index,
     )
     user        = var.ssh_user
     agent       = "false"
-    private_key = file(var.ssh_privkey)
+    private_key = fileexists(var.ssh_privkey) ? file(var.ssh_privkey) : null
   }
 
   # This ensures the VM is booted and SSH'able
@@ -214,8 +214,8 @@ resource "null_resource" "worker" {
   connection {
     type = "ssh"
     host = element(
-        libvirt_domain.worker.*.network_interface.0.addresses.0,
-        count.index,
+      libvirt_domain.worker.*.network_interface.0.addresses.0,
+      count.index,
     )
     user        = var.ssh_user
     agent       = "false"
