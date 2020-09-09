@@ -1,0 +1,26 @@
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: test-emptydir
+  namespace: default
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        name: test-emptydir
+    spec:
+      containers:
+      - name: test-emptydir
+        image: busybox
+        command:
+        - sh
+        - -c
+        - 'while true; do date > /mnt/cephfs/index.html; hostname >> /mnt/cephfs/index.html; sleep $(($RANDOM % 5 + 5)); done'
+        volumeMounts:
+        - mountPath: "/mnt/cephfs"
+          name: cephfs
+      volumes:
+      - name: cephfs
+        emptyDir: {}

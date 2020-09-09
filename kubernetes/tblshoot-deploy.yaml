@@ -1,4 +1,63 @@
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tblshoot
+---
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: psp.tblshoot.privileged
+  annotations:
+    seccomp.security.alpha.kubernetes.io/allowedProfileNames: '*'
+    seccomp.security.alpha.kubernetes.io/defaultProfileName: 'runtime/default'
+    apparmor.security.beta.kubernetes.io/allowedProfileName: '*'
+    apparmor.security.beta.kubernetes.io/defaultProfileName: 'runtime/default'
+spec:
+  privileged: true
+  allowPrivilegeEscalation: true
+  allowedCapabilities:
+  - '*'
+  volumes:
+  - '*'
+  hostNetwork: true
+  hostPorts:
+  - min: 0
+    max: 65535
+  hostIPC: true
+  hostPID: true
+  runAsUser:
+    rule: 'RunAsAny'
+  seLinux:
+    rule: 'RunAsAny'
+  supplementalGroups:
+    rule: 'RunAsAny'
+  fsGroup:
+    rule: 'RunAsAny'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: psp:tblshoot:privileged
+rules:
+  - apiGroups: ['extensions']
+    resources: ['podsecuritypolicies']
+    verbs: ['use']
+    resourceNames: ['psp.tblshoot.privileged']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: psp:tblshoot:privileged
+roleRef:
+  kind: ClusterRole
+  name: psp:tblshoot:privileged
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- kind: ServiceAccount
+  namespace: default
+  name: tblshoot
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -23,11 +82,8 @@ spec:
           - tail
           - -f
           - /dev/null
-        #resources:
-        #  requests:
-        #    cpu: 100m
-        #    memory: 100Mi
-        #  limits:
-        #    cpu: 2000m
-        #    memory: 2048Mi
+      securityContext:
+        runAsUser: 0
+      serviceAccount: tblshoot
+      serviceAccountName: tblshoot
       terminationGracePeriodSeconds: 0
