@@ -1,0 +1,33 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tblshoot
+  labels:
+    app: tblshoot
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: tblshoot
+  template:
+    metadata:
+      labels:
+        app: tblshoot
+    spec:
+      containers:
+      - name: tblshoot
+        image: docker.io/spiarh/tblshoot-large:latest
+        imagePullPolicy: IfNotPresent
+        command:
+          - tail
+          - -f
+          - /dev/null
+        #resources:
+        #  requests:
+        #    cpu: 100m
+        #    memory: 100Mi
+        #  limits:
+        #    cpu: 2000m
+        #    memory: 2048Mi
+      terminationGracePeriodSeconds: 0
