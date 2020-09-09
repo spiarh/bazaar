@@ -8,10 +8,9 @@ unattended_upgrades:
   package_blacklist: []
   automatic_reboot: "false"
   remove_unused_kernel_packages: "true"
-  remove_unused_kernel_packages: "true"
 
 apt_periodic:
-    download_upgradeable_packages: "1"
-    autoclean_interval: "7"
-    update_package_lists: "1"
-    unattended_upgrade: "1"
+  download_upgradeable_packages: "1"
+  autoclean_interval: "7"
+  update_package_lists: "1"
+  unattended_upgrade: "1"
