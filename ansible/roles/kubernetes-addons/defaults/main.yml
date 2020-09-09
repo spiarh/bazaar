@@ -15,7 +15,7 @@ calico:
   mtu: "1420"
 
 cilium:
-  version: "latest"
+  version: "v1.8.3"
   cni_conf_name: "05-cilium.conf"
   mtu: "1420"
   debug: "false"
