@@ -129,6 +129,7 @@ resource "null_resource" "node" {
   provisioner "remote-exec" {
     inline = [
       "sudo hostnamectl set-hostname ${var.basename}-${count.index}",
+      "cloud-init status --wait > /dev/null",
     ]
   }
 }

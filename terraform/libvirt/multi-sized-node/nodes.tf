@@ -161,6 +161,7 @@ resource "null_resource" "master" {
   provisioner "remote-exec" {
     inline = [
       "sudo hostnamectl set-hostname master-${var.basename}-${count.index}",
+      "cloud-init status --wait > /dev/null",
     ]
   }
 }
