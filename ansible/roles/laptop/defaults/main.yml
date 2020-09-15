@@ -21,7 +21,11 @@ packages_from_default_repos:
   - gcc
   - gcc-c++
   - gcc-gdb-plugin
+  - google-cloud-sdk
+  - gimp
   - git
+  - gnome-tweaks
+  - gnome-shell-theme-yaru
   - golang
   - golang-x-tools-benchcmp
   - golang-x-tools-bundle
@@ -50,7 +54,6 @@ packages_from_default_repos:
   - grubby
   - htop
   - httrack
-  - icedtea-web
   - iftop
   - ipcalc
   - ipmitool
@@ -65,7 +68,7 @@ packages_from_default_repos:
   - mumble
   - nmap
   - nmap-ncat
-  - nodejs
+  #- nodejs
   - openvpn
   - openssh-askpass
   - podman
@@ -141,9 +144,9 @@ packages_from_default_repos:
   - youtube-dl
   - vim
   - vim-X11
+  - vlc
   - virt-install
   - virt-manager
-  - xss-lock # xss-lock -- mate-screensaver-command --lock
   - wireguard-tools
 
 packages_from_external_repos:
@@ -198,10 +201,20 @@ yum_repo_to_add:
     description: "Hashicorp Test"
     file: hashicorp-test.repo
     baseurl: https://rpm.releases.hashicorp.com/fedora/$releasever/$basearch/test
-    enabled: yes
+    enabled: no
     gpgcheck: yes
     repo_gpgcheck: 1
     gpgkey: https://rpm.releases.hashicorp.com/gpg
+  - name: google-cloud-sdk
+    description: "Google Cloud SDK"
+    file: google-cloud-sdk.repo
+    baseurl: https://packages.cloud.google.com/yum/repos/cloud-sdk-el7-x86_64
+    enabled: yes
+    gpgcheck: yes
+    repo_gpgcheck: 1
+    gpgkey:
+      - https://packages.cloud.google.com/yum/doc/yum-key.gpg
+      - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 
 services_to_disable:
   - bluetooth.service
@@ -212,6 +225,9 @@ services_to_disable:
   - multipathd.service
   - ModemManager.service
   - sssd.service
+  - sssd-kcm.service
+  - sssd-kcm.socket
+
 
 services_to_enable:
   - libvirtd
