@@ -25,6 +25,12 @@
     state: absent
     remove: yes
 
+# created in armbian
+- name: remove_not_logged_file
+  file:
+    path: /root/.not_logged_in_yet
+    state: absent
+
 - name: manage_home
   file:
     path: "{{ item.value.home }}"
