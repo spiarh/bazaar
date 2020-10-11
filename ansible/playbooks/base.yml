@@ -1,0 +1,10 @@
+---
+- hosts: all
+  gather_facts: true
+  roles:
+    - common
+    - chrony
+    - users
+    - ssh
+  tags:
+    - base

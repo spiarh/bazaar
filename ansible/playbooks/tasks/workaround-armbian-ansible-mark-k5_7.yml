@@ -1,0 +1,10 @@
+- name: apt_mark_packages_hold
+  dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  with_items:
+    - linux-dtb-current-rockchip64
+    - linux-focal-root-current-rock64
+    - linux-image-current-rockchip64 
+    - linux-u-boot-rock64-current    
+

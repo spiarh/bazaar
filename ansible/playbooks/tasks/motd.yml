@@ -1,0 +1,16 @@
+- name: disable_motd-news
+  lineinfile:
+    dest: /etc/default/motd-news
+    state: present
+    regexp: '^ENABLED='
+    line: 'ENABLED=0'
+
+- name: disable_motd
+  file:
+    path: "/etc/update-motd.d/{{ item }}"
+    state: absent
+  with_items:
+    - 10-help-text
+    - 50-motd-news
+    - 80-esm
+    - 80-livepatch

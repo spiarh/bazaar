@@ -1,0 +1,8 @@
+---
+- hosts: all
+  gather_facts: false
+  tags:
+    - update_with_reboot
+  tasks:
+    - import_tasks: ./tasks/update.yml
+    - import_tasks: ./tasks/update-check-and-reboot-required.yml

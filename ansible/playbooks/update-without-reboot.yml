@@ -1,0 +1,7 @@
+---
+- hosts: all
+  gather_facts: false
+  tags:
+    - update_all_without_reboot
+  tasks:
+    - import_tasks: ./tasks/update.yml
