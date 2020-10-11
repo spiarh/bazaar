@@ -22,10 +22,10 @@
     group: root
     mode: 0644
   notify:
-    - restart_unattended_upgrade
+    - restart_unattended_upgrades
 
 - name: start_enable_service_unattended_upgrades
   service:
-    name: unattended-upgrades
+    name: unattended-upgrades.service
     state: started
     enabled: True
