@@ -1,0 +1,17 @@
+---
+- name: deploy_masters
+  hosts: masters
+  gather_facts: true
+  roles:
+    - kubernetes-kubeadm
+  serial: 1
+  tags:
+    - deploy_kubernetes_masters
+
+- name: deploy_workers
+  hosts: workers
+  gather_facts: true
+  roles:
+    - kubernetes-kubeadm
+  tags:
+    - deploy_kubernetes_workers

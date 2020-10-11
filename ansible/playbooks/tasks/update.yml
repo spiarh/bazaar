@@ -1,0 +1,8 @@
+- name: update_apt_cache
+  apt:
+    update_cache: yes
+
+- name: upgrade_packages
+  shell:
+    cmd: apt-get -y -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold upgrade
+    warn: false
