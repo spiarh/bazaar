@@ -1,11 +1,15 @@
 ---
 - name: disable_zram
   service:
-    name: zram-config
+    name: "{{ item }}"
     state: stopped
     enabled: False
+  ignore_errors: true
   notify:
     - disable_swap
+  with_items:
+    - zram-config
+    - armbian-zram-config
   when:
     - board_type is defined
     - board_type == "rock64"
