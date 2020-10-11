@@ -1,6 +1,7 @@
 ---
 packages_to_remove:
   - openvswitch
+  - thunderbird-enigmail
 
 packages_from_default_repos:
   - akmod-nvidia
@@ -15,6 +16,7 @@ packages_from_default_repos:
   - deja-dup
   - dkms
   - faketime
+  - ffmpeg
   - filezilla
   - freerdp
   - fwupd
@@ -75,6 +77,7 @@ packages_from_default_repos:
   - pkgconfig
   - pylint
   - python3-devel
+  - python3-netaddr
   - python3-pip
   - python3-virtualenv
   - python3-virtualenvwrapper
@@ -132,13 +135,15 @@ packages_from_default_repos:
   - rhythmbox
   - salt-master
   - salt-ssh
+  - screen
+  - skopeo
   - ShellCheck
   - shutter
   - sshuttle
   - strace
   - tcpdump
   - terminator
-  - thunderbird-enigmail
+  - transmission
   - tree
   - yarnpkg
   - youtube-dl
@@ -148,6 +153,7 @@ packages_from_default_repos:
   - virt-install
   - virt-manager
   - wireguard-tools
+  - wireshark
 
 packages_from_external_repos:
   - brave-browser-beta
