@@ -8,7 +8,6 @@ metadata:
     seccomp.security.alpha.kubernetes.io/defaultProfileName: 'runtime/default'
     apparmor.security.beta.kubernetes.io/allowedProfileName: '*'
 spec:
-  privileged: true
   allowPrivilegeEscalation: true
   allowedCapabilities:
    - NET_ADMIN
@@ -21,6 +20,7 @@ spec:
     - pathPrefix: /etc/cni/net.d
     - pathPrefix: /lib/modules
     - pathPrefix: /opt/cni/bin
+    - pathPrefix: /sys/fs
     - pathPrefix: /run/xtables.lock
     - pathPrefix: /usr/libexec/kubernetes/kubelet-plugins/volume/exec/
     - pathPrefix: /var/lib/calico
@@ -33,6 +33,7 @@ spec:
     max: 65535
   hostIPC: false
   hostPID: false
+  privileged: true
   runAsUser:
     rule: 'RunAsAny'
   seLinux:

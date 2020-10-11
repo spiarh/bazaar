@@ -10,7 +10,7 @@ flannel:
   cni_conf_name: "10-flannel.conflist"
 
 calico:
-  version: "v3.9.5"
+  version: "v3.16.1"
   cni_conf_name: "10-calico.conflist"
   mtu: "1420"
 
