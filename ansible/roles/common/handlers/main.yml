@@ -1,5 +1,5 @@
 ---
-- name: restart_unattended_upgrade
+- name: restart_unattended_upgrades
   systemd:
     name: unattended-upgrades.service
     state: restarted
