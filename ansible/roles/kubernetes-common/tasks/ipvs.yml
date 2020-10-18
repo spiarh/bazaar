@@ -8,8 +8,24 @@
     mode: 0644
   notify:
     - restart_systemd_modules_load
+  when: kubernetes_network_req.ipvs
 
 - name: install_ipvsadm
   apt:
     name: ipvsadm
     state: latest
+  when: kubernetes_network_req.ipvs      
+
+- name: remove_modprobe_ipvs
+  file:
+    dest: /etc/modules-load.d/ipvs.conf
+    state: absent
+  notify:
+    - restart_systemd_modules_load
+  when: not kubernetes_network_req.ipvs
+
+- name: remove_ipvsadm
+  apt:
+    name: ipvsadm
+    state: absent
+  when: not kubernetes_network_req.ipvs      

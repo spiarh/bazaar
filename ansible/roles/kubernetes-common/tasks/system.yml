@@ -20,10 +20,8 @@
     - restart_systemd_modules_load
 
 - import_tasks: ipvs.yml
-  when: kubernetes_network_req.ipvs
 
 - import_tasks: ebpf.yml
-  when: kubernetes_network_req.ebpf
 
 # just to be sure
 - name: run_sysctl_reload
