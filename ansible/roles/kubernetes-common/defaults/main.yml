@@ -7,19 +7,18 @@ k8s_apt_repos:
   - "deb https://apt.kubernetes.io/ kubernetes-xenial main"
 
 kubernetes_pkgs:
-  - name: kubeadm=1.17.2-00
+  - name: kubeadm=1.19.2-00
     state: present
-  - name: kubectl=1.17.2-00
+  - name: kubectl=1.19.2-00
     state: present
-  - name: kubelet=1.17.2-00
+  - name: kubelet=1.19.2-00
     state: present
-  - name: ceph-common
-    state: latest
 
 cgroup_manager: "systemd" 
 
 #kubelet_default_args: "--runtime-cgroups=/systemd/system.slice --kubelet-cgroups=/systemd/system.slice"
 kubelet_default_args: ""
 
+# allow to use the prereq just for the LXC host
 kubernetes_common_prereq: True
 kubernetes_common_install: True
