@@ -1,5 +1,8 @@
 ---
-# defaults file for kubernetes
+# allow to use the prereq just for the LXC host
+kubernetes_common_prereq: True
+kubernetes_common_install: True
+
 k8s_apt_keys:
   - https://packages.cloud.google.com/apt/doc/apt-key.gpg
 
@@ -19,6 +22,6 @@ cgroup_manager: "systemd"
 #kubelet_default_args: "--runtime-cgroups=/systemd/system.slice --kubelet-cgroups=/systemd/system.slice"
 kubelet_default_args: ""
 
-# allow to use the prereq just for the LXC host
-kubernetes_common_prereq: True
-kubernetes_common_install: True
+kubernetes_network_req:
+  ipvs: False
+  ebpf: False

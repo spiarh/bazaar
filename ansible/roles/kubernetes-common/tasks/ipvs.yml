@@ -1,0 +1,15 @@
+---
+- name: set_modprobe_ipvs
+  template:
+    src: modeprobe-ipvs.conf
+    dest: /etc/modules-load.d/ipvs.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart_systemd_modules_load
+
+- name: install_ipvsadm
+  apt:
+    name: ipvsadm
+    state: latest

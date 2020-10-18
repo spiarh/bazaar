@@ -1,0 +1,10 @@
+---
+- name: set_modprobe_ebpf
+  template:
+    src: modeprobe-ebpf.conf
+    dest: /etc/modules-load.d/ebpf.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart_systemd_modules_load
