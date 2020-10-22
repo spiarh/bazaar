@@ -76,9 +76,12 @@ packages_from_default_repos:
   - podman
   - pkgconfig
   - pylint
+  - python3-autopep8
   - python3-devel
+  - python3-flake8
   - python3-netaddr
   - python3-pip
+  - python3-pytest
   - python3-virtualenv
   - python3-virtualenvwrapper
   - pssh
