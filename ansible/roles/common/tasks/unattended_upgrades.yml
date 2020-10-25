@@ -12,7 +12,7 @@
     group: root
     mode: 0644
   notify:
-    - restart_unattended_upgrade
+    - restart_unattended_upgrades
 
 - name: configure_unattended_upgrades_auto
   template:
