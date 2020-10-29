@@ -21,3 +21,6 @@
     var: run_kubeadm_node_upgrade
 
 - meta: flush_handlers
+
+- include_tasks: init/rm_conf.yml
+- include_tasks: join/rm_conf.yml
