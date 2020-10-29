@@ -1,18 +1,18 @@
 ---
 # tasks file for wireguard
-- name: wireguard_add_apt_repos
+- name: wireguard_rm_apt_repos
   apt_repository:
     repo: "{{ item }}"
-    state: present
+    state: absent
   with_items:
-    - "{{ wireguard_apt_repos }}"
+    - "{{ wireguard.apt_repos }}"
 
 - name: wireguard_install_packages
   apt:
     name: "{{ item.name }}"
     state: "{{ item.state }}"
   with_items:
-    - "{{ wireguard_pkgs }}"
+    - "{{ wireguard.pkgs }}"
 
 - name: wireguard_conf_dir
   file:
@@ -31,7 +31,7 @@
     mode: 0440
   vars:
     conf: "{{ item }}"
-  loop: "{{ q('dict', wireguard) }}"
+  loop: "{{ q('dict', wireguard.interfaces) }}"
   when:
     - wireguard is defined
     - item.value.state == "started"
@@ -45,7 +45,7 @@
     name: "wg-quick@{{ item.key }}"
     state: stopped
     enabled: False
-  loop: "{{ q('dict', wireguard) }}"
+  loop: "{{ q('dict', wireguard.interfaces) }}"
   when:
     - wireguard is defined
     - item.value.state == "deleted"
@@ -55,7 +55,7 @@
   file:
     path: "/etc/wireguard/{{ item.key }}.conf"
     state: absent
-  loop: "{{ q('dict', wireguard) }}"
+  loop: "{{ q('dict', wireguard.interfaces) }}"
   when:
     - wireguard is defined
     - item.value.state == "deleted"
@@ -65,6 +65,6 @@
     name: "wg-quick@{{ item.key }}"
     state: started
     enabled: True
-  loop: "{{ q('dict', wireguard) }}"
+  loop: "{{ q('dict', wireguard.interfaces) }}"
   when:
     - item.value.state == "started"
