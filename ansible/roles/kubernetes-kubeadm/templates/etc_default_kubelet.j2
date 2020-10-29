@@ -1,1 +1,1 @@
-KUBELET_EXTRA_ARGS="--node-ip={{ (ansible_facts[kubelet_listen_interface | replace("-", "_")]['ipv4']['address']) | default(ansible_facts['default_ipv4']['address']) }} {{ kubelet_extra_args }}"
+KUBELET_EXTRA_ARGS="--node-ip={{ (ansible_facts[kubelet.listen_interface | replace("-", "_")]['ipv4']['address']) | default(ansible_facts['default_ipv4']['address']) }} {{ kubelet.extra_args }}"

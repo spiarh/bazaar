@@ -4,17 +4,18 @@ caCertPath: /etc/kubernetes/pki/ca.crt
 {% if inventory_hostname in groups['masters'] %}
 controlPlane:
   localAPIEndpoint:
-    advertiseAddress: {{ ansible_facts[apiserver_listen_interface | replace("-", "_")]['ipv4']['address'] | default(ansible_facts['default_ipv4']['address']) }}
+    advertiseAddress: {{ ansible_facts[kubernetes.apiserver.listen_interface | replace("-", "_")]['ipv4']['address'] | default(ansible_facts['default_ipv4']['address']) }}
 {% endif %}
 discovery:
   bootstrapToken:
-    apiServerEndpoint: {{ control_plane_endpoint }}
-    token: {{ token }}
+    apiServerEndpoint: {{ kubernetes.control_plane_endpoint }}
+    token: {{ kubeadm.token }}
     unsafeSkipCAVerification: False
     caCertHashes:
-    - sha256:{{ ca_cert_hash }}
+    - sha256:{{ kubeadm.ca_cert_hash }}
   timeout: 8m0s
 kind: JoinConfiguration
 nodeRegistration:
   name: {{ ansible_hostname }}
 {% include "templates/kubelet.yml.j2" %}
+{% include "templates/kube_proxy.yml.j2" %}

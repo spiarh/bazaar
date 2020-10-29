@@ -18,9 +18,9 @@
 
 - name: copy_kubeadm_args
   copy:
-    content: "KUBELET_KUBEADM_ARGS='{{ kubelet_kubeadm_args }}'"
+    content: "KUBELET_KUBEADM_ARGS='{{ kubeadm.kubelet_args }}'"
     dest: /var/lib/kubelet/kubeadm-flags.env
     owner: root
     group: root
     mode: 0644
-  when: kubelet_kubeadm_args != ""
+  when: kubeadm.kubelet_args != ""

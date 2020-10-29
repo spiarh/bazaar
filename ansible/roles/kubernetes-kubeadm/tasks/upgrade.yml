@@ -2,25 +2,17 @@
 - import_tasks: certs.yml
 - import_tasks: prereq.yml
 
-- name: copy_init_conf
-  template:
-    src: init.conf.j2
-    dest: "{{ kubeadm_init_file }}"
-    owner: root
-    group: root
-    mode: 0440
+- include_tasks: init/copy_conf.yml
 
 - name: run_kubeadm_upgrade
-  command: "kubeadm upgrade apply -v{{ kubeadm_log_level }} v{{ kubernetes_version }} --yes"
+  command: "kubeadm upgrade apply --config {{ kubeadm.init.config_file }} -v{{ kubeadm.log_level }} v{{ kubernetes.version }} --yes"
   register: run_kubeadm_upgrade
   when:
     - inventory_hostname == groups.masters[0]
 
 - name: run_kubeadm_node_upgrade
-  command: "kubeadm upgrade node -v{{ kubeadm_log_level }}"
+  command: "kubeadm upgrade node -v{{ kubeadm.log_level }}"
   register: run_kubeadm_node_upgrade
-  when:
-    - inventory_hostname != groups.masters[0]
 
 - debug:
     var: run_kubeadm_upgrade
@@ -29,6 +21,3 @@
     var: run_kubeadm_node_upgrade
 
 - meta: flush_handlers
-
-#- include_tasks: init_check.yml
-#  when: run_kubeadm_init is succeeded

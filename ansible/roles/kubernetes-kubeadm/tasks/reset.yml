@@ -1,19 +1,20 @@
 ---
 - name: run_kubeadm_reset
-  command: "kubeadm reset --force"
+  command: "kubeadm reset --force -v{{ kubeadm.log_level }}"
   register: run_kubeadm_reset
 
-- debug: var=run_kubeadm_reset
+- debug:
+    var: run_kubeadm_reset
 
 - name: run_clean_iptables
   shell: "iptables -F && iptables -t nat -F && iptables -t mangle -F && iptables -X"
   when: reset.clean_iptables
 
-- name: run_clean_etcd
-  shell: "rm -Rvf /var/lib/etcd"
-
-- name: run_remove_witness_init
-  shell: "rm -Rvf /etc/kubernetes/init_already_done"
-
-- name: run_remove_witness_join
-  shell: "rm -Rvf /etc/kubernetes/join_already_done"
+- name: remove_witness_etcd
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ kubeadm.init.witness_file }}"
+    - "{{ kubeadm.join.witness_file }}"
+    - "{{ etcd.data_dir }}"
