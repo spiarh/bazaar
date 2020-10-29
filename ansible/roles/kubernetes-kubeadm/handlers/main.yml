@@ -6,7 +6,7 @@
 
 - name: create_init_witness_file
   file:
-    path: "{{ init_witness_file }}"
+    path: "{{ kubeadm.init.witness_file }}"
     state: touch
     owner: root
     group: root
@@ -14,7 +14,7 @@
 
 - name: create_join_witness_file
   file:
-    path: "{{ join_witness_file }}"
+    path: "{{ kubeadm.join.witness_file }}"
     state: touch
     owner: root
     group: root

@@ -1,4 +1,6 @@
 ---
+cert_path: "{{ inventory_dir }}/secrets/kubernetes/pki"
+
 kubernetes:
   apiserver:
     admission_plugins: "NamespaceLifecycle,LimitRanger,ServiceAccount,TaintNodesByCondition,Priority,DefaultTolerationSeconds,DefaultStorageClass,PersistentVolumeClaimResize,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,NodeRestriction,PodSecurityPolicy"
@@ -40,7 +42,7 @@ kubeadm:
 #kubeconfig_admin: "/etc/kubernetes/admin.conf"
 
 kubelet:
-  # /etc/default/kubelet 
+  # /etc/default/kubelet
   extra_args: ""
   extra_configuration_default: |
     cgroupDriver: systemd
@@ -62,10 +64,6 @@ kube_proxy:
   mode: ""
   # extra_configuration_default: |
   extra_configuration_default: ""
-
-
-cert_path: "{{ inventory_dir }}/secrets/kubernetes/pki"
-
 
 reset:
   clean_iptables: false
