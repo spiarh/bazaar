@@ -10,6 +10,7 @@
   with_items:
     - zram-config
     - armbian-zram-config
+    - armbian-ramlog
   when:
     - board_type is defined
     - board_type == "rock64"

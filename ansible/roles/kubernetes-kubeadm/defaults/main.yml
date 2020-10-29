@@ -1,56 +1,71 @@
 ---
-apiserver_listen_interface: ""
-kubelet_listen_interface: ""
-#kubelet_kubeadm_args: "--container-runtime=remote --container-runtime-endpoint=/var/run/crio/crio.sock --resolv-conf=/run/systemd/resolve/resolv.conf"
-kubelet_kubeadm_args: ""
+kubernetes:
+  apiserver:
+    admission_plugins: "NamespaceLifecycle,LimitRanger,ServiceAccount,TaintNodesByCondition,Priority,DefaultTolerationSeconds,DefaultStorageClass,PersistentVolumeClaimResize,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,NodeRestriction,PodSecurityPolicy"
+    listen_interface: ""
 
-kubeadm_log_level: "5"
+  controller_manager:
+    listen_interface: ""
 
-admission_plugins: "NamespaceLifecycle,LimitRanger,ServiceAccount,TaintNodesByCondition,Priority,DefaultTolerationSeconds,DefaultStorageClass,PersistentVolumeClaimResize,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,NodeRestriction,PodSecurityPolicy"
-cluster_name: "the_knick"
-control_plane_endpoint: "services.maison.lan:6443"
-kubernetes_version: "1.17.2"
+  scheduler:
+    listen_interface: ""
+
+  cluster_name: "the_knick"
+  control_plane_endpoint: "services.maison.lan:6443"
+  version: "1.19.2"
 
 pod_subnet_cidr: "172.16.0.0/16"
-service_subnet: "172.17.0.0/16"
+service_subnet_cidr: "172.17.0.0/16"
 
-kubeadm_init_file: "/etc/kubernetes/kubeadm-init.yaml"
-kubeadm_join_file: "/etc/kubernetes/kubeadm-join.yaml"
-init_witness_file: "/etc/kubernetes/init_already_done"
-join_witness_file: "/etc/kubernetes/join_already_done"
+etcd:
+  data_dir: "/var/lib/etcd"
+
+kubeadm:
+  # openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'
+  ca_cert_hash: "{{lookup('file', inventory_dir + '/secrets/kubernetes/kubeadm/ca-cert-hash')}}"
+  init:
+    # Split with comma "addon/kube-proxy"
+    skip_phases: ""
+    config_file: "/etc/kubernetes/kubeadm-init.yaml"
+    witness_file: "/etc/kubernetes/init_already_done"
+  join:
+    skip_phases: ""
+    config_file: "/etc/kubernetes/kubeadm-join.yaml"
+    witness_file: "/etc/kubernetes/join_already_done"
+  # "--container-runtime=remote --container-runtime-endpoint=/var/run/crio/crio.sock --resolv-conf=/run/systemd/resolve/resolv.conf"
+  kubelet_args: ""
+  log_level: "5"
+  token: "{{lookup('file', inventory_dir + '/secrets/kubernetes/kubeadm/token')}}"
 
 #kubeconfig_admin: "/etc/kubernetes/admin.conf"
 
-kubelet_extra_configuration_default: |
-  cgroupDriver: systemd
-  cgroupRoot: /
-  kubeletCgroups: /podruntime.slice
-  kubeReservedCgroup: /podruntime.slice
-  resolvConf: /run/systemd/resolve/resolv.conf
-  runtimeCgroups: /podruntime.slice
-  systemReserved:
-    cpu: 250m
-    memory: 256Mi
-  resolvConf: /run/systemd/resolve/resolv.conf
+kubelet:
+  # /etc/default/kubelet 
+  extra_args: ""
+  extra_configuration_default: |
+    cgroupDriver: systemd
+    cgroupRoot: /
+    kubeletCgroups: /podruntime.slice
+    kubeReservedCgroup: /podruntime.slice
+    runtimeCgroups: /podruntime.slice
+    systemReserved:
+      cpu: 100m
+      memory: 128Mi
+  extra_configuration_kubereserved: |
+    kubeReserved:
+      cpu: 100m
+      memory: 128Mi
+      ephemeral-storage: 1024Mi
+  listen_interface: ""
 
-kubelet_extra_configuration_kubereserved: |
-  kubeReserved:
-    cpu: 250m
-    memory: 256Mi
-    ephemeral-storage: 1024Mi
+kube_proxy:
+  mode: ""
+  # extra_configuration_default: |
+  extra_configuration_default: ""
 
-# /etc/default/kubelet 
-kubelet_extra_args: ""
 
-# Split with comma "addon/kube-proxy"
-init_skip_phases: ""
-join_skip_phases: ""
+cert_path: "{{ inventory_dir }}/secrets/kubernetes/pki"
 
-cert_path: "pki"
-token: "{{lookup('file', 'templates/kubeadm/token')}}"
-
-# openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'
-ca_cert_hash: "{{lookup('file', 'templates/kubeadm/ca_cert_hash')}}"
 
 reset:
   clean_iptables: false

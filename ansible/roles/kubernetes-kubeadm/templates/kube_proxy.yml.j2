@@ -1,0 +1,6 @@
+---
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+kind: KubeProxyConfiguration
+clusterCIDR: {{ pod_subnet_cidr }}
+mode: {{ kube_proxy.mode }}
+{{ kube_proxy.extra_configuration_default }}
