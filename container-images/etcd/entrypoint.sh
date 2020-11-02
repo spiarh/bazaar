@@ -6,10 +6,13 @@ set -o nounset
 # Constants
 HOSTNAME="$(hostname -s)"
 AUTH_SKIP_TLS="${AUTH_SKIP_TLS:-false}"
+ETCD_FLAGS="${ETCD_FLAGS:-}"
 ETCDCTL_FLAGS=""
 if [ "${AUTH_SKIP_TLS}" = "true" ]; then ETCDCTL_FLAGS="$ETCDCTL_FLAGS --insecure-skip-tls-verify"; fi
 if [ -n "${ETCD_ROOT_PASSWORD:-}" ]; then ETCDCTL_FLAGS="$ETCDCTL_FLAGS --user root:$ETCD_ROOT_PASSWORD"; fi
 ETCDCTL="etcdctl $ETCDCTL_FLAGS"
+ETCD_DATA_DIR="${ETCD_DATA_DIR:-/var/lib/etcd/data}"
+ETCDCTL_ENDPOINTS="${ETCDCTL_ENDPOINTS:-}"
 ETCD_MEMBER_ID_FILE="$ETCD_DATA_DIR/member_id"
 ETCD_MEMBER_REMOVAL_LOG="$(dirname "$ETCD_DATA_DIR")/member_removal.log"
 ETCD_ENDPOINTS_LIST="$(echo "$ETCDCTL_ENDPOINTS" | sed 's/,/ /g')"
