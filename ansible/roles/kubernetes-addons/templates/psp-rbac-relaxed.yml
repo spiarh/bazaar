@@ -2,7 +2,7 @@
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
-  name: psp.relaxed
+  name: relaxed
   annotations:
     apparmor.security.beta.kubernetes.io/allowedProfileNames: 'runtime/default'
     seccomp.security.alpha.kubernetes.io/allowedProfileNames: 'runtime/default'
@@ -63,10 +63,10 @@ kind: ClusterRole
 metadata:
   name: psp:relaxed
 rules:
-  - apiGroups: ['extensions']
+  - apiGroups: ['policy']
     resources: ['podsecuritypolicies']
     verbs: ['use']
-    resourceNames: ['psp.relaxed']          
+    resourceNames: ['relaxed']
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding

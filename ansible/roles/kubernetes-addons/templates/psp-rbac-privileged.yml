@@ -2,7 +2,7 @@
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
-  name: psp.privileged
+  name: privileged
   annotations:
     seccomp.security.alpha.kubernetes.io/allowedProfileNames: '*'
     seccomp.security.alpha.kubernetes.io/defaultProfileName: 'runtime/default'
@@ -35,10 +35,10 @@ kind: ClusterRole
 metadata:
   name: psp:privileged
 rules:
-  - apiGroups: ['extensions']
+  - apiGroups: ['policy']
     resources: ['podsecuritypolicies']
     verbs: ['use']
-    resourceNames: ['psp.privileged']
+    resourceNames: ['privileged']
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding

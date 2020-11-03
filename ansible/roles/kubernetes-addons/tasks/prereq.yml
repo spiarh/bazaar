@@ -8,7 +8,7 @@
     state: mounted
   when:
     - cni == "cilium"
-    - inventory_hostname not in groups['lxd_k8s_containers']
+    # - inventory_hostname not in groups['lxd_k8s_containers']
 
 - name: clean_cni_from_cilium
   file:
