@@ -50,6 +50,7 @@ kubelet:
     kubeletCgroups: /podruntime.slice
     kubeReservedCgroup: /podruntime.slice
     runtimeCgroups: /podruntime.slice
+    resolvConf: /run/systemd/resolve/resolv.conf
     systemReserved:
       cpu: 100m
       memory: 128Mi
@@ -62,6 +63,9 @@ kubelet:
 
 kube_proxy:
   mode: ""
+  nodeport_addresses:
+    cidr: []
+    interfaces: []
   # extra_configuration_default: |
   extra_configuration_default: ""
 
