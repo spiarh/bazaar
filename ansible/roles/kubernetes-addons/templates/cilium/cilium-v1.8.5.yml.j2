@@ -185,7 +185,7 @@ data:
   auto-direct-node-routes: "false"
   enable-bandwidth-manager: "true"
   kube-proxy-replacement:  "{{ cilium.kube_proxy_replacement }}"
-  enable-health-check-nodeport: "true"
+  enable-health-check-nodeport: "{{ cilium.enable_health_check_nodeport }}"
   node-port-bind-protection: "true"
   enable-auto-protect-node-port-range: "true"
   enable-host-reachable-services: "{{ cilium.enable_host_reachable_services }}"
@@ -225,7 +225,6 @@ data:
   hubble-disable-tls: "true"
   ipam: "cluster-pool"
   cluster-pool-ipv4-cidr: "{{ pod_subnet_cidr }}"
-  #cluster-pool-ipv4-mask-size: "24"
   disable-cnp-status-updates: "true"
 ---
 # Source: cilium/charts/hubble-relay/templates/configmap.yaml

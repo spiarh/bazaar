@@ -2,7 +2,7 @@
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
-  name: psp.restricted
+  name: restricted
   annotations:
     apparmor.security.beta.kubernetes.io/allowedProfileNames: 'runtime/default'
     seccomp.security.alpha.kubernetes.io/allowedProfileNames: 'runtime/default'
@@ -61,7 +61,7 @@ kind: ClusterRole
 metadata:
   name: psp:restricted
 rules:
-  - apiGroups: ['extensions']
+  - apiGroups: ['policy']
     resources: ['podsecuritypolicies']
     verbs: ['use']
-    resourceNames: ['psp.restricted']
+    resourceNames: ['restricted']

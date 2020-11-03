@@ -17,6 +17,7 @@
     owner: root
     group: root
     mode: 0644
+  register: addons_manifests_copied
   with_items:
     - {src: "psp-rbac-privileged.yml", dest: "psp-rbac-privileged.yml"}
     - {src: "psp-rbac-relaxed.yml", dest: "psp-rbac-relaxed.yml"}
@@ -39,4 +40,6 @@
   register: addons_manifests_applied
 
 - debug:
-    var: addons_manifests_applied.stdout_lines
+    msg: "{{ item.stdout }}"
+  with_items:
+    - "{{ addons_manifests_applied.results }}"

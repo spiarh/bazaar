@@ -10,7 +10,11 @@ data:
   # Typha is disabled.
   typha_service_name: "none"
   # Configure the backend to use.
-  calico_backend: "bird"
+  calico_backend: "vxlan"
+  # IP autodetection methods
+  ip_autodetection_method: "{{ calico.ip_autodetection_method }}"
+  # IPv6 autodetection methods
+  ip6_autodetection_method: "{{ calico.ip6_autodetection_method }}"
   # Configure the MTU to use for workload interfaces and tunnels.
   # - If Wireguard is enabled, set to your network MTU - 60
   # - Otherwise, if VXLAN or BPF mode is enabled, set to your network MTU - 50
@@ -3653,6 +3657,18 @@ spec:
             # Auto-detect the BGP IP address.
             - name: IP
               value: "autodetect"
+            # IP autodetection methods
+            - name: IP_AUTODETECTION_METHOD
+              valueFrom:
+                configMapKeyRef:
+                  name: calico-config
+                  key: ip_autodetection_method
+            # IPv6 autodetection methods
+            - name: IP6_AUTODETECTION_METHOD
+              valueFrom:
+                configMapKeyRef:
+                  name: calico-config
+                  key: ip6_autodetection_method
             # Enable IPIP
             - name: CALICO_IPV4POOL_IPIP
               value: "Always"

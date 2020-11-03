@@ -2,7 +2,7 @@
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
-  name: psp.calico
+  name: calico
   annotations:
     seccomp.security.alpha.kubernetes.io/allowedProfileNames: '*'
     seccomp.security.alpha.kubernetes.io/defaultProfileName: 'runtime/default'
@@ -46,20 +46,20 @@ spec:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: psp:calico
+  name: calico:psp
 rules:
-  - apiGroups: ['extensions']
+  - apiGroups: ['policy']
     resources: ['podsecuritypolicies']
     verbs: ['use']
-    resourceNames: ['psp.calico']
+    resourceNames: ['calico']
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: psp:calico
+  name: calico:psp
 roleRef:
   kind: ClusterRole
-  name: psp:calico
+  name: calico:psp
   apiGroup: rbac.authorization.k8s.io
 subjects:
 - kind: ServiceAccount
@@ -69,7 +69,7 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: psp:calico-kube-controllers
+  name: calico-kube-controllers:psp
   namespace: kube-system
 roleRef:
   kind: ClusterRole
