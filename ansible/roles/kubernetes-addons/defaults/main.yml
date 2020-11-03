@@ -26,6 +26,7 @@ cilium:
   debug: "false"
   prepend_iptables_chains: "true"
   enable_ipv4: "true"
+  ipv4_mask_size: "24"
   enable_ipv6: "false"
   wait_bpf_mount: "true"
   kube_proxy_replacement: "strict"

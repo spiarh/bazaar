@@ -225,6 +225,7 @@ data:
   hubble-disable-tls: "true"
   ipam: "cluster-pool"
   cluster-pool-ipv4-cidr: "{{ pod_subnet_cidr }}"
+  cluster-pool-ipv4-mask-size: "{{ ipv4_mask_size }}"
   disable-cnp-status-updates: "true"
 ---
 # Source: cilium/charts/hubble-relay/templates/configmap.yaml
