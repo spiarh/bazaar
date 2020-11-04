@@ -177,6 +177,7 @@ data:
   cni-chaining-mode: "portmap"
 {% endif %}
 
+  mtu: "{{ cilium.mtu | default('1500') }}"
   masquerade: "true"
   enable-bpf-masquerade: "true"
   prepend-iptables-chains: "{{ cilium.prepend_iptables_chains }}"
@@ -225,7 +226,7 @@ data:
   hubble-disable-tls: "true"
   ipam: "cluster-pool"
   cluster-pool-ipv4-cidr: "{{ pod_subnet_cidr }}"
-  cluster-pool-ipv4-mask-size: "{{ ipv4_mask_size }}"
+  cluster-pool-ipv4-mask-size: "{{ cilium.ipv4_mask_size }}"
   disable-cnp-status-updates: "true"
 ---
 # Source: cilium/charts/hubble-relay/templates/configmap.yaml
@@ -599,7 +600,6 @@ spec:
       containers:
       - args:
         - --config-dir=/tmp/cilium/config-map
-        - --mtu={{ cilium.mtu | default('1500') }}
         command:
         - cilium-agent
         livenessProbe:
@@ -634,8 +634,6 @@ spec:
           successThreshold: 1
           timeoutSeconds: 5
         env:
-        #- name: MTU
-        #  value: "{{ cilium.mtu | default('1500') }}"
         - name: KUBERNETES_SERVICE_HOST
           value: "{{ kubernetes.control_plane_endpoint.split(":")[0] }}"
         - name: KUBERNETES_SERVICE_PORT
