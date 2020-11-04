@@ -2,6 +2,7 @@
 kubeconfig_admin: "/etc/kubernetes/admin.conf"
 addons_directoy: "/etc/kubernetes/addons"
 
+
 psp:
   default: "relaxed"
 
