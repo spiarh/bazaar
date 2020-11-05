@@ -1,7 +1,8 @@
 ---
-containerd_version: 1.3.3
-containerd_pkgs:
-  - name: containerd=1.3.3-0ubuntu1~18.04.2
+containerd:
+  version: 1.3.3
+  pkgs:
+  - name: containerd=1.3.3-0ubuntu2
     state: present
 
 runtime_endpoint: "/run/containerd/containerd.sock"
