@@ -1,7 +1,9 @@
 ---
 - set_fact:
-    podman_apt_key: "{{ podman_repo_base }}{{ ansible_facts['lsb']['release'] }}/Release.key"
-    podman_apt_repo: "deb {{ podman_repo_base }}{{ ansible_facts['lsb']['release'] }} /"
+    podman:
+      apt:
+        key: "{{ podman.repo_base }}{{ ansible_facts['lsb']['release'] }}/Release.key"
+        repo: "deb {{ podman.repo_base }}{{ ansible_facts['lsb']['release'] }} /"
     cacheable: yes
 
 - name: podman_add_apt_keys
@@ -9,20 +11,20 @@
     url: "{{ item }}"
     state: present
   with_items:
-    - "{{ podman_apt_key }}"
-    - "{{ kubernetes_apt_key }}"
+    - "{{ podman.apt.key }}"
+    - "{{ kubernetes.apt.key }}"
 
 - name: podman_add_apt_repos
   apt_repository:
     repo: "{{ item }}"
     state: present
   with_items:
-    - "{{ podman_apt_repo }}"
-    - "{{ kubernetes_apt_repo }}"
+    - "{{ podman.apt.repo }}"
+    - "{{ kubernetes.apt.repo }}"
 
 - name: podman_install_packages
   apt:
     name: "{{ item.name }}"
     state: "{{ item.state }}"
   with_items:
-    - "{{ podman_pkgs }}"
+    - "{{ podman.pkgs }}"

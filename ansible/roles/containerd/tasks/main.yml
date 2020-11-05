@@ -6,7 +6,7 @@
     dpkg_options: "force-confold,force-confdef,force-hold"
     force: yes
   with_items:
-    - "{{ containerd_pkgs }}"
+    - "{{ containerd.pkgs }}"
   register: containerd_pkgs_install
 
 - name: apt_mark_packages_hold
@@ -14,7 +14,7 @@
     name: "{{ item.name.split('=')[0] }}"
     selection: hold
   with_items:
-    - "{{ containerd_pkgs }}"
+    - "{{ containerd.pkgs }}"
 
 - name: create_containerd_dir
   file:
@@ -26,7 +26,7 @@
 
 - name: configure_containerd
   template:
-    src: "containerd-{{ containerd_version }}.toml.j2"
+    src: "containerd-{{ containerd.version }}.toml.j2"
     dest: /etc/containerd/config.toml
     owner: root
     group: root
