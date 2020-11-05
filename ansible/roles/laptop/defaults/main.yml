@@ -9,6 +9,7 @@ packages_from_default_repos:
   - acpid
   - awscli
   - bat
+  - bcc
   - buildah
   - chromium
   - curl
@@ -20,6 +21,7 @@ packages_from_default_repos:
   - filezilla
   - freerdp
   - fwupd
+  - fzf
   - gcc
   - gcc-c++
   - gcc-gdb-plugin
@@ -144,6 +146,7 @@ packages_from_default_repos:
   - shutter
   - sshuttle
   - strace
+  - sysstat
   - tcpdump
   - terminator
   - transmission
