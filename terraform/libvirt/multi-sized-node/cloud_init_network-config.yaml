@@ -1,5 +1,5 @@
-#config: disabled
 version: 2
+renderer: netplan
 ethernets:
   ens3:
     dhcp4: true

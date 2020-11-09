@@ -24,4 +24,10 @@ ntp:
   ntp_client: chrony
   pools: [0.pool.ntp.org, 1.pool.ntp.org, 2.pool.ntp.org]
 
+runcmd:
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  - add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  - apt install -y git golang docker-ce docker-ce-cli containerd.io
+  - systemctl start --now docker
+
 final_message: "The system is up, after $UPTIME seconds"
