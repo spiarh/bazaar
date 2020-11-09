@@ -7,13 +7,12 @@ locale: en_US.UTF-8
 timezone: Europe/Berlin
 
 users:
+#  - default
   - name: root
     lock_passwd: true
   - name: regular
     lock_passwd: true
     sudo: ALL=(ALL) NOPASSWD:ALL
-    # lock_passwd: false
-    # passwd: "$6$rounds=4096$8EKow3orYr8/Djiy$FfCIxiwSzO0jyfut/oxGZ6SE6St2giUfMeaRmmMNW5FJ/mvQmeLTSHogsnVJL86Cw4VA.Z0oHk8RSWQky8K3n/" # linux
     ssh_authorized_keys:
       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFHUkbmn1u0EPaf1Nqnx8KSn9sfcgLxsaDSyPy+xmHJ1
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDvBiyxnCaL3zU8VUDdFyrCdU9HgRzzD5Jp76bhwsulMDAd0CbmX+RIwRTL+IkEK7y6OmEMmBY8zKpwwoE70CFtUHLKjKlsJGu6miw3IQx7rJ+Bn0AbUxoq5ho/ovysiKNZjn4cUH/XbKQENfX1LVjnh2fBNfgMvGaOJ5pPxu+Ky5mWkFXCONOQRvYeQ/gSMeKOJAuYUx/Tf1svrm14+HUr3evNbYlGOwbK5bNhS54EX1ZodA7RrOrPSJjIsLoRPm6bre5VxovHc4q8AMgTJ5KM7VnuQqKLbMQZBJGCu01W/hXAjM7JC/gz3ahEHeDEVDoVq9k3qywMEpaEkfNNKd6e9TCqBSTtjjtkD2MEmkXXQsupStPSh+pny/tu+4J2ITyoqh8H+bgSPCH/nGjsGF3wKFyKoNgeztQmqkHxIdqVeIjNnIavNuH9vuURJbTl7Igckd1Jja02xA5bo1q4zoyPcd5P8Fz6sdmiFYV2sg1SUw9gl9N1KCXYmOwLVRq+OQBaeWn6TymA56gZ1c6co0RDFGzaI7XQYRYydyQt7fPshkQXonOmWTqtNvOON4QGGWX2Qso/9Xe8RGlGTMPeCghGICYlUWicahRUqp3zkqUQIT0JLuVgUduHmM8g24URqbHDM1nOfJfRG0PWLEzcdYzkltfbVj8w9trVHXd7DaV1nw==
@@ -24,5 +23,11 @@ ntp:
   enabled: true
   ntp_client: chrony
   pools: [0.pool.ntp.org, 1.pool.ntp.org, 2.pool.ntp.org]
+
+runcmd:
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  - add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  - apt install -y git golang docker-ce docker-ce-cli containerd.io
+  - systemctl start --now docker
 
 final_message: "The system is up, after $UPTIME seconds"

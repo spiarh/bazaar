@@ -1,22 +1,19 @@
+variable "role" {
+}
+
 variable "basename" {
 }
 
 variable "image" {
 }
 
-variable "cloud_init_file" {
-}
-
 variable "cloud_init_network_config_file" {
 }
 
-variable "storage_pool" {
+variable "node_count" {
 }
 
-variable "storage_format" {
-}
-
-variable "network" {
+variable "cloud_init_file" {
 }
 
 variable "memory" {
@@ -25,25 +22,40 @@ variable "memory" {
 variable "vcpu" {
 }
 
+variable "network" {
+}
+
+variable "storage_pool" {
+}
+
+variable "storage_format" {
+}
+
 variable "ssh_privkey" {
 }
 
 variable "ssh_user" {
 }
 
-# Povider
-provider "libvirt" {
-  uri = "qemu:///system"
+terraform {
+ required_version = ">= 0.13"     
+ required_providers {
+   libvirt = {
+     source  = "dmacvicar/libvirt"
+     version = "0.6.2"
+   }
+ }
 }
 
-###############
-### VOLUMES ###
-###############
 
-# adapt the build number 
+##############
+### VOLUME ###
+##############
+
 resource "libvirt_volume" "node" {
-  name   = "vol-${var.basename}"
-  source = var.image
+  name   = "vol-${var.role}-${var.basename}-${count.index}"
+  source = pathexpand(var.image)
+  count  = var.node_count
   pool   = var.storage_pool
   format = var.storage_format
 }
@@ -53,30 +65,29 @@ resource "libvirt_volume" "node" {
 ##################
 
 data "template_file" "user_data" {
-  template = file(var.cloud_init_file)
+  template = file(pathexpand(var.cloud_init_file))
 }
 
 data "template_file" "network_config" {
-  template = file(var.cloud_init_network_config_file)
+  template = file(pathexpand(var.cloud_init_network_config_file))
 }
 
-
 resource "libvirt_cloudinit_disk" "cloud_init" {
-  name           = "cloud_init_${var.basename}.iso"
+  name           = "cloud-init-${var.role}-${var.basename}.iso"
   pool           = var.storage_pool
   user_data      = data.template_file.user_data.rendered
-  network_config = data.template_file.network_config.rendered
+  #network_config = data.template_file.network_config.rendered
 }
 
 ##########
 ### VM ###
 ##########
 
-# Create the machine
 resource "libvirt_domain" "node" {
-  name   = var.basename
+  name   = "${var.role}-${var.basename}-${count.index}"
   memory = var.memory
   vcpu   = var.vcpu
+  count  = var.node_count
 
   cloudinit = libvirt_cloudinit_disk.cloud_init.id
 
@@ -101,7 +112,7 @@ resource "libvirt_domain" "node" {
   }
 
   disk {
-    volume_id = libvirt_volume.node.id
+    volume_id = element(libvirt_volume.node.*.id, count.index)
   }
 
   graphics {
@@ -112,26 +123,28 @@ resource "libvirt_domain" "node" {
 }
 
 resource "null_resource" "node" {
+  count = var.node_count
 
   connection {
-    type        = "ssh"
-    host        = libvirt_domain.node.network_interface.0.addresses.0
+    type = "ssh"
+    host = element(
+      libvirt_domain.node.*.network_interface.0.addresses.0,
+      count.index,
+    )
     user        = var.ssh_user
-    agent       = "true"
+    agent       = "false"
     private_key = fileexists(var.ssh_privkey) ? file(var.ssh_privkey) : null
   }
 
   # This ensures the VM is booted and SSH'able
   provisioner "remote-exec" {
     inline = [
-      "sudo hostnamectl set-hostname ${var.basename}",
+      "sudo hostnamectl set-hostname ${var.role}-${var.basename}-${count.index}",
       "cloud-init status --wait > /dev/null",
     ]
   }
 }
 
-# IPs: use wait_for_lease true or after creation use terraform refresh and terraform show for the ips of domain
 output "ip_nodes" {
-  value = [libvirt_domain.node.network_interface.0.addresses]
+  value = libvirt_domain.node.*.network_interface.0.addresses
 }
-
