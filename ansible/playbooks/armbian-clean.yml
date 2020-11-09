@@ -1,0 +1,19 @@
+---
+- hosts: all
+  gather_facts: false
+  tags:
+    - armbian_clean
+  tasks:
+    - name: use_dns_from_dhcp
+      lineinfile:
+        path: /etc/systemd/resolved.conf
+        regexp: "^DNS=.*"
+        line: "#DNS="
+      register: dns_removed
+    - name:
+      service:
+        name: systemd-resolved.service
+        state: restarted
+        enabled: true
+      when:
+        - dns_removed.changed == True

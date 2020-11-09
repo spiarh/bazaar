@@ -6,5 +6,3 @@
   roles:
     - kubernetes-common
     - containerd
-  tags:
-    - deploy_kubernetes_base

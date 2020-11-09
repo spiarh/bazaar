@@ -1,0 +1,11 @@
+---
+- name: deploy_masters
+  hosts: masters
+  gather_facts: true
+  roles:
+    - kubernetes-kubeadm
+  serial: 1
+  # tasks:
+  #   - include_role:
+  #       name: kubernetes-kubeadm
+  #       tasks_from: init/copy_conf

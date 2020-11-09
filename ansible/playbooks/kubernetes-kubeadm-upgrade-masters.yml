@@ -1,0 +1,9 @@
+- name: upgrade-masters
+  gather_facts: true
+  hosts: masters
+  serial: 1
+  tasks:
+    - import_tasks: ./tasks/gather_facts_masters_workers.yml
+    - include_role:
+        name: kubernetes-kubeadm
+        tasks_from: upgrade
