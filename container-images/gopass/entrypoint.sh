@@ -3,7 +3,7 @@
 if [ "$1" = "sh" ]; then
   set -- /bin/sh
 else
-  set -- /usr/local/bin/gopass "$@"
+  set -- /usr/local/bin/gopass-full "$@"
 fi
 
 # Avoid warnings about server version
