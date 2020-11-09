@@ -1,0 +1,9 @@
+---
+- name: deploy_addons
+  hosts:
+  - masters
+  - workers
+  roles:
+    - kubernetes-addons
+  tags:
+    - deploy_kubernetes_addons

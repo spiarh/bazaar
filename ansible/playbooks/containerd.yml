@@ -1,0 +1,9 @@
+---
+- hosts:
+  - masters
+  - workers
+  gather_facts: true
+  roles:
+    - containerd
+  tags:
+    - deploy_kubernetes_base

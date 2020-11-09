@@ -1,0 +1,7 @@
+- name: gather_facts_from_masters_workers
+  ansible.builtin.setup:
+  delegate_to: "{{ item }}"
+  delegate_facts: true
+  with_items:
+    - "{{ groups['masters'] }}"
+    - "{{ groups['workers'] }}"

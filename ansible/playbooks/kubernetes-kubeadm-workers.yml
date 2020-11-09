@@ -1,0 +1,8 @@
+---
+- name: deploy_workers
+  hosts: workers
+  gather_facts: true
+  roles:
+    - kubernetes-kubeadm
+  tags:
+    - deploy_kubernetes_workers
