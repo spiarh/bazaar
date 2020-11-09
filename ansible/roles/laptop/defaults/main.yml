@@ -151,6 +151,7 @@ packages_from_default_repos:
   - terminator
   - transmission
   - tree
+  - yamllint
   - yarnpkg
   - youtube-dl
   - vim
