@@ -1,4 +1,4 @@
-FROM golang:1.14-alpine AS builder
+FROM golang:1.15-alpine AS builder
 
 ARG VERSION=2.7.1
 
@@ -24,10 +24,12 @@ RUN set -ex && \
 
 COPY --from=builder /go/bin/registry /usr/local/bin/registry
 
+ADD config.yml /usr/local/etc/config.yml
+
 EXPOSE 5000
 
 USER 1871
 
 ENTRYPOINT ["/usr/local/bin/registry"]
 
-CMD ["serve", "/etc/docker/registry/config.yml"]
+CMD ["serve", "/usr/local/etc/config.yml"]
