@@ -49,11 +49,6 @@ variable "ssh_privkey" {
 variable "ssh_user" {
 }
 
-# Provider
-provider "libvirt" {
-  uri = "qemu:///system"
-}
-
 module "master" {
   source   = "../modules/node"
   role = "master"
