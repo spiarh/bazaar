@@ -35,7 +35,7 @@ calico:
 
 cilium:
   version: "v1.8.5"
-  cni_conf_name: "05-cilium.conf"
+  cni_conf_name: "05-cilium.conflist"
   debug: "false"
   prepend_iptables_chains: "true"
   enable_ipv4: "true"
