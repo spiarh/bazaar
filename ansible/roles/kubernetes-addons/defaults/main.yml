@@ -2,11 +2,13 @@
 kubeconfig_admin: "/etc/kubernetes/admin.conf"
 addons_directoy: "/etc/kubernetes/addons"
 
-
 psp:
   default: "relaxed"
 
-cni: "cilium"
+cni:
+  name: "cilium"
+  mtu: "1420"
+  ipv4_mask_size: "24"
 #cni: "calico"
 
 flannel:
@@ -18,16 +20,25 @@ calico:
   cni_conf_name: "10-calico.conflist"
   ip_autodetection_method: "interface=.*"
   ip6_autodetection_method: "interface=.*"
-  mtu: "1420"
+
+  ippool:
+    ipip_mode: "Never"
+    nat_outgoing: "true"
+    vxlan_mode: "Always"
+
+  felix:
+    bpf_enabled: "true"
+    bpf_log_level: "Info"
+    ipip_enabled: "false"
+    log_severity_screen: "Info"
+    vxlan_enabled: "true"
 
 cilium:
   version: "v1.8.5"
   cni_conf_name: "05-cilium.conf"
-  mtu: "1420"
   debug: "false"
   prepend_iptables_chains: "true"
   enable_ipv4: "true"
-  ipv4_mask_size: "24"
   enable_ipv6: "false"
   wait_bpf_mount: "true"
   kube_proxy_replacement: "strict"

@@ -20,7 +20,7 @@ data:
   # - Otherwise, if VXLAN or BPF mode is enabled, set to your network MTU - 50
   # - Otherwise, if IPIP is enabled, set to your network MTU - 20
   # - Otherwise, if not using any encapsulation, set to your network MTU.
-  veth_mtu: "{{ calico.mtu }}"
+  veth_mtu: "{{ cni.mtu }}"
 
   # The CNI network configuration to install on each node. The special
   # values in this config will be automatically populated.
@@ -3722,7 +3722,9 @@ spec:
               command:
               - /bin/calico-node
               - -felix-live
+{% if calico.ippool.ipip_mode != "Never" %}
               - -bird-live
+{% endif %}
             periodSeconds: 10
             initialDelaySeconds: 10
             failureThreshold: 6
@@ -3731,7 +3733,9 @@ spec:
               command:
               - /bin/calico-node
               - -felix-ready
+{% if calico.ippool.ipip_mode != "Never" %}
               - -bird-ready
+{% endif %}
             periodSeconds: 10
           volumeMounts:
             - mountPath: /lib/modules
@@ -3864,12 +3868,26 @@ metadata:
   namespace: kube-system
 
 ---
-# Source: calico/templates/calico-etcd-secrets.yaml
-
+apiVersion: crd.projectcalico.org/v1
+kind: IPPool
+metadata:
+  name: default-ipv4-ippool
+spec:
+  blockSize: {{ cni.ipv4_mask_size }}
+  cidr: "{{ pod_subnet_cidr }}"
+  ipipMode: "{{ calico.ippool.ipip_mode }}"
+  natOutgoing: {{ calico.ippool.nat_outgoing }}
+  nodeSelector: all()
+  vxlanMode: "{{ calico.ippool.vxlan_mode }}"
 ---
-# Source: calico/templates/calico-typha.yaml
-
----
-# Source: calico/templates/configure-canal.yaml
-
-
+apiVersion: crd.projectcalico.org/v1
+kind: FelixConfiguration
+metadata:
+  name: default
+spec:
+  bpfEnabled: {{ calico.felix.bpf_enabled }}
+  bpfLogLevel: "{{ calico.felix.bpf_log_level }}"
+  ipipEnabled: {{ calico.felix.ipip_enabled }}
+  logSeverityScreen: "{{ calico.felix.log_severity_screen }}"
+  reportingInterval: 0s
+  vxlanEnabled: {{ calico.felix.vxlan_enabled }}

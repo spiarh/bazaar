@@ -6,9 +6,6 @@
     owner: root
     group: root
     mode: 0755
-  with_items:
-    - "{{ addons_directoy }}"
-    - "{{ addons_directoy }}/{{ cni }}"
 
 - name: copy_addons_manifests
   template:
@@ -24,8 +21,9 @@
     - {src: "psp-rbac-restricted.yml", dest: "psp-rbac-restricted.yml"}
     - {src: "psp-rbac-kube-proxy.yml", dest: "psp-rbac-kube-proxy.yml"}
     - {src: "psp-default.yml", dest: "psp-default.yml"}
-    - {src: "{{ cni }}/{{ cni }}-{{ vars[cni]['version'] }}.yml.j2", dest: "{{ cni }}-{{ vars[cni]['version'] }}.yml"}
-    - {src: "{{ cni }}/psp-rbac.yml", dest: "psp-rbac-{{ cni }}.yml"}
+    - {src: "kubernetes-services-endpoint.yml", dest: "kubernetes-services-endpoint.yml"}
+    - {src: "{{ cni.name }}/{{ cni.name }}-{{ vars[cni.name]['version'] }}.yml.j2", dest: "{{ cni.name }}-{{ vars[cni.name]['version'] }}.yml"}
+    - {src: "{{ cni.name }}/psp-rbac.yml", dest: "psp-rbac-{{ cni.name }}.yml"}
 
 - name: apply_addons_manifests
   command: "kubectl apply -f {{ addons_directoy }}/{{ item }} --kubeconfig={{ kubeconfig_admin }} -v4"
@@ -35,8 +33,9 @@
     - psp-rbac-restricted.yml
     - psp-rbac-kube-proxy.yml
     - psp-default.yml
-    - "{{ cni }}-{{ vars[cni]['version'] }}.yml"
-    - "psp-rbac-{{ cni }}.yml"
+    - kubernetes-services-endpoint.yml
+    - "{{ cni.name }}-{{ vars[cni.name]['version'] }}.yml"
+    - "psp-rbac-{{ cni.name }}.yml"
   register: addons_manifests_applied
 
 - debug:

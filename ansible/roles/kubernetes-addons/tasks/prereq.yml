@@ -7,7 +7,7 @@
     - "/etc/cni/net.d/{{ cilium.cni_conf_name }}"
     - /opt/cni/bin/cilium-cni
     - /var/run/cilium
-  when: cni != "cilium"
+  when: cni.name != "cilium"
 
 - name: clean_cni_from_calico
   file:
@@ -22,7 +22,7 @@
     #- /var/lib/cni/networks used by other plugins?
     - /opt/cni/bin/calico
     - /opt/cni/bin/calico-ipam
-  when: cni != "calico"
+  when: cni.name != "calico"
 
 - name: clean_cni_from_flannel
   file:
@@ -32,4 +32,4 @@
     - "/etc/cni/net.d/{{ flannel.cni_conf_name }}"
     - /etc/kube-flannel
     - /run/flannel
-  when: cni != "flannel"
+  when: cni.name != "flannel"
