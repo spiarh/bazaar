@@ -177,7 +177,7 @@ data:
   cni-chaining-mode: "portmap"
 {% endif %}
 
-  mtu: "{{ cilium.mtu | default('1500') }}"
+  mtu: "{{ cni.mtu | default('1500') }}"
   masquerade: "true"
   enable-bpf-masquerade: "true"
   prepend-iptables-chains: "{{ cilium.prepend_iptables_chains }}"
@@ -226,7 +226,7 @@ data:
   hubble-disable-tls: "true"
   ipam: "cluster-pool"
   cluster-pool-ipv4-cidr: "{{ pod_subnet_cidr }}"
-  cluster-pool-ipv4-mask-size: "{{ cilium.ipv4_mask_size }}"
+  cluster-pool-ipv4-mask-size: "{{ cni.ipv4_mask_size }}"
   disable-cnp-status-updates: "true"
 ---
 # Source: cilium/charts/hubble-relay/templates/configmap.yaml
