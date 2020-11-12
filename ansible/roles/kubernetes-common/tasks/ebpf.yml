@@ -10,10 +10,28 @@
     - restart_systemd_modules_load
   when: kubernetes_network_req.ebpf
 
+- name: mount_bpf_fs
+  mount:
+    path: /sys/fs/bpf
+    src: bpffs
+    fstype: bpf
+    opts: defaults
+    state: mounted
+  when: kubernetes_network_req.ebpf
+
 - name: remove_modprobe_ebpf
   file:
     dest: /etc/modules-load.d/ebpf.conf
     state: absent
   notify:
     - restart_systemd_modules_load
+  when: not kubernetes_network_req.ebpf
+
+- name: mount_bpf_fs
+  mount:
+    path: /sys/fs/bpf
+    src: bpffs
+    fstype: bpf
+    opts: defaults
+    state: absent
   when: not kubernetes_network_req.ebpf
