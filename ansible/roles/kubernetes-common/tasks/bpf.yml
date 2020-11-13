@@ -1,14 +1,14 @@
 ---
-- name: set_modprobe_ebpf
+- name: set_modprobe_bpf
   template:
-    src: modeprobe-ebpf.conf
-    dest: /etc/modules-load.d/ebpf.conf
+    src: modeprobe-bpf.conf
+    dest: /etc/modules-load.d/bpf.conf
     owner: root
     group: root
     mode: 0644
   notify:
     - restart_systemd_modules_load
-  when: kubernetes_network_req.ebpf
+  when: kubernetes_network_req.bpf
 
 - name: mount_bpf_fs
   mount:
@@ -17,15 +17,15 @@
     fstype: bpf
     opts: defaults
     state: mounted
-  when: kubernetes_network_req.ebpf
+  when: kubernetes_network_req.bpf
 
-- name: remove_modprobe_ebpf
+- name: remove_modprobe_bpf
   file:
-    dest: /etc/modules-load.d/ebpf.conf
+    dest: /etc/modules-load.d/bpf.conf
     state: absent
   notify:
     - restart_systemd_modules_load
-  when: not kubernetes_network_req.ebpf
+  when: not kubernetes_network_req.bpf
 
 - name: mount_bpf_fs
   mount:
@@ -34,4 +34,4 @@
     fstype: bpf
     opts: defaults
     state: absent
-  when: not kubernetes_network_req.ebpf
+  when: not kubernetes_network_req.bpf
