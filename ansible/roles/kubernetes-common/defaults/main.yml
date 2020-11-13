@@ -17,11 +17,11 @@ kubernetes_pkgs:
   - name: kubelet=1.19.2-00
     state: present
 
-cgroup_manager: "systemd" 
+cgroup_manager: "systemd"
 
 #kubelet_default_args: "--runtime-cgroups=/systemd/system.slice --kubelet-cgroups=/systemd/system.slice"
 kubelet_default_args: ""
 
 kubernetes_network_req:
   ipvs: False
-  ebpf: False
+  bpf: False

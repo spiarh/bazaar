@@ -21,7 +21,7 @@
 
 - import_tasks: ipvs.yml
 
-- import_tasks: ebpf.yml
+- import_tasks: bpf.yml
 
 # just to be sure
 - name: run_sysctl_reload
