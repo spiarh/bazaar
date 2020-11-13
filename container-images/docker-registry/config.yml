@@ -3,7 +3,7 @@ version: 0.1
 loglevel: info
 storage:
   filesystem:
-    rootdirectory: /srv
+    rootdirectory: /home/regular
   delete:
     enabled: true
 http:
