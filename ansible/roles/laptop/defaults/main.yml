@@ -61,6 +61,7 @@ packages_from_default_repos:
   - httrack
   - iftop
   - ipcalc
+  - iperf3
   - ipmitool
   - jq
   - lshw
@@ -76,6 +77,7 @@ packages_from_default_repos:
   #- nodejs
   - openvpn
   - openssh-askpass
+  - picocom
   - podman
   - pkgconfig
   - pylint
