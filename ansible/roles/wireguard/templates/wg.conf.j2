@@ -1,7 +1,7 @@
 [Interface]
 Address = {{ conf.value.address }}
 ListenPort = {{ conf.value.port }}
-PrivateKey = {{ conf.value.priv_key }}
+PrivateKey = {{ lookup('file', inventory_dir + '/secrets/wireguard/' + inventory_hostname + '/' + conf.key + '/priv_key') }}
 {% if conf.value.mtu is defined %}
 MTU = {{ conf.value.mtu }}
 {% endif %}
@@ -43,7 +43,7 @@ PersistentKeepalive = {{ vars['wireguard_external'][conf]['persistent_keepalive'
 {% for h in groups['all'] %}
 {% if hostvars[h]['wireguard']['interfaces'] is defined %}
 {% for k, v in hostvars[h]['wireguard']['interfaces'].items() %}
-{% if (k == conf.key) and (h != ansible_nodename) %}
+{% if (k == conf.key) and (h != inventory_hostname) %}
 
 {% set allowedIps = [(v.address | ipaddr('network/prefix'))] %}
 {% if v.extra_allowed_ips is defined %}
@@ -52,8 +52,8 @@ PersistentKeepalive = {{ vars['wireguard_external'][conf]['persistent_keepalive'
 
 [Peer]
 Endpoint = {{ hostvars[h]['ansible_default_ipv4']['address'] }}:{{ v.port }}
-PublicKey = {{ v.pub_key }}
-PresharedKey = {{ v.preshared_key }}
+PublicKey = {{ lookup('file', inventory_dir + '/secrets/wireguard/' + h + '/' + conf.key + '/pub_key') }}
+PresharedKey = {{ lookup('file', inventory_dir + '/secrets/wireguard/' + '/' + conf.key + '/preshared_key') }}
 AllowedIPs = {{ allowedIps|join(",") }}
 {% if v.persistent_keepalive is defined %}
 PersistentKeepalive = {{ v.persistent_keepalive }}
