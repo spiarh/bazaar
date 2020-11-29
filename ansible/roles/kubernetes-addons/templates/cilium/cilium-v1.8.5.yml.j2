@@ -68,11 +68,11 @@ data:
 
   # Enable IPv4 addressing. If enabled, all endpoints are allocated an IPv4
   # address.
-  enable-ipv4: "{{ cilium.enable_ipv4 }}"
+  enable-ipv4: "{{ cni.enable_ipv4 }}"
 
   # Enable IPv6 addressing. If enabled, all endpoints are allocated an IPv6
   # address.
-  enable-ipv6: "{{ cilium.enable_ipv6 }}"
+  enable-ipv6: "{{ cni.enable_ipv6 }}"
   enable-bpf-clock-probe: "true"
   enable-bpf-tproxy: "true"
 

@@ -9,7 +9,8 @@ cni:
   name: "cilium"
   mtu: "1420"
   ipv4_mask_size: "24"
-#cni: "calico"
+  enable_ipv4: "true"
+  enable_ipv6: "false"
 
 flannel:
   version: "v0.12.0-amd64"
@@ -17,6 +18,7 @@ flannel:
 
 calico:
   version: "v3.16.1"
+  backend: "vxlan"
   cni_conf_name: "10-calico.conflist"
   ip_autodetection_method: "interface=.*"
   ip6_autodetection_method: "interface=.*"
@@ -28,18 +30,15 @@ calico:
 
   felix:
     bpf_enabled: "true"
+    bpf_external_service_mode: "Tunnel" # || DSR
     bpf_log_level: "Info"
-    ipip_enabled: "false"
     log_severity_screen: "Info"
-    vxlan_enabled: "true"
 
 cilium:
   version: "v1.8.5"
   cni_conf_name: "05-cilium.conflist"
   debug: "false"
   prepend_iptables_chains: "true"
-  enable_ipv4: "true"
-  enable_ipv6: "false"
   wait_bpf_mount: "true"
   kube_proxy_replacement: "strict"
   enable_external_ips: "false"
