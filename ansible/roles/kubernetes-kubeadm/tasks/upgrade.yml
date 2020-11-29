@@ -2,7 +2,15 @@
 - import_tasks: certs.yml
 - import_tasks: prereq.yml
 
+# Check apiserver is responding
+- include_tasks: check_apiserver_is_responding.yml
+
 - include_tasks: init/copy_conf.yml
+
+# push admin.conf
+- include_tasks: admin-conf/push.yml
+  when:
+    - inventory_hostname == groups.masters[0]
 
 - name: run_kubeadm_upgrade
   command: "kubeadm upgrade apply --config {{ kubeadm.init.config_file }} -v{{ kubeadm.log_level }} v{{ kubernetes.version }} --yes"
@@ -24,3 +32,4 @@
 
 - include_tasks: init/rm_conf.yml
 - include_tasks: join/rm_conf.yml
+- include_tasks: admin-conf/remove.yml

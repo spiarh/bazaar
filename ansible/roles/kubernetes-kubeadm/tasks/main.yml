@@ -16,6 +16,9 @@
 # Check apiserver is responding
 - include_tasks: check_apiserver_is_responding.yml
 
+# fetch admin.conf
+- include_tasks: admin-conf/fetch.yml
+
 # JOIN
 - include_tasks: join/check.yml
 
@@ -35,3 +38,4 @@
 
 - include_tasks: init/rm_conf.yml
 - include_tasks: join/rm_conf.yml
+- include_tasks: admin-conf/remove.yml

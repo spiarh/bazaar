@@ -1,4 +1,8 @@
 ---
+kubeconfig:
+  remote_path: "/etc/kubernetes/admin.conf"
+  local_path: "{{ inventory_dir }}/secrets/kubernetes/admin.conf"
+
 cert_path: "{{ inventory_dir }}/secrets/kubernetes/pki"
 
 kubernetes:
@@ -38,8 +42,6 @@ kubeadm:
   kubelet_args: ""
   log_level: "5"
   token: "{{lookup('file', inventory_dir + '/secrets/kubernetes/kubeadm/token')}}"
-
-#kubeconfig_admin: "/etc/kubernetes/admin.conf"
 
 kubelet:
   # /etc/default/kubelet
