@@ -10,7 +10,7 @@ data:
   # Typha is disabled.
   typha_service_name: "none"
   # Configure the backend to use.
-  calico_backend: "vxlan"
+  calico_backend: "{{ calico.backend }}"
   # IP autodetection methods
   ip_autodetection_method: "{{ calico.ip_autodetection_method }}"
   # IPv6 autodetection methods
@@ -3669,12 +3669,6 @@ spec:
                 configMapKeyRef:
                   name: calico-config
                   key: ip6_autodetection_method
-            # Enable IPIP
-            - name: CALICO_IPV4POOL_IPIP
-              value: "Always"
-            # Enable or Disable VXLAN on the default IP pool.
-            - name: CALICO_IPV4POOL_VXLAN
-              value: "Never"
             # Set MTU for tunnel device used if ipip is enabled
             - name: FELIX_IPINIPMTU
               valueFrom:
@@ -3693,23 +3687,12 @@ spec:
                 configMapKeyRef:
                   name: calico-config
                   key: veth_mtu
-            # The default IPv4 pool to create on startup if none exists. Pod IPs will be
-            # chosen from this range. Changing this value after installation will have
-            # no effect. This should fall within `--cluster-cidr`.
-            - name: CALICO_IPV4POOL_CIDR
-              value: "{{ pod_subnet_cidr }}"
             # Disable file logging so `kubectl logs` works.
             - name: CALICO_DISABLE_FILE_LOGGING
               value: "true"
             # Set Felix endpoint to host default action to ACCEPT.
             - name: FELIX_DEFAULTENDPOINTTOHOSTACTION
               value: "ACCEPT"
-            # Disable IPv6 on Kubernetes.
-            - name: FELIX_IPV6SUPPORT
-              value: "false"
-            # Set Felix logging to "info"
-            - name: FELIX_LOGSEVERITYSCREEN
-              value: "info"
             - name: FELIX_HEALTHENABLED
               value: "true"
           securityContext:
@@ -3722,7 +3705,7 @@ spec:
               command:
               - /bin/calico-node
               - -felix-live
-{% if calico.ippool.ipip_mode != "Never" %}
+{% if calico.backend == "bird" %}
               - -bird-live
 {% endif %}
             periodSeconds: 10
@@ -3733,7 +3716,7 @@ spec:
               command:
               - /bin/calico-node
               - -felix-ready
-{% if calico.ippool.ipip_mode != "Never" %}
+{% if calico.backend == "bird" %}
               - -bird-ready
 {% endif %}
             periodSeconds: 10
@@ -3887,7 +3870,6 @@ metadata:
 spec:
   bpfEnabled: {{ calico.felix.bpf_enabled }}
   bpfLogLevel: "{{ calico.felix.bpf_log_level }}"
-  ipipEnabled: {{ calico.felix.ipip_enabled }}
+  ipv6Support: {{ cni.enable_ipv6 }}
   logSeverityScreen: "{{ calico.felix.log_severity_screen }}"
   reportingInterval: 0s
-  vxlanEnabled: {{ calico.felix.vxlan_enabled }}
