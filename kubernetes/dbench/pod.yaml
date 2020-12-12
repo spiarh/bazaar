@@ -1,0 +1,49 @@
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: dbench
+  namespace: default
+spec:
+  storageClassName: longhorn-replica-nodeselector
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dbench
+  namespace: default
+  labels:
+    name: dbench
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: dbench
+  template:
+    metadata:
+      labels:
+        name: dbench
+    spec:
+      containers:
+      - name: dbench
+        image: docker.io/spiarh/dbench:latest
+        imagePullPolicy: Always
+        command:
+          - tail
+          - -f
+          - /dev/null
+        securityContext:
+          runAsUser: 1871
+        volumeMounts:
+        - mountPath: /test
+          name: dbench
+      terminationGracePeriodSeconds: 0
+      volumes:
+      - name: dbench
+        persistentVolumeClaim:
+          claimName: dbench

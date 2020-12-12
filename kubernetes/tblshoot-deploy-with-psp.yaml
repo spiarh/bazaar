@@ -23,11 +23,11 @@ spec:
           - tail
           - -f
           - /dev/null
-        #resources:
-        #  requests:
-        #    cpu: 100m
-        #    memory: 100Mi
-        #  limits:
-        #    cpu: 2000m
-        #    memory: 2048Mi
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 2000m
+            memory: 2048Mi
       terminationGracePeriodSeconds: 0
