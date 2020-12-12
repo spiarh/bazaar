@@ -62,9 +62,9 @@ data "template_file" "network_config" {
 }
 
 resource "libvirt_cloudinit_disk" "cloud_init" {
-  name           = "cloud-init-${var.role}-${var.basename}.iso"
-  pool           = var.storage_pool
-  user_data      = data.template_file.user_data.rendered
+  name      = "cloud-init-${var.role}-${var.basename}.iso"
+  pool      = var.storage_pool
+  user_data = data.template_file.user_data.rendered
   #network_config = data.template_file.network_config.rendered
 }
 
