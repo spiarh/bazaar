@@ -1,10 +1,8 @@
 ---
-# Source: minio/templates/post-install-prometheus-metrics-role.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: minio-update-prometheus-secret
-  namespace: prod
   labels:
     app: minio
 rules:

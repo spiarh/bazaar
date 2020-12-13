@@ -14,7 +14,7 @@ images:
 
 configMapGenerator:
 - name: docker-registry-config
-  behavior: replace
+  behavior: create
   files:
   - config=config/config.yml
 
