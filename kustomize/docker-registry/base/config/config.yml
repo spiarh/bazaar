@@ -1,0 +1,26 @@
+---
+version: 0.1
+loglevel: info
+storage:
+  s3:
+    region: REGION
+    regionendpoint: HTTPS://MINIO
+    bucket: BUCKET
+    encrypt: false
+    secure: true
+    v4auth: true
+  delete:
+    enabled: true
+http:
+  addr: 0.0.0.0:5000
+  debug:
+    addr: 0.0.0.0:5001
+    prometheus:
+      enabled: true
+      path: /metrics
+auth:
+  token:
+    realm: DOCKER_AUTH_URL
+    service: SERVICE
+    issuer: ISSUER
+    rootcertbundle: /certificates/docker-auth-tls.crt

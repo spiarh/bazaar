@@ -1,0 +1,71 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docker-registry
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    spec:
+      containers:
+      - name: docker-registry
+        envFrom:
+        - secretRef:
+            name: docker-registry-config
+        image: docker-registry
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 5000
+            name: http
+            protocol: TCP
+          - containerPort: 5001
+            name: debug
+            protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /metrics
+            port: 5001
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /metrics
+            port: 5001
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        securityContext:
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - name: docker-registry-config
+          mountPath: /etc/docker/registry
+          readOnly: true
+        - name: container-registry-tls
+          mountPath: /certificates
+          readOnly: true
+      enableServiceLinks: false
+      serviceAccount: docker-registry
+      terminationGracePeriodSeconds: 60
+      volumes:
+      - name: docker-registry-config
+        configMap:
+          name: docker-registry-config
+          items:
+          - key: config
+            path: config.yml
+      - name: container-registry-tls
+        secret:
+          secretName: container-registry-tls
+          items:
+          - key: tls.crt
+            path: docker-auth-tls.crt

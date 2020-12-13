@@ -1,0 +1,115 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+spec:
+  revisionHistoryLimit: 3
+  replicas: 2
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    spec:
+      initContainers:
+      - name: init
+        image: minio
+        imagePullPolicy: IfNotPresent
+        command:
+        - sh
+        - -c
+        args:
+        - mkdir -p /root/.minio/certs/CAs && cp /certs/ca.crt /root/.minio/certs/CAs/ca.crt
+        volumeMounts:
+        - name: home
+          mountPath: /root
+        - name: etcd-client-certs
+          mountPath: /certs
+          readOnly: true
+      containers:
+      - name: minio
+        env:
+          - name: MINIO_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: minio
+                key: accesskey
+          - name: MINIO_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: minio
+                key: secretkey
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: MINIO_ETCD_CLIENT_CERT
+            value: /certs/tls.crt
+          - name: MINIO_ETCD_CLIENT_CERT_KEY
+            value: /certs/tls.key
+          - name: MINIO_ETCD_ENDPOINTS
+            value: "https://etcd-0.etcd-headless.$(NAMESPACE).svc.cluster.local:2379,https://etcd-1.etcd-headless.$(NAMESPACE).svc.cluster.local:2379,https://etcd-2.etcd-headless.$(NAMESPACE).svc.cluster.local:2379"
+        image: minio
+        imagePullPolicy: IfNotPresent
+        args:
+        - gateway
+        - nas
+        - /srv/shared
+        ports:
+          - containerPort: 9000
+            name: http
+            protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /minio/health/live
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 30
+          timeoutSeconds: 1
+          successThreshold: 1
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /minio/health/ready
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 15
+          timeoutSeconds: 1
+          successThreshold: 1
+          failureThreshold: 3
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1024Mi
+          requests:
+            cpu: 150m
+            memory: 256Mi
+        #securityContext:
+        #  readOnlyRootFilesystem: true
+        volumeMounts:
+        - name: data
+          mountPath: /srv/shared
+        - name: home
+          mountPath: /root
+        - name: etcd-client-certs
+          mountPath: /certs
+          readOnly: true
+      hostNetwork: false
+      serviceAccount: minio
+      serviceAccountName: minio
+      #securityContext:
+      #  fsGroup: 2911
+      #  runAsUser: 2911
+      terminationGracePeriodSeconds: 60
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: minio-data
+      - name: etcd-client-certs
+        secret:
+          secretName: minio-etcd-client-tls
+          defaultMode: 256
+      - name: home
+        emptyDir: {}

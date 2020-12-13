@@ -1,0 +1,31 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: psp:minio
+  namespace: prod
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: psp:relaxed
+subjects:
+- kind: ServiceAccount
+  name: minio
+  namespace: prod
+---
+# Source: minio/templates/post-install-prometheus-metrics-rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: minio-update-prometheus-secret
+  namespace: prod
+  labels:
+    app: minio
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: minio-update-prometheus-secret
+subjects:
+  - kind: ServiceAccount
+    name: minio-update-prometheus-secret
+    namespace: prod

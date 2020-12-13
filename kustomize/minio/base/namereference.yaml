@@ -1,0 +1,7 @@
+nameReference:
+- kind: PersistentVolumeClaim
+  version: v1
+  fieldSpecs:
+  - path: spec/claimRef/name
+    version: v1
+    kind: PersistentVolume

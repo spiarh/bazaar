@@ -1,0 +1,19 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+commonLabels:
+  app.kubernetes.io/instance: local-path-provisioner
+  app.kubernetes.io/name: local-path-provisioner
+  app.kubernetes.io/managed-by: kustomize
+  app.kubernetes.io/version: "v0.0.18"
+
+images:
+- name: local-path-provisioner
+  newName: docker.io/rancher/local-path-provisioner
+  newTag: v0.0.18
+
+resources:
+- local-path-storage.yaml
+- psp.yaml
+- rbac.yaml

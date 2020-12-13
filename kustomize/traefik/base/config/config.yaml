@@ -1,0 +1,53 @@
+---
+global:
+  checkNewVersion: true
+  sendAnonymousUsage: false
+
+entryPoints:
+  http:
+    address: :8000/TCP
+    http:
+      redirections:
+        entrypoint:
+          scheme: https
+  https:
+    address: :8443/TCP
+    http:
+      tls: {}
+  traefik:
+    address: :9000/TCP
+
+log:
+  level: INFO
+  filePath: /dev/stdout
+  # format: json
+  format: "common"
+
+accessLog:
+  filePath: /dev/stdout
+  # format: json
+  format: "common"
+
+api:
+  insecure: true
+  dashboard: true
+
+ping:
+  entryPoint: traefik
+
+providers:
+  kubernetesIngress:
+    ingressClass: traefik
+    labelselector: ""
+    namespaces: []
+  kubernetesCRD:
+    ingressClass: traefik
+    labelselector: ""
+    namespaces: []
+
+http:
+  middlewares:
+    redirect-https:
+      redirectScheme:
+        scheme: https
+        permanent: true

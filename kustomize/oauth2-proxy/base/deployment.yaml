@@ -1,0 +1,59 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oauth2-proxy
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    spec:
+      containers:
+      - name: oauth2-proxy
+        image: oauth2-proxy
+        imagePullPolicy: Always
+        env:
+        - name: OAUTH2_PROXY_HTTP_ADDRESS
+          value: "0.0.0.0:4180"
+        - name: OAUTH2_PROXY_REVERSE_PROXY
+          value: "true"
+        envFrom:
+        - configMapRef:
+            name: oauth2-proxy-env
+        - secretRef:
+            name: oauth2-proxy-env
+        ports:
+          # TODO: add https
+        - containerPort: 4180
+          name: http
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /ping
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /ping
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 15
+        resources:
+          limits:
+            cpu: 200m
+            memory: 32Mi
+          requests:
+            cpu: 20m
+            memory: 32Mi
+        securityContext:
+          readOnlyRootFilesystem: true
+      enableServiceLinks: false
+      serviceAccount: oauth2-proxy
+      terminationGracePeriodSeconds: 0
