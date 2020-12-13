@@ -1,0 +1,42 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+commonLabels:
+  app.kubernetes.io/instance: grafana
+  app.kubernetes.io/name: grafana
+  app.kubernetes.io/managed-by: kustomize
+  app.kubernetes.io/version: "7.3.3"
+
+images:
+- name: init-chown-data
+  newName: docker.io/busybox
+  newTag: "1.31.1"
+- name: grafana-sc-datasources
+  newName: docker.io/kiwigrid/k8s-sidecar
+  newTag: "1.1.0"
+- name: grafana-sc-dashboard
+  newName: docker.io/kiwigrid/k8s-sidecar
+  newTag: "1.1.0"
+- name: grafana
+  newName: docker.io/grafana/grafana
+  newTag: "7.3.3"
+
+configMapGenerator:
+- name: grafana
+  files:
+  - ./config/grafana.ini
+- name: grafana-config-dashboards
+  options:
+    disableNameSuffixHash: true
+  files:
+  - ./config/provider.yaml
+
+resources:
+- ./deployment.yaml
+- ./podsecuritypolicy.yaml
+- ./pvc.yaml
+- ./rolebinding.yaml
+- ./role.yaml
+- ./serviceaccount.yaml
+- ./service.yaml

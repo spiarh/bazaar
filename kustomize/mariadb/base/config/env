@@ -1,0 +1,2 @@
+MASTER_FQDN=mariadb-0.mariadb-headless
+POD_NETWORK=172.16.%.%

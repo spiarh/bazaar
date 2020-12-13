@@ -1,0 +1,28 @@
+server:
+  addr: ":5002"
+  real_ip_header: "X-Forwarded-For"
+  real_ip_pos: -2
+
+token:
+  issuer: "REPLACE_HOSTNAME"
+  expiration: 900
+  certificate: "/certificates/tls.crt"
+  key: "/certificates/tls.key"
+
+users:
+  # Password is specified as a BCrypt hash. Use `htpasswd -nB USERNAME` to generate.
+  "admin":
+    # password: ccb004b9-c9d5-4033-b13e-385a05337bf5
+    password: "admin:$2y$05$NGERiLVrdlAVpAF7.8tTbOB9x9AhWrCX5DXe5F59MKE6cgAkBs8Gy"
+  "": {}
+
+acl:
+  - match: {account: "admin"}
+    actions: ["*"]
+    comment: "full access to everything."
+  - match: {account: "", type: "registry", name: "catalog"}
+    actions: ["*"]
+    comment: "Anonymous can query the catalog"
+  - match: {account: ""}
+    actions: ["pull"]
+    comment: "Anonymous can pull stuff"

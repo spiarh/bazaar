@@ -1,0 +1,16 @@
+ETCDCTL_API=3
+ETCD_LOG_LEVEL=info
+ETCD_DATA_DIR=/var/lib/etcd/data
+ETCD_LISTEN_CLIENT_URLS=https://0.0.0.0:2379
+ETCD_LISTEN_PEER_URLS=https://0.0.0.0:2380
+ETCD_INITIAL_CLUSTER_TOKEN=etcd-spiarh
+ETCD_INITIAL_CLUSTER_STATE=new
+ETCD_TRUSTED_CA_FILE=/certs/client/ca.crt
+ETCD_CERT_FILE=/certs/client/tls.crt
+ETCD_KEY_FILE=/certs/client/tls.key
+ETCD_CLIENT_CERT_AUTH=true
+ETCD_PEER_AUTO_TLS=true
+ETCD_FLAGS=--listen-metrics-urls=http://0.0.0.0:2381
+ETCDCTL_CACERT=/certs/client/ca.crt
+ETCDCTL_CERT=/certs/client/tls.crt
+ETCDCTL_KEY=/certs/client/tls.key

@@ -1,0 +1,25 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+commonLabels:
+  app.kubernetes.io/instance: docker-auth
+  app.kubernetes.io/name: container-registry
+  app.kubernetes.io/managed-by: kustomize
+  app.kubernetes.io/version: ""
+
+images:
+- name: docker-auth
+  newName: docker.io/spiarh/docker-auth
+  newTag: 1.5.0
+
+configMapGenerator:
+- name: docker-auth-config
+  behavior: create
+  files:
+  - config=config/auth_config.yml
+
+resources:
+- deployment.yaml
+- serviceaccount.yaml
+- service.yaml

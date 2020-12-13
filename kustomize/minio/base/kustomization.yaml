@@ -1,0 +1,21 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+commonLabels:
+  app.kubernetes.io/instance: minio
+  app.kubernetes.io/name: minio
+  app.kubernetes.io/managed-by: kustomize
+  app.kubernetes.io/version: "RELEASE.2020-10-28T08-16-50Z"
+
+images:
+- name: minio
+  newName: docker.io/minio/minio
+  newTag: RELEASE.2020-10-28T08-16-50Z
+
+resources:
+- deployment.yaml
+- pvc.yaml
+- rolebinding.yaml
+- serviceaccount.yaml
+- service.yaml

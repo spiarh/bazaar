@@ -1,0 +1,36 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+commonLabels:
+  app.kubernetes.io/instance: traefik
+  app.kubernetes.io/name: traefik
+  app.kubernetes.io/managed-by: kustomize
+  app.kubernetes.io/version: "2.3.1"
+
+images:
+- name: traefik
+  newName: docker.io/traefik
+  newTag: "2.3.1"
+
+configMapGenerator:
+- name: traefik-config
+  files:
+  - ./config/config.yaml
+
+resources:
+- ./crd/ingressroutetcp.yaml
+- ./crd/ingressrouteudp.yaml
+- ./crd/ingressroute.yaml
+- ./crd/middlewares.yaml
+- ./crd/tlsoptions.yaml
+- ./crd/tlsstores.yaml
+- ./crd/traefikservices.yaml
+- ./dashboard-hook-ingressroute.yaml
+- ./deployment.yaml
+- ./ingressclass.yaml
+- ./rbac/clusterrolebinding.yaml
+- ./rbac/clusterrole.yaml
+- ./rbac/podsecuritypolicy.yaml
+- ./service.yaml
+- ./serviceaccount.yaml

@@ -1,0 +1,48 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ip
+spec:
+  revisionHistoryLimit: 3
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    spec:
+      containers:
+      - name: ip
+        image: ip
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+          name: http
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+        resources:
+          limits:
+            memory: 32Mi
+          requests:
+            cpu: 20m
+            memory: 32Mi
+        securityContext:
+          readOnlyRootFilesystem: true
+      enableServiceLinks: false
+      serviceAccount: ip
+      serviceAccountName: ip
+      terminationGracePeriodSeconds: 0

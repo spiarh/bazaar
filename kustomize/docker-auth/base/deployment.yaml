@@ -1,0 +1,66 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docker-auth
+spec:
+  replicas: 2
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    spec:
+      containers:
+      - name: docker-auth
+        args:
+        - "--v=1"
+        - "--logtostderr"
+        - /config/auth_config.yml
+        image: docker-auth
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5002
+          name: http
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 5002
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5002
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        resources:
+          limits:
+            cpu: 200m
+            memory: 128Mi
+          requests:
+            cpu: 50m
+            memory: 32Mi
+        securityContext:
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - name: docker-auth-config
+          mountPath: /config
+          readOnly: true
+        - name: container-registry-tls
+          mountPath: /certificates
+          readOnly: true
+      enableServiceLinks: false
+      serviceAccount: docker-auth
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: container-registry-tls
+        secret:
+          secretName: container-registry-tls
+      - name: docker-auth-config
+        secret:
+          secretName: docker-auth-config
+          items:
+          - key: config
+            path: auth_config.yml

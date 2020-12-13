@@ -1,0 +1,26 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+commonLabels:
+  app.kubernetes.io/instance: etcd
+  app.kubernetes.io/name: etcd
+  app.kubernetes.io/managed-by: kustomize
+  app.kubernetes.io/version: "3.4.9"
+
+images:
+- name: etcd
+  newName: docker.io/spiarh/etcd
+  newTag: 3.4.9
+
+configMapGenerator:
+- name: etcd-env
+  behavior: create
+  envs:
+  - config/env
+
+resources:
+- serviceaccount.yaml
+- service-headless.yaml
+- service.yaml
+- statefulset.yaml
