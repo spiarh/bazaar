@@ -6,7 +6,6 @@ commonLabels:
   app.kubernetes.io/instance: docker-auth
   app.kubernetes.io/name: container-registry
   app.kubernetes.io/managed-by: kustomize
-  app.kubernetes.io/version: ""
 
 images:
 - name: docker-auth

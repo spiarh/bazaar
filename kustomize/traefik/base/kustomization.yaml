@@ -6,7 +6,6 @@ commonLabels:
   app.kubernetes.io/instance: traefik
   app.kubernetes.io/name: traefik
   app.kubernetes.io/managed-by: kustomize
-  app.kubernetes.io/version: "2.3.1"
 
 images:
 - name: traefik

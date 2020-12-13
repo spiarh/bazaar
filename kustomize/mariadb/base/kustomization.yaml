@@ -6,7 +6,6 @@ commonLabels:
   app.kubernetes.io/instance: mariadb
   app.kubernetes.io/name: mariadb
   app.kubernetes.io/managed-by: kustomize
-  app.kubernetes.io/version: ""
 
 images:
 - name: mariadb

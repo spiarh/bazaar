@@ -6,7 +6,6 @@ commonLabels:
   app.kubernetes.io/instance: grafana
   app.kubernetes.io/name: grafana
   app.kubernetes.io/managed-by: kustomize
-  app.kubernetes.io/version: "7.3.3"
 
 images:
 - name: init-chown-data

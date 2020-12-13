@@ -6,7 +6,6 @@ commonLabels:
   app.kubernetes.io/instance: ip
   app.kubernetes.io/name: ip
   app.kubernetes.io/managed-by: kustomize
-  app.kubernetes.io/version: "0.1"
 
 images:
 - name: ip
