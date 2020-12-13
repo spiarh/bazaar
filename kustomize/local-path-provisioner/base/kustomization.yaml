@@ -6,7 +6,6 @@ commonLabels:
   app.kubernetes.io/instance: local-path-provisioner
   app.kubernetes.io/name: local-path-provisioner
   app.kubernetes.io/managed-by: kustomize
-  app.kubernetes.io/version: "v0.0.18"
 
 images:
 - name: local-path-provisioner

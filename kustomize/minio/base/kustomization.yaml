@@ -6,7 +6,6 @@ commonLabels:
   app.kubernetes.io/instance: minio
   app.kubernetes.io/name: minio
   app.kubernetes.io/managed-by: kustomize
-  app.kubernetes.io/version: "RELEASE.2020-10-28T08-16-50Z"
 
 images:
 - name: minio

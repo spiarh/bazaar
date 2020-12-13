@@ -6,7 +6,6 @@ commonLabels:
   app.kubernetes.io/instance: etcd
   app.kubernetes.io/name: etcd
   app.kubernetes.io/managed-by: kustomize
-  app.kubernetes.io/version: "3.4.9"
 
 images:
 - name: etcd
@@ -20,7 +19,7 @@ configMapGenerator:
   - config/env
 
 resources:
-- serviceaccount.yaml
-- service-headless.yaml
-- service.yaml
-- statefulset.yaml
+- ./serviceaccount.yaml
+- ./service-headless.yaml
+- ./service.yaml
+- ./statefulset.yaml
