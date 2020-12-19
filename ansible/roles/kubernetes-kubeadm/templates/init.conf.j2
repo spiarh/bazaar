@@ -25,6 +25,9 @@ apiServer:
     advertise-address: {{ (ansible_facts[kubernetes.apiserver.listen_interface | replace("-", "_")]['ipv4']['address']) | default(ansible_facts['default_ipv4']['address']) }}
     bind-address: {{ (ansible_facts[kubernetes.apiserver.listen_interface | replace("-", "_")]['ipv4']['address']) | default(ansible_facts['default_ipv4']['address']) }}
     enable-admission-plugins: {{ kubernetes.apiserver.admission_plugins }}
+{% if kubernetes.apiserver.secret_encryption.enable %}
+    encryption-provider-config: {{ kubernetes.apiserver.secret_encryption.path }}
+{% endif %}
   timeoutForControlPlane: 8m0s
 apiVersion: kubeadm.k8s.io/v1beta2
 certificatesDir: /etc/kubernetes/pki

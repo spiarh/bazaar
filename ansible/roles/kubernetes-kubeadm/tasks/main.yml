@@ -1,6 +1,12 @@
 ---
-# tasks file for deploy-cluster-kubeadm
 - import_tasks: certs.yml
+  when: inventory_hostname in groups['masters']
+
+- import_tasks: secret_encryption.yml
+  when:
+    - inventory_hostname in groups['masters']
+    - kubernetes.apiserver.secret_encryption.enable
+
 - import_tasks: prereq.yml
 
 # INIT
@@ -18,6 +24,8 @@
 
 # fetch admin.conf
 - include_tasks: admin-conf/fetch.yml
+  when:
+    - inventory_hostname in groups['masters']
 
 # JOIN
 - include_tasks: join/check.yml
@@ -39,3 +47,5 @@
 - include_tasks: init/rm_conf.yml
 - include_tasks: join/rm_conf.yml
 - include_tasks: admin-conf/remove.yml
+  when:
+    - inventory_hostname in groups['masters']

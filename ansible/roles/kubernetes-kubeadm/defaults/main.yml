@@ -1,12 +1,42 @@
 ---
 kubeconfig:
-  remote_path: "/etc/kubernetes/admin.conf"
+  path: "/etc/kubernetes/admin.conf"
   local_path: "{{ inventory_dir }}/secrets/kubernetes/admin.conf"
 
-cert_path: "{{ inventory_dir }}/secrets/kubernetes/pki"
-
 kubernetes:
+  # Certificates
+  pki:
+    dir: "/etc/kubernetes/pki"
+    local_dir: "{{ inventory_dir }}/secrets/kubernetes/pki"
+    sa:
+      key: "{{ inventory_dir }}/secrets/kubernetes/pki/sa.key"
+      pub: "{{ inventory_dir }}/secrets/kubernetes/pki/sa.pub"
+    ca:
+      common_name: "{{ (cluster_name | default('kubernetes')) + '-ca' }}"
+      openssl_conf: "{{ inventory_dir }}/secrets/kubernetes/pki/ca_openssl.conf"
+      crt: "{{ inventory_dir }}/secrets/kubernetes/pki/ca.crt"
+      key: "{{ inventory_dir }}/secrets/kubernetes/pki/ca.key"
+    front_proxy_ca:
+      common_name: "front-proxy-ca"
+      openssl_conf: "{{ inventory_dir }}/secrets/kubernetes/pki/front-proxy_openssl.conf"
+      crt: "{{ inventory_dir }}/secrets/kubernetes/pki/front-proxy-ca.crt"
+      key: "{{ inventory_dir }}/secrets/kubernetes/pki/front-proxy-ca.key"
+    etcd:
+      dir: "/etc/kubernetes/pki/etcd"
+      local_dir: "{{ inventory_dir }}/secrets/kubernetes/pki/etcd"
+      common_name: "etcd-ca"
+      openssl_conf: "{{ inventory_dir }}/secrets/kubernetes/pki/etcd/ca_openssl.conf"
+      crt: "{{ inventory_dir }}/secrets/kubernetes/pki/etcd/ca.crt"
+      key: "{{ inventory_dir }}/secrets/kubernetes/pki/etcd/ca.key"
+
+  # Components
   apiserver:
+    secret_encryption:
+      enable: false
+      local_dir: "{{ inventory_dir }}/secrets/kubernetes/secret_encryption"
+      local_key: "{{ inventory_dir }}/secrets/kubernetes/secret_encryption/key"
+      # use pki dir because it is already mounted in pod
+      path: "/etc/kubernetes/pki/encryption-provider-config.yaml"
     admission_plugins: "NamespaceLifecycle,LimitRanger,ServiceAccount,TaintNodesByCondition,Priority,DefaultTolerationSeconds,DefaultStorageClass,PersistentVolumeClaimResize,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,NodeRestriction,PodSecurityPolicy"
     listen_interface: ""
 
@@ -27,8 +57,10 @@ etcd:
   data_dir: "/var/lib/etcd"
 
 kubeadm:
+  local_dir: "{{ inventory_dir }}/secrets/kubernetes/kubeadm"
   # openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'
-  ca_cert_hash: "{{lookup('file', inventory_dir + '/secrets/kubernetes/kubeadm/ca-cert-hash')}}"
+  ca_cert_hash: "{{ inventory_dir }}/secrets/kubernetes/kubeadm/ca-cert-hash"
+  token: "{{ inventory_dir }}/secrets/kubernetes/kubeadm/token"
   init:
     # Split with comma "addon/kube-proxy"
     skip_phases: ""
@@ -41,7 +73,6 @@ kubeadm:
   # "--container-runtime=remote --container-runtime-endpoint=/var/run/crio/crio.sock --resolv-conf=/run/systemd/resolve/resolv.conf"
   kubelet_args: ""
   log_level: "5"
-  token: "{{lookup('file', inventory_dir + '/secrets/kubernetes/kubeadm/token')}}"
 
 kubelet:
   # /etc/default/kubelet
