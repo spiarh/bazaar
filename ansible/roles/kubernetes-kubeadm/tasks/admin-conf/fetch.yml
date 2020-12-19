@@ -1,14 +1,14 @@
 ---
-- name: check_kubeconfig_remote_path_exist
+- name: check_kubeconfig_path_exist
   stat:
-    path: "{{ kubeconfig.remote_path }}"
-  register: kubeconfig_remote_path
+    path: "{{ kubeconfig.path }}"
+  register: kubeconfig_path
 
 - name: fetch_admin_conf
-  copy:
-    src: "{{ kubeconfig.remote_path }}"
+  fetch:
+    src: "{{ kubeconfig.path }}"
     dest: "{{ kubeconfig.local_path }}"
     mode: '0600'
-    remote_src: yes
+    flat: yes
   when:
-    - kubeconfig_remote_path.stat.exists == true
+    - kubeconfig_path.stat.exists == true

@@ -9,10 +9,10 @@ controlPlane:
 discovery:
   bootstrapToken:
     apiServerEndpoint: {{ kubernetes.control_plane_endpoint }}
-    token: {{ kubeadm.token }}
+    token: {{ lookup('file', kubeadm.token) }}
     unsafeSkipCAVerification: False
     caCertHashes:
-    - sha256:{{ kubeadm.ca_cert_hash }}
+    - sha256:{{ lookup('file', kubeadm.ca_cert_hash) }}
   timeout: 8m0s
 kind: JoinConfiguration
 nodeRegistration:

@@ -12,18 +12,28 @@
 
 - name: copy_certs
   template:
-    src: "{{ cert_path }}/{{ item }}"
-    dest: "/etc/kubernetes/pki/{{ item }}"
+    src: "{{ item }}"
+    dest: "{{ kubernetes.pki.dir }}/{{ item | basename }}"
     owner: root
     group: root
     mode: 0440
   with_items:
-    - ca.crt
-    - ca.key
-    - etcd/ca.crt
-    - etcd/ca.key
-    - front-proxy-ca.crt
-    - front-proxy-ca.key
-    - sa.key
-    - sa.pub
+    - "{{ kubernetes.pki.ca.crt }}"
+    - "{{ kubernetes.pki.ca.key }}"
+    - "{{ kubernetes.pki.front_proxy_ca.crt }}"
+    - "{{ kubernetes.pki.front_proxy_ca.key }}"
+    - "{{ kubernetes.pki.sa.key }}"
+    - "{{ kubernetes.pki.sa.pub }}"
+  when: inventory_hostname in groups['masters']
+
+- name: copy_etcd_certs
+  template:
+    src: "{{ item }}"
+    dest: "{{ kubernetes.pki.etcd.dir }}/{{ item | basename }}"
+    owner: root
+    group: root
+    mode: 0440
+  with_items:
+    - "{{ kubernetes.pki.etcd.crt }}"
+    - "{{ kubernetes.pki.etcd.key }}"
   when: inventory_hostname in groups['masters']
