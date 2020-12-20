@@ -16,7 +16,8 @@ images:
 configMapGenerator:
 - name: mariadb-env
   behavior: create
-  env: config/env
+  envs:
+  - config/env
 
 resources:
 - serviceaccount.yaml

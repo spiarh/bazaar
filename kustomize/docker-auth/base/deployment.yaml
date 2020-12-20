@@ -53,6 +53,7 @@ spec:
           readOnly: true
       enableServiceLinks: false
       serviceAccount: docker-auth
+      serviceAccountName: docker-auth
       terminationGracePeriodSeconds: 30
       volumes:
       - name: container-registry-tls

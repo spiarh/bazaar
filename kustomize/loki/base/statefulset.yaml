@@ -1,0 +1,70 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: loki
+spec:
+  podManagementPolicy: OrderedReady
+  replicas: 1
+  serviceName: loki-headless
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    spec:
+      containers:
+      - name: loki
+        image: loki
+        imagePullPolicy: IfNotPresent
+        args:
+        - "-config.file=/etc/loki/loki.yaml"
+        ports:
+        - name: http-metrics
+          containerPort: 3100
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /ready
+            port: http-metrics
+          initialDelaySeconds: 45
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: http-metrics
+          initialDelaySeconds: 45
+        resources:
+          limits:
+            cpu: 200m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        securityContext:
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - name: config
+          mountPath: /etc/loki
+        - name: data
+          mountPath: "/data"
+      enableServiceLinks: false
+      serviceAccount: loki
+      serviceAccountName: loki
+      securityContext:
+        fsGroup: 10001
+        runAsGroup: 10001
+        runAsNonRoot: true
+        runAsUser: 10001
+      terminationGracePeriodSeconds: 4800
+      volumes:
+        - name: config
+          configMap:
+            name: loki
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: "30Gi"
+      storageClassName: my-storage-class

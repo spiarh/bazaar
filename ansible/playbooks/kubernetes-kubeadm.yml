@@ -2,16 +2,21 @@
 - name: deploy_masters
   hosts: masters
   gather_facts: true
+  serial: 1
   roles:
     - kubernetes-kubeadm
-  serial: 1
-  tags:
-    - deploy_kubernetes_masters
+
+- hosts: masters
+  connection: local
+  vars:
+    ansible_become: False
+  tasks:
+    - include_role:
+        name: kubernetes-kubeadm
+        tasks_from: admin-conf/encrypt-local.yml
 
 - name: deploy_workers
   hosts: workers
   gather_facts: true
   roles:
     - kubernetes-kubeadm
-  tags:
-    - deploy_kubernetes_workers
