@@ -1,0 +1,28 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+commonLabels:
+  app.kubernetes.io/instance: loki
+  app.kubernetes.io/name: loki
+  app.kubernetes.io/managed-by: kustomize
+
+images:
+- name: loki
+  newName: grafana/loki
+  newTag: "2.0.0"
+
+configMapGenerator:
+- name: loki
+  behavior: create
+  files:
+  - ./config/loki.yaml
+
+resources:
+- ./podsecuritypolicy.yaml
+- ./rolebinding.yaml
+- ./role.yaml
+- ./serviceaccount.yaml
+- ./service-headless.yaml
+- ./service.yaml
+- ./statefulset.yaml
