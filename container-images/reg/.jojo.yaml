@@ -1,0 +1,21 @@
+from_image:
+  name: alpine
+  registry: r.spiarh.fr
+  tag: 3.12.1
+from_image_builder:
+  name: golang
+  registry: docker.io/library
+  tag: 1.15-alpine
+image:
+  name: reg
+  registry: r.spiarh.fr
+  tag: 0.16.1
+  tag_build:
+    type: VERSION
+    version: 0.16.1
+    version_from:
+      owner: genuinetools
+      repository: reg
+      semver: null
+      type: github
+      version: null
