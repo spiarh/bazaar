@@ -1,14 +1,17 @@
-FROM golang:1.14-alpine AS builder
+ARG FROM_IMAGE_BUILDER
+ARG FROM_IMAGE
 
-ARG VERSION=1.9.2
+FROM ${FROM_IMAGE_BUILDER} AS builder
+
+ARG VERSION
 
 RUN apk add --no-cache git make curl gcc libc-dev ncurses
 
 RUN curl -OL "https://github.com/gopasspw/gopass/archive/v${VERSION}.tar.gz" && \
     tar zxf "v${VERSION}.tar.gz" && cd "gopass-${VERSION}" && \
-    make full && mv ./gopass-linux-amd64-full /go/bin/gopass-full
+    make full && mv ./gopass-full /go/bin/gopass-full
 
-FROM r.spiarh.fr/alpine:latest
+FROM ${FROM_IMAGE}
 
 LABEL maintainer="_me@spiarh.fr"
 

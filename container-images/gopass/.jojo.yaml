@@ -1,0 +1,21 @@
+from_image:
+  name: alpine
+  registry: r.spiarh.fr
+  tag: 3.12.1
+from_image_builder:
+  name: golang
+  registry: docker.io/library
+  tag: 1.15-alpine
+image:
+  name: gopass
+  registry: r.spiarh.fr
+  tag: 1.10.1
+  tag_build:
+    type: VERSION
+    version: 1.10.1
+    version_from:
+      owner: gopasspw
+      repository: gopass
+      semver: null
+      type: github
+      version: null
