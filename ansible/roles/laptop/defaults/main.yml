@@ -15,6 +15,8 @@ packages_from_default_repos:
   - curl
   - cmake
   - deja-dup
+  - distribution-gpg-keys
+  - dnf-plugins-core
   - dkms
   - faketime
   - ffmpeg
@@ -84,6 +86,7 @@ packages_from_default_repos:
   - python3-autopep8
   - python3-devel
   - python3-flake8
+  - python3-jedi
   - python3-netaddr
   - python3-pip
   - python3-pytest
