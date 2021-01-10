@@ -1,0 +1,7 @@
+image:
+  name: alpine
+  registry: r.spiarh.fr
+  tag: "3.12.1"
+  tag_build:
+    type: VERSION
+    version: "3.12.1"
