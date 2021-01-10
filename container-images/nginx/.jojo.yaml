@@ -1,0 +1,21 @@
+from_image:
+  name: alpine
+  registry: r.spiarh.fr
+  tag: 3.12.1
+from_image_builder: null
+image:
+  name: nginx
+  registry: r.spiarh.fr
+  tag: 1.18.0-r1
+  tag_build:
+    type: VERSION
+    version: 1.18.0-r1
+    version_from:
+      arch: x86_64
+      mirror: null
+      package: nginx
+      repository: main
+      semver: null
+      type: alpine
+      version: null
+      version_id: '3.12'

@@ -1,14 +1,14 @@
-ARG REGISTRY
+ARG FROM_IMAGE
 
-FROM ${REGISTRY}/alpine:latest
+FROM ${FROM_IMAGE}
 
-ARG VERSION=1.16.1
+ARG VERSION
 
 LABEL maintainer="_me@spiarh.fr"
 
 RUN addgroup -g 2111 -S nginx && adduser -u 2111 -s /bin/false -S -D -G nginx nginx
 
-RUN apk add --no-cache nginx tzdata
+RUN apk add --no-cache "nginx~=${VERSION}" tzdata
 
 # Nginx user needs access to program directories
 # Redirect logs to stdout/sterr
@@ -23,8 +23,7 @@ RUN mkdir -p /run/nginx && \
 COPY ./nginx.conf /etc/nginx/nginx.conf
 
 # Allow a non privileged to update file (e.g postStart)
-#RUN chown -f nginx:nginx /etc/nginx/nginx.conf
-#    chown -f nginx:nginx /etc/nginx/nginx.conf
+RUN chown -f nginx:nginx /etc/nginx/nginx.conf
 
 EXPOSE 8080 8443
 
