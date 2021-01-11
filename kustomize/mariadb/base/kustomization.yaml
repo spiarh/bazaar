@@ -10,8 +10,7 @@ commonLabels:
 images:
 - name: mariadb
   newName: docker.io/spiarh/mariadb
-  # TODO: add version
-  newTag: latest
+  newTag: 10.4.15-r0
 
 configMapGenerator:
 - name: mariadb-env
