@@ -1,0 +1,21 @@
+from_image:
+  name: alpine
+  registry: r.spiarh.fr
+  tag: 3.12.1
+from_image_builder: null
+image:
+  name: mariadb
+  registry: r.spiarh.fr
+  tag: 10.4.15-r0
+  tag_build:
+    type: VERSION
+    version: 10.4.15-r0
+    version_from:
+      arch: x86_64
+      mirror: null
+      package: mariadb
+      repository: main
+      semver: null
+      type: alpine
+      version: null
+      version_id: '3.12'

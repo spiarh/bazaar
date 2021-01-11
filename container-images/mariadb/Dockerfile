@@ -1,12 +1,14 @@
-ARG REGISTRY
+ARG FROM_IMAGE
 
-FROM ${REGISTRY}/alpine:latest
+FROM ${FROM_IMAGE}
+
+ARG VERSION
 
 LABEL maintainer="_me@spiarh.fr"
 
 RUN addgroup -g 2811 -S mysql && adduser -u 2811 -s /bin/false -S -D -G mysql mysql
 
-RUN apk add --no-cache mariadb mariadb-client mariadb-server-utils tzdata
+RUN apk add --no-cache "mariadb~=${VERSION}" mariadb-client mariadb-server-utils tzdata
 
 # create dirs
 # mysql user needs access to program directories
