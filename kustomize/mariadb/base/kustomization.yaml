@@ -7,10 +7,10 @@ commonLabels:
   app.kubernetes.io/name: mariadb
   app.kubernetes.io/managed-by: kustomize
 
-images:
-- name: mariadb
-  newName: docker.io/spiarh/mariadb
-  newTag: 10.4.15-r0
+# images:
+# - name: mariadb
+#   newName: docker.io/spiarh/mariadb
+#   newTag: 10.4.15-r0
 
 configMapGenerator:
 - name: mariadb-env
