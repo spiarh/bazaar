@@ -1,4 +1,6 @@
-FROM docker.io/spiarh/alpine:latest
+ARG FROM_IMAGE
+
+FROM ${FROM_IMAGE}
 
 # Network, DNS
 RUN set -ex && \
