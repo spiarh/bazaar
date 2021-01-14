@@ -3,6 +3,7 @@
   - masters
   - workers
   gather_facts: true
+  serial: 1
   roles:
     - containerd
   tags:
