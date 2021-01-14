@@ -141,6 +141,7 @@ packages_from_default_repos:
   - libvirt-daemon-kvm
   - pass
   - rdesktop
+  - ripgrep
   - ruby
   - ruby-devel
   - rhythmbox
