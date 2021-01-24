@@ -41,13 +41,7 @@ metadata:
   name: local-path-provisioner
 spec:
   replicas: 1
-  selector:
-    matchLabels:
-      app: local-path-provisioner
   template:
-    metadata:
-      labels:
-        app: local-path-provisioner
     spec:
       containers:
       - name: local-path-provisioner
