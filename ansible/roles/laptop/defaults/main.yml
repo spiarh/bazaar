@@ -17,6 +17,7 @@ packages_from_default_repos:
   - deja-dup
   - distribution-gpg-keys
   - dnf-plugins-core
+  - dnf-plugin-system-upgrade
   - dkms
   - faketime
   - ffmpeg
@@ -59,6 +60,7 @@ packages_from_default_repos:
   - golang-x-tools-stringer
   - golang-x-tools-toolstash
   - grubby
+  - hdparm
   - htop
   - httrack
   - iftop
@@ -149,6 +151,7 @@ packages_from_default_repos:
   - salt-ssh
   - screen
   - skopeo
+  - smartmontools
   - ShellCheck
   - shutter
   - sshuttle
