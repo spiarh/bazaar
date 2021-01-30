@@ -1,0 +1,58 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hugo
+spec:
+  revisionHistoryLimit: 3
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    spec:
+      containers:
+      - name: hugo
+        image: hugo
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        resources:
+          limits:
+            memory: 64Mi
+          requests:
+            cpu: 50m
+            memory: 32Mi
+        securityContext:
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - mountPath: /var/lib/nginx/tmp
+          name: lib
+        - mountPath: /run/nginx
+          name: run
+      volumes:
+      - name: lib
+        emptyDir:
+      - name: run
+        emptyDir:
+      enableServiceLinks: false
+      serviceAccount: hugo
+      serviceAccountName: hugo
+      terminationGracePeriodSeconds: 0
