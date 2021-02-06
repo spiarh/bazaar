@@ -1,5 +1,5 @@
 # Default configuration
-{% for option, value in sshd_default_config.items() %}
+{% for option, value in sshd_config.items() %}
 {{ option }} {{ value}}
 {% endfor %}
 
@@ -15,6 +15,8 @@ HostKey {{ key }}
 {% endif %}
 
 # Allowed users
+{% if sshd_allowed_users is defined %}
 {% for user in sshd_allowed_users %}
 AllowUsers {{ user }}
 {% endfor %}
+{% endif %}
