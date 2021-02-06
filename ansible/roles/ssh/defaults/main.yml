@@ -1,6 +1,6 @@
 ---
 # defaults file for ssh
-sshd_default_config:
+sshd_config:
   Port: 2889
   ListenAddress: 0.0.0.0
   Protocol: 2
@@ -48,5 +48,4 @@ sshd_host_keys:
 
 #sshd_extra_config:
 
-sshd_allowed_users:
-  - thack
+# sshd_allowed_users:
