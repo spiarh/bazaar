@@ -1,0 +1,23 @@
+metadata:
+  registry: r.spiarh.fr
+  name: nextcloud
+  tag: 21.0.0
+spec:
+  fromImage:
+    registry: r.spiarh.fr
+    name: alpine
+    tag: latest
+  buildArgs:
+  - VERSION
+  tagFormat: '{{ .VERSION }}'
+  facts:
+  - name: VERSION
+    value: 21.0.0
+    source: github
+    kind: version
+  sources:
+  - name: github
+    github:
+      owner: nextcloud
+      repository: server
+      object: tag
