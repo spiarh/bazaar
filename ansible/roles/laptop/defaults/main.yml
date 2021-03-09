@@ -4,7 +4,6 @@ packages_to_remove:
   - thunderbird-enigmail
 
 packages_from_default_repos:
-  - akmod-nvidia
   - ansible
   - acpid
   - awscli
@@ -18,7 +17,6 @@ packages_from_default_repos:
   - distribution-gpg-keys
   - dnf-plugins-core
   - dnf-plugin-system-upgrade
-  - dkms
   - faketime
   - ffmpeg
   - filezilla
@@ -75,10 +73,9 @@ packages_from_default_repos:
   - minicom
   - mlocate
   - mtr
-  - mumble
   - nmap
   - nmap-ncat
-  #- nodejs
+  - nodejs
   - openvpn
   - openssh-askpass
   - picocom

@@ -1,0 +1,8 @@
+---
+- name: nitrokey_udev
+  template:
+    src: 41-nitrokey.rules
+    dest: /etc/udev/rules.d/41-nitrokey.rules
+    owner: root
+    group: root
+    mode: 0644
