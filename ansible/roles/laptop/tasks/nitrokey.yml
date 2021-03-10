@@ -1,6 +1,6 @@
 ---
 - name: nitrokey_udev
-  template:
+  copy:
     src: 41-nitrokey.rules
     dest: /etc/udev/rules.d/41-nitrokey.rules
     owner: root
