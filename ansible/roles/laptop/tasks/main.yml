@@ -4,3 +4,4 @@
 - import_tasks: services.yml
 - import_tasks: misc.yml
 - import_tasks: nitrokey.yml
+- import_tasks: firewalld.yml
