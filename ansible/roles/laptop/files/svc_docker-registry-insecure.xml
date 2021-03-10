@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<service>
+  <short>registry-insecure</short>
+  <description>Docker registry insecure and metrics </description>
+  <port protocol="tcp" port="5000"/>
+  <port protocol="tcp" port="5001"/>
+</service>

@@ -1,0 +1,19 @@
+# ---
+- name: copy_libvirt_custom_zone_xml
+  copy:
+    src: zone_libvirt-custom.xml
+    dest: /etc/firewalld/zones/libvirt-custom.xml
+    mode: 0644
+    owner: root
+    group: root
+
+- name: libvirt_custom_zone_exists
+  ansible.builtin.shell: firewall-cmd --info-zone=libvirt-custom
+  register: libvirt_custom_zone_exists
+  ignore_errors: true
+
+- name: reload_firewalld
+  service:
+    name: firewalld
+    state: reloaded
+  when: libvirt_custom_zone_exists.failed == true
