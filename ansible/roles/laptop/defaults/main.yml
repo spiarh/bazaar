@@ -154,6 +154,7 @@ packages_from_default_repos:
   - sshuttle
   - strace
   - sysstat
+  - thunderbird
   - tcpdump
   - terminator
   - transmission
@@ -174,6 +175,10 @@ packages_from_external_repos:
   - code
   - kubectl
   - terraform
+
+rpmfusion:
+  free: true
+  nonfree: false
 
 #rpm_keys_to_remove:
 
@@ -241,8 +246,6 @@ services_to_disable:
   - iscsi.service
   - iscsid.socket
   - iscsiuio.socket
-  - multipathd.socket
-  - multipathd.service
   - ModemManager.service
   - sssd.service
   - sssd-kcm.service

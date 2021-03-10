@@ -1,0 +1,24 @@
+---
+- name: is_rpmfusion_free_installed
+  ansible.builtin.shell: rpm -q rpmfusion-free-release
+  register: rpmfusion_free_installed
+  ignore_errors: true
+  when: rpmfusion.free
+
+- name: install_rpmfusion_free
+  ansible.builtin.shell: "dnf install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm"
+  when:
+  - rpmfusion.free
+  - rpmfusion_free_installed.failed == true
+
+- name: is_rpmfusion_nonfree_installed
+  ansible.builtin.shell: rpm -q rpmfusion-nonfree-release
+  register: rpmfusion_nonfree_installed
+  ignore_errors: true
+  when: rpmfusion.nonfree
+
+- name: install_rpmfusion_nonfree
+  ansible.builtin.shell: "dnf install -y https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
+  when:
+  - rpmfusion.nonfree
+  - rpmfusion_nonfree_installed.failed == true
