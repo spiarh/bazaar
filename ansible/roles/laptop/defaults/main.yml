@@ -18,7 +18,6 @@ packages_from_default_repos:
   - dnf-plugins-core
   - dnf-plugin-system-upgrade
   - faketime
-  - ffmpeg
   - filezilla
   - ftp
   - freerdp
@@ -164,7 +163,6 @@ packages_from_default_repos:
   - youtube-dl
   - vim
   - vim-X11
-  - vlc
   - virt-install
   - virt-manager
   - wireguard-tools
@@ -173,8 +171,11 @@ packages_from_default_repos:
 packages_from_external_repos:
   - brave-browser-beta
   - code
+  - ffmpeg
   - kubectl
   - terraform
+  - signal-desktop
+  - vlc
 
 rpmfusion:
   free: true
@@ -240,6 +241,14 @@ yum_repo_to_add:
     gpgkey:
       - https://packages.cloud.google.com/yum/doc/yum-key.gpg
       - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+  - name: copr-signal-dekstop
+    description: "Copr repo for Signal-Desktop owned by luminoso"
+    file: "_copr:copr.fedorainfracloud.org:luminoso:Signal-Desktop.repo"
+    baseurl: https://download.copr.fedorainfracloud.org/results/luminoso/Signal-Desktop/fedora-$releasever-$basearch/
+    enabled: yes
+    gpgcheck: yes
+    repo_gpgcheck: 0
+    gpgkey: https://download.copr.fedorainfracloud.org/results/luminoso/Signal-Desktop/pubkey.gpg
 
 services_to_disable:
   - bluetooth.service
