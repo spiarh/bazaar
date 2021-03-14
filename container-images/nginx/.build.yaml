@@ -1,10 +1,11 @@
+kind: Build
 image:
   registry: r.spiarh.fr/library
   name: nginx
   tag: 1.18.0-r1
 spec:
-  fromImage:
-    registry: r.spiarh.fr
+  fromImages:
+  - registry: r.spiarh.fr
     name: alpine
     tag: 3.12.1
   buildArgs:

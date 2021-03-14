@@ -1,10 +1,11 @@
+kind: Build
 image:
   registry: r.spiarh.fr/library
   name: nextcloud
   tag: 20.0.8
 spec:
-  fromImage:
-    registry: r.spiarh.fr
+  fromImages:
+  - registry: r.spiarh.fr
     name: alpine
     tag: latest
   buildArgs:
