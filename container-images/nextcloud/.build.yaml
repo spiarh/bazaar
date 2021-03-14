@@ -1,7 +1,7 @@
-metadata:
-  registry: r.spiarh.fr
+image:
+  registry: r.spiarh.fr/library
   name: nextcloud
-  tag: 21.0.0
+  tag: 20.0.8
 spec:
   fromImage:
     registry: r.spiarh.fr
@@ -12,9 +12,10 @@ spec:
   tagFormat: '{{ .VERSION }}'
   facts:
   - name: VERSION
-    value: 21.0.0
+    value: 20.0.8
     source: github
     kind: version
+    semver: < 21.0.0
   sources:
   - name: github
     github:
