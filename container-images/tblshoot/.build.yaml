@@ -1,0 +1,9 @@
+image:
+  name: tblshoot
+  registry: r.spiarh.fr/library
+  tag: latest
+spec:
+  fromImages:
+  - name: alpine
+    registry: r.spiarh.fr
+    tag: 3.13.2
