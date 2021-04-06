@@ -69,6 +69,9 @@ packages_from_default_repos:
   - libglvnd-glx
   - libglvnd-opengl
   - libglvnd-devel
+  - libreoffice-langpack-en
+  - libreoffice-langpack-de
+  - libreoffice-langpack-fr
   - minicom
   - mlocate
   - mtr
@@ -170,7 +173,7 @@ packages_from_default_repos:
 
 packages_from_external_repos:
   - brave-browser-beta
-  - code
+  - codium
   - ffmpeg
   - kubectl
   - terraform
@@ -193,23 +196,15 @@ yum_repo_to_del:
 yum_repo_to_add:
   - name: brave
     description: "Brave browser repository"
-    file: brave.repo
+    file: brave
     baseurl: https://brave-browser-rpm-beta.s3.brave.com/x86_64/
     enabled: yes
     gpgcheck: yes
     repo_gpgcheck: 1
     gpgkey: https://brave-browser-rpm-beta.s3.brave.com/brave-core-nightly.asc
-  - name: vscode
-    description: "Visual Studio Code"
-    file: vscode.repo
-    baseurl: https://packages.microsoft.com/yumrepos/vscode
-    enabled: yes
-    gpgcheck: yes
-    repo_gpgcheck: 1
-    gpgkey: https://packages.microsoft.com/keys/microsoft.asc
   - name: kubernetes
     description: "Kubernetes repository"
-    file: kubernetes.repo
+    file: kubernetes
     baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
     enabled: yes
     gpgcheck: yes
@@ -217,7 +212,7 @@ yum_repo_to_add:
     gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
   - name: hashicorp
     description: "Hashicorp"
-    file: hashicorp.repo
+    file: hashicorp
     baseurl: https://rpm.releases.hashicorp.com/fedora/$releasever/$basearch/stable
     enabled: yes
     gpgcheck: yes
@@ -225,7 +220,7 @@ yum_repo_to_add:
     gpgkey: https://rpm.releases.hashicorp.com/gpg
   - name: hashicorp-test
     description: "Hashicorp Test"
-    file: hashicorp-test.repo
+    file: hashicorp-test
     baseurl: https://rpm.releases.hashicorp.com/fedora/$releasever/$basearch/test
     enabled: no
     gpgcheck: yes
@@ -233,7 +228,7 @@ yum_repo_to_add:
     gpgkey: https://rpm.releases.hashicorp.com/gpg
   - name: google-cloud-sdk
     description: "Google Cloud SDK"
-    file: google-cloud-sdk.repo
+    file: google-cloud-sdk
     baseurl: https://packages.cloud.google.com/yum/repos/cloud-sdk-el7-x86_64
     enabled: yes
     gpgcheck: yes
@@ -243,12 +238,20 @@ yum_repo_to_add:
       - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
   - name: copr-signal-dekstop
     description: "Copr repo for Signal-Desktop owned by luminoso"
-    file: "_copr:copr.fedorainfracloud.org:luminoso:Signal-Desktop.repo"
+    file: "_copr:copr.fedorainfracloud.org:luminoso:Signal-Desktop"
     baseurl: https://download.copr.fedorainfracloud.org/results/luminoso/Signal-Desktop/fedora-$releasever-$basearch/
     enabled: yes
     gpgcheck: yes
     repo_gpgcheck: 0
     gpgkey: https://download.copr.fedorainfracloud.org/results/luminoso/Signal-Desktop/pubkey.gpg
+  - name: gitlab.com_paulcarroty_vscodium_repo
+    description: "VSCodium Repo"
+    file: vscodium.repo
+    baseurl: https://paulcarroty.gitlab.io/vscodium-deb-rpm-repo/rpms/
+    enabled: yes
+    gpgcheck: yes
+    repo_gpgcheck: 1
+    gpgkey: https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg
 
 services_to_disable:
   - bluetooth.service
