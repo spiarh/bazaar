@@ -19,7 +19,7 @@ COPY --from=builder /go/bin/gopass-full /usr/local/bin/gopass-full
 
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
-RUN apk add --no-cache gnupg
+RUN apk add --no-cache gnupg xclip
 
 WORKDIR /root
 
