@@ -2,7 +2,7 @@
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
-  name: privileged
+  name: unrestricted
   annotations:
     seccomp.security.alpha.kubernetes.io/allowedProfileNames: '*'
     seccomp.security.alpha.kubernetes.io/defaultProfileName: 'runtime/default'
@@ -33,21 +33,21 @@ spec:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: psp:privileged
+  name: psp:unrestricted
 rules:
   - apiGroups: ['policy']
     resources: ['podsecuritypolicies']
     verbs: ['use']
-    resourceNames: ['privileged']
+    resourceNames: ['unrestrited']
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: psp-default:privileged
+  name: psp-default:unrestricted
   namespace: kube-system
 roleRef:
   kind: ClusterRole
-  name: psp:privileged
+  name: psp:unrestricted
   apiGroup: rbac.authorization.k8s.io
 subjects:
 - kind: Group

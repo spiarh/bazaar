@@ -16,7 +16,7 @@
     mode: 0644
   register: addons_manifests_copied
   with_items:
-    - {src: "psp-rbac-privileged.yml", dest: "psp-rbac-privileged.yml"}
+    - {src: "psp-rbac-unrestricted.yml", dest: "psp-rbac-unrestricted.yml"}
     - {src: "psp-rbac-relaxed.yml", dest: "psp-rbac-relaxed.yml"}
     - {src: "psp-rbac-restricted.yml", dest: "psp-rbac-restricted.yml"}
     - {src: "psp-rbac-kube-proxy.yml", dest: "psp-rbac-kube-proxy.yml"}
@@ -28,7 +28,7 @@
 - name: apply_addons_manifests
   command: "kubectl apply -f {{ addons_directoy }}/{{ item }} --kubeconfig={{ kubeconfig_admin }} -v4"
   with_items:
-    - psp-rbac-privileged.yml
+    - psp-rbac-unrestricted.yml
     - psp-rbac-relaxed.yml
     - psp-rbac-restricted.yml
     - psp-rbac-kube-proxy.yml
