@@ -14,6 +14,7 @@ packages_from_default_repos:
   - curl
   - cmake
   - deja-dup
+  - dconf-editor
   - distribution-gpg-keys
   - dnf-plugins-core
   - dnf-plugin-system-upgrade
@@ -57,6 +58,7 @@ packages_from_default_repos:
   - golang-x-tools-stringer
   - golang-x-tools-toolstash
   - grubby
+  - hadolint
   - hdparm
   - htop
   - httrack
@@ -148,8 +150,6 @@ packages_from_default_repos:
   - ruby
   - ruby-devel
   - rhythmbox
-  - salt-master
-  - salt-ssh
   - screen
   - skopeo
   - smartmontools
@@ -261,6 +261,7 @@ services_to_disable:
   - iscsid.socket
   - iscsiuio.socket
   - ModemManager.service
+  - pcscd.service
   - sssd.service
   - sssd-kcm.service
   - sssd-kcm.socket
