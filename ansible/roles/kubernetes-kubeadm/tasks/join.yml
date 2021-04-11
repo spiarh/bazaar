@@ -10,6 +10,7 @@
 - include_tasks: reset.yml
 # reimport cert wipe by kubeadm reset...
 - import_tasks: certs.yml
+- include_tasks: patches.yml
 - import_tasks: secret_encryption.yml
   when:
     - inventory_hostname in groups['masters']
@@ -17,7 +18,7 @@
 
 
 - name: run_kubeadm_join
-  command: "kubeadm join --config {{ kubeadm.join.config_file }}  --skip-phases=\"{{ kubeadm.join.skip_phases }}\" -v{{ kubeadm.log_level }}"
+  command: "kubeadm join --config {{ kubeadm.join.config_file }}  --skip-phases=\"{{ kubeadm.join.skip_phases }}\" --experimental-patches={{ kubeadm.patches_dir }} -v{{ kubeadm.log_level }}"
   notify: create_join_witness_file
   register: run_kubeadm_join
 

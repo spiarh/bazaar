@@ -1,12 +1,4 @@
 ---
-- import_tasks: certs.yml
-  when: inventory_hostname in groups['masters']
-
-- import_tasks: secret_encryption.yml
-  when:
-    - inventory_hostname in groups['masters']
-    - kubernetes.apiserver.secret_encryption.enable
-
 - import_tasks: prereq.yml
 
 # INIT
@@ -43,6 +35,14 @@
     - kubeadm_init_already_done.stat.exists
     - not kubeadm_join_already_done.stat.exists
     - not inventory_hostname in groups.masters
+
+- import_tasks: certs.yml
+  when: inventory_hostname in groups['masters']
+
+- import_tasks: secret_encryption.yml
+  when:
+    - inventory_hostname in groups['masters']
+    - kubernetes.apiserver.secret_encryption.enable
 
 - include_tasks: init/rm_conf.yml
 - include_tasks: join/rm_conf.yml

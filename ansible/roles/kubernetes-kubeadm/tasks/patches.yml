@@ -1,0 +1,20 @@
+---
+- name: create_patches_dir
+  file:
+    path: "{{ kubeadm.patches_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: copy_patches
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ kubeadm.patches_dir }}/{{ item.dest }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - {src: "patches/kube-apiserver0+json.json.j2", dest: "kube-apiserver0+json.json"}
+    - {src: "patches/kube-controller-manager0+json.json.j2", dest: "kube-controller-manager0+json.json"}
+    - {src: "patches/kube-scheduler0+json.json.j2", dest: "kube-scheduler0+json.json"}

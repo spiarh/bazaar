@@ -57,6 +57,7 @@ etcd:
   data_dir: "/var/lib/etcd"
 
 kubeadm:
+  patches_dir: "/etc/kubernetes/patches"
   local_dir: "{{ inventory_dir }}/secrets/kubernetes/kubeadm"
   # openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'
   ca_cert_hash: "{{ inventory_dir }}/secrets/kubernetes/kubeadm/ca-cert-hash"
