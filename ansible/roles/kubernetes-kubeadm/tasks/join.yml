@@ -10,6 +10,11 @@
 - include_tasks: reset.yml
 # reimport cert wipe by kubeadm reset...
 - import_tasks: certs.yml
+- import_tasks: secret_encryption.yml
+  when:
+    - inventory_hostname in groups['masters']
+    - kubernetes.apiserver.secret_encryption.enable
+
 
 - name: run_kubeadm_join
   command: "kubeadm join --config {{ kubeadm.join.config_file }}  --skip-phases=\"{{ kubeadm.join.skip_phases }}\" -v{{ kubeadm.log_level }}"

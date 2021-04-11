@@ -3,7 +3,7 @@ apiVersion: kubeadm.k8s.io/v1beta2
 bootstrapTokens:
 - groups:
   - system:bootstrappers:kubeadm:default-node-token
-  token: {{ kubeadm.token }}
+  token: "{{ lookup('file', kubeadm.token) }}"
   ttl: 24h0m0s
   usages:
   - signing

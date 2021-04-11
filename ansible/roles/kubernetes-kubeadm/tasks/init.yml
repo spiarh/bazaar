@@ -2,8 +2,11 @@
 - include_tasks: init/copy_conf.yml
 
 - include_tasks: reset.yml
-# reimport cert wipe by kubeadm reset...
+# reimport cert, etcd secret wipe by kubeadm reset...
 - import_tasks: certs.yml
+- import_tasks: secret_encryption.yml
+  when:
+    - kubernetes.apiserver.secret_encryption.enable
 
 - name: run_kubeadm_init
   command: "kubeadm init --config {{ kubeadm.init.config_file }} --skip-phases=\"{{ kubeadm.init.skip_phases }}\" -v{{ kubeadm.log_level }}"

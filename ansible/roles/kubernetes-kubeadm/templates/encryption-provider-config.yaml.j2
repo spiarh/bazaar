@@ -8,5 +8,5 @@ resources:
     - aescbc:
         keys:
         - name: key1
-          secret: "{{lookup('file', kubernetes.apiserver.secret_encryption.local_key) }}"
+          secret: "{{ lookup('file', kubernetes.apiserver.secret_encryption.local_key) }}"
     - identity: {}
