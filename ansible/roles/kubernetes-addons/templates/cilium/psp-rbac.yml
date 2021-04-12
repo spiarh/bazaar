@@ -17,6 +17,7 @@ spec:
     - configMap
     - secret
     - hostPath
+    - projected
   allowedHostPaths:
     - pathPrefix: /sys/fs/bpf
     - pathPrefix: /var/run/cilium
