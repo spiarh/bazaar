@@ -2,6 +2,5 @@
 - hosts:
   - masters
   - workers
-  gather_facts: true
   roles:
     - containerd
