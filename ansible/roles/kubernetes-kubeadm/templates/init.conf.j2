@@ -13,7 +13,7 @@ localAPIEndpoint:
   advertiseAddress: {{ (ansible_facts[kubernetes.apiserver.listen_interface | replace("-", "_")]['ipv4']['address']) | default(ansible_facts['default_ipv4']['address']) }}
   bindPort: 6443
 nodeRegistration:
-  name: {{ ansible_hostname }}
+  name: {{ ansible_nodename }}
   taints:
   - effect: NoSchedule
     key: node-role.kubernetes.io/master
@@ -30,6 +30,9 @@ apiServer:
 apiVersion: kubeadm.k8s.io/v1beta2
 certificatesDir: /etc/kubernetes/pki
 clusterName: {{ kubernetes.cluster_name }}
+controllerManager:
+  extraArgs:
+    allocate-node-cidrs: "{{ kubernetes.controller_manager.allocate_node_cidrs }}"
 controlPlaneEndpoint: {{ kubernetes.control_plane_endpoint }}
 dns:
   type: CoreDNS

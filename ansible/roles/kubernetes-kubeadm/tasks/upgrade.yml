@@ -11,13 +11,13 @@
 # push admin.conf
 - include_tasks: admin-conf/push.yml
   when:
-    - inventory_hostname == groups.masters[0]
+    - inventory_hostname in groups['masters']
 
 - name: run_kubeadm_upgrade
   command: "kubeadm upgrade apply --config {{ kubeadm.init.config_file }} --experimental-patches={{ kubeadm.patches_dir }} v{{ kubernetes.version }} --yes -v{{ kubeadm.log_level }}"
   register: run_kubeadm_upgrade
   when:
-    - inventory_hostname == groups.masters[0]
+    - inventory_hostname in groups['masters']
 
 - name: run_kubeadm_node_upgrade
   command: "kubeadm upgrade node -v{{ kubeadm.log_level }}"

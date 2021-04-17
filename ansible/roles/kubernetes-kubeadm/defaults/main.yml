@@ -41,6 +41,7 @@ kubernetes:
     listen_interface: ""
 
   controller_manager:
+    allocate_node_cidrs: "true"
     listen_interface: ""
 
   scheduler:
@@ -80,10 +81,6 @@ kubelet:
   extra_args: ""
   extra_configuration_default: |
     cgroupDriver: systemd
-    cgroupRoot: /
-    kubeletCgroups: /podruntime.slice
-    kubeReservedCgroup: /podruntime.slice
-    runtimeCgroups: /podruntime.slice
     resolvConf: /run/systemd/resolve/resolv.conf
     systemReserved:
       cpu: 100m

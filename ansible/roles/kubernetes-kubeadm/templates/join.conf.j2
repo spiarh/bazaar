@@ -16,6 +16,6 @@ discovery:
   timeout: 8m0s
 kind: JoinConfiguration
 nodeRegistration:
-  name: {{ ansible_hostname }}
+  name: {{ ansible_nodename }}
 {% include "templates/kubelet.yml.j2" %}
 {% include "templates/kube_proxy.yml.j2" %}
