@@ -1,0 +1,23 @@
+---
+- name: apply_baseline_template_manifests
+  community.kubernetes.k8s:
+    state: present
+    definition: "{{ lookup('template', item) | from_yaml }}"
+    validate:
+      fail_on_error: yes
+  with_items:
+    - psp-default.yml
+    - kubernetes-services-endpoint.yml
+
+- name: apply_baseline_file_manifests
+  community.kubernetes.k8s:
+    state: present
+    src: "{{ role_path }}/files/{{ item }}"
+    validate:
+      fail_on_error: yes
+  with_items:
+    - psp-rbac-cilium.yml
+    - psp-rbac-unrestricted.yml
+    - psp-rbac-relaxed.yml
+    - psp-rbac-restricted.yml
+    - psp-rbac-kube-proxy.yml
