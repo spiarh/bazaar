@@ -1,0 +1,22 @@
+---
+- name: install_haproxy
+  package:
+    name: haproxy
+    state: latest
+    update_cache: yes
+
+- name: configure_haproxy
+  template:
+    src: haproxy.conf.j2
+    dest: /etc/haproxy/haproxy.cfg
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart_haproxy
+
+- name: start_enable_service_haproxy
+  service:
+    name: haproxy
+    state: started
+    enabled: True

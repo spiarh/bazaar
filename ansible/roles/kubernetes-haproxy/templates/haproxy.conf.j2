@@ -1,0 +1,37 @@
+global 
+  log /dev/log	local0
+  log /dev/log	local1 notice
+  chroot /var/lib/haproxy
+  stats socket /run/haproxy/admin.sock mode 660 level admin expose-fd listeners
+  stats timeout 30s
+  user haproxy
+  group haproxy
+  daemon
+
+defaults
+  mode       tcp
+  log        global
+  option     tcplog
+  option     redispatch
+  option     tcpka
+  retries    2
+  http-check      expect status   200
+  default-server  check check-ssl verify none
+  timeout  connect 5s
+  timeout  client  5s
+  timeout  server  5s
+  timeout  tunnel  86400s
+
+listen stats
+  bind   {{ (ansible_facts[haproxy_local_lb.stats.bind_interface | replace('-', '_')]['ipv4']['address']) | default(ansible_facts['default_ipv4']['address']) }}:9000
+  mode   http
+  stats  hide-version
+  stats  uri  /stats
+
+listen apiserver
+  bind    {{ haproxy_local_lb.apiserver.bind_ip }}:{{ haproxy_local_lb.apiserver.bind_port }}
+  option  httpchk GET /healthz
+{% for master in groups['masters'] %}
+{% set server = hostvars[master]['haproxy_local_lb']['master'] %}
+  server  {{ server }} {{ server }}:6443
+{% endfor -%}

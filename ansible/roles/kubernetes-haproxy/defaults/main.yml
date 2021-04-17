@@ -1,0 +1,7 @@
+---
+haproxy_local_lb:
+  apiserver:
+    bind_ip: "*"
+    bind_port: 7443
+  stats:
+    bind_interface: ""
