@@ -23,8 +23,8 @@ RUN set -ex && \
 
 # Misc
 RUN apk add --no-cache \
-      busybox-extras mariadb-client \
-      openssl openssh etcd-ctl \
-      file git jq util-linux vim
+      etcd-ctl busybox-extras mariadb-client \
+      openssl openssh file \
+      git jq rsync util-linux vim
 
 ENTRYPOINT ["bash", "-l"]
