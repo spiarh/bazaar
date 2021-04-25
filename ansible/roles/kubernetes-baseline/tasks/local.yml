@@ -1,0 +1,4 @@
+---
+- include_tasks: local/manifests.yml
+- include_tasks: local/podcidr.yml
+- include_tasks: local/taints.yml

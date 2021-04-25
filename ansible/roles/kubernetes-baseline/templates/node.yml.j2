@@ -1,0 +1,6 @@
+spec:
+  taints:
+{% if masters_noschedule %}
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/master
+{% endif %}

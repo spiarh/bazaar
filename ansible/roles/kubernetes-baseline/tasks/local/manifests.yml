@@ -5,6 +5,8 @@
     definition: "{{ lookup('template', item) | from_yaml }}"
     validate:
       fail_on_error: yes
+  delegate_to: localhost
+  run_once: true
   with_items:
     - psp-default.yml
     - kubernetes-services-endpoint.yml
@@ -15,6 +17,8 @@
     src: "{{ role_path }}/files/{{ item }}"
     validate:
       fail_on_error: yes
+  delegate_to: localhost
+  run_once: true
   with_items:
     - psp-rbac-cilium.yml
     - psp-rbac-unrestricted.yml

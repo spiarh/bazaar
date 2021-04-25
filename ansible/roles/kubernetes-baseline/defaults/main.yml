@@ -2,6 +2,10 @@
 kubeconfig:
   local_path: "{{ inventory_dir }}/secrets/kubernetes/admin.conf"
 
+taints:
+  master:
+    noschedule: true
+
 psp:
   default: "relaxed"
 
