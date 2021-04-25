@@ -6,7 +6,7 @@
 
 - name: reboot_node
   reboot:
-    msg: "Reboot initiated by Ansible"
+    msg: "reboot initiated by ansible"
   when: reboot_required_file.stat.exists == true
 
 - name: wait_for_node
