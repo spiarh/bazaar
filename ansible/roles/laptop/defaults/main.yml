@@ -172,6 +172,7 @@ packages_from_default_repos:
   - virt-manager
   - wireguard-tools
   - wireshark
+  - xsel
 
 packages_from_external_repos:
   - brave-browser-beta
