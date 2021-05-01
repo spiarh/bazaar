@@ -59,10 +59,10 @@ spec:
             successThreshold: 1
           resources:
             limits:
-              cpu: 500m
-              memory: 512Mi
+              cpu: 2000m
+              memory: 4096
             requests:
-              cpu: 250m
+              cpu: 100m
               memory: 256m
           volumeMounts:
             - name: config
