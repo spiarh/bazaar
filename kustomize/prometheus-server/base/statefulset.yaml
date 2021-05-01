@@ -24,7 +24,7 @@ spec:
               cpu: 50m
               memory: 50Mi
           volumeMounts:
-            - name: config-volume
+            - name: config
               mountPath: /etc/config
               readOnly: true
         - name: prometheus-server
