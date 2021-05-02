@@ -33,6 +33,7 @@ configMapGenerator:
 resources:
 - ./deployment.yaml
 - ./podsecuritypolicy.yaml
+- ./podsecuritypolicy-role.yaml
 - ./pvc.yaml
 - ./rolebinding.yaml
 - ./role.yaml
