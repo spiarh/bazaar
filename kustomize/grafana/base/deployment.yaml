@@ -20,6 +20,7 @@ spec:
           image: init-chown-data
           imagePullPolicy: IfNotPresent
           securityContext:
+            readOnlyRootFilesystem: true
             runAsNonRoot: false
             runAsUser: 0
           command: ["chown", "-R", "472:472", "/var/lib/grafana"]
@@ -68,6 +69,8 @@ spec:
             requests:
               cpu: 50m
               memory: 50Mi
+          securityContext:
+            readOnlyRootFilesystem: true
           volumeMounts:
             - name: sc-dashboard-volume
               mountPath: "/tmp/dashboards"
@@ -123,6 +126,8 @@ spec:
             requests:
               cpu: 100m
               memory: 128Mi
+          securityContext:
+            readOnlyRootFilesystem: true
       volumes:
         - name: config
           configMap:
