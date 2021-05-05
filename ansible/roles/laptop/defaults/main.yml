@@ -92,6 +92,7 @@ packages_from_default_repos:
   - python3-flake8
   - python3-jedi
   - python3-netaddr
+  - python3-octaviaclient
   - python3-openstackclient
   - python3-pip
   - python3-pytest
