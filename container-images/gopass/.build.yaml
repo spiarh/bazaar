@@ -1,8 +1,7 @@
-kind: Build
 image:
   registry: r.spiarh.fr
   name: gopass
-  tag: 1.12.2
+  tag: 1.12.6
 spec:
   fromImages:
   - registry: docker.io/library
@@ -17,7 +16,7 @@ spec:
   tagFormat: '{{ .VERSION }}'
   facts:
   - name: VERSION
-    value: 1.12.2
+    value: 1.12.6
     source: github
     kind: version
   sources:

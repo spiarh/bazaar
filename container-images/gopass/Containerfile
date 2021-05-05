@@ -9,18 +9,17 @@ RUN apk add --no-cache git make curl gcc libc-dev ncurses
 
 RUN curl -OL "https://github.com/gopasspw/gopass/archive/v${VERSION}.tar.gz" && \
     tar zxf "v${VERSION}.tar.gz" && cd "gopass-${VERSION}" && \
-    make full && mv ./gopass-full /go/bin/gopass-full
+    make build && mv ./gopass /go/bin/gopass
 
 FROM ${FROM_IMAGE}
 
 LABEL maintainer="_me@spiarh.fr"
 
-COPY --from=builder /go/bin/gopass-full /usr/local/bin/gopass-full
+COPY --from=builder /go/bin/gopass /usr/local/bin/gopass
 
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-
-RUN apk add --no-cache gnupg xclip
+RUN apk add --no-cache gnupg xclip bash && \
+    gopass completion bash > /root/.bashrc
 
 WORKDIR /root
 
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/gopass"]
