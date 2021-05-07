@@ -1,0 +1,25 @@
+ARG FROM_IMAGE_BUILDER
+ARG FROM_IMAGE
+
+FROM ${FROM_IMAGE_BUILDER} AS builder
+
+ARG K9S_VERSION
+ARG KUBECTL_VERSION
+
+RUN apk add --no-cache make git gcc libc-dev curl
+
+RUN curl -OL "https://github.com/derailed/k9s/archive/v${K9S_VERSION}.tar.gz" && \
+    tar zxf "v${K9S_VERSION}.tar.gz" && cd "k9s-${K9S_VERSION}" && \
+    make build && mv ./execs/k9s /go/bin/k9s
+
+RUN curl -L https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /go/bin/kubectl && \
+    chmod +x /go/bin/kubectl
+
+FROM ${FROM_IMAGE}
+
+LABEL maintainer="_me@spiarh.fr"
+
+COPY --from=builder /go/bin/k9s /usr/local/bin/k9s
+COPY --from=builder /go/bin/kubectl /usr/local/bin/kubectl
+
+ENTRYPOINT ["/usr/local/bin/k9s"]
