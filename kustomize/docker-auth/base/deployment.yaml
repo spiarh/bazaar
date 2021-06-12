@@ -58,7 +58,7 @@ spec:
       volumes:
       - name: docker-auth-tls
         secret:
-          secretName: container-registry-tls
+          secretName: docker-auth-tls
       - name: docker-auth-config
         secret:
           secretName: docker-auth-config

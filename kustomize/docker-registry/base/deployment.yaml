@@ -50,7 +50,7 @@ spec:
         - name: docker-registry-config
           mountPath: /etc/docker/registry
           readOnly: true
-        - name: container-registry-tls
+        - name: docker-registry-tls
           mountPath: /certificates
           readOnly: true
       enableServiceLinks: false
@@ -63,9 +63,9 @@ spec:
           items:
           - key: config
             path: config.yml
-      - name: container-registry-tls
+      - name: docker-registry-tls
         secret:
-          secretName: container-registry-tls
+          secretName: docker-registry-tls
           items:
           - key: tls.crt
             path: docker-auth-tls.crt
