@@ -1,0 +1,27 @@
+image:
+  registry: r.spiarh.fr
+  name: jwt
+  tag: 4.0.0
+spec:
+  fromImages:
+  - registry: docker.io/library
+    name: rust
+    tag: latest
+    target: builder
+  - registry: r.spiarh.fr
+    name: ubuntu
+    tag: "20.04"
+  buildArgs:
+  - VERSION
+  tagFormat: '{{ .VERSION }}'
+  facts:
+  - name: VERSION
+    value: 4.0.0
+    source: github
+    kind: version
+  sources:
+  - name: github
+    github:
+      owner: mike-engel
+      repository: jwt-cli
+      object: release

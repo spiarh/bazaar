@@ -1,0 +1,29 @@
+ARG FROM_IMAGE_BUILDER
+ARG FROM_IMAGE
+
+FROM ${FROM_IMAGE_BUILDER} AS builder
+
+ARG VERSION
+ARG TARGET=x86_64-unknown-linux-gnu
+
+# RUN apk add --no-cache git make curl gcc libc-dev ncurses
+# RUN apk add --no-cache git curl
+
+RUN curl -OL "https://github.com/mike-engel/jwt-cli/archive/refs/tags/${VERSION}.tar.gz" && \
+    tar zxf "${VERSION}.tar.gz" && cd "jwt-cli-${VERSION}" && \
+    rustup target add ${TARGET} && \
+    cargo build --target ${TARGET} && \
+    mv ./target/${TARGET}/debug/jwt /usr/local/cargo/bin/jwt
+
+FROM ${FROM_IMAGE}
+
+LABEL maintainer="_me@spiarh.fr"
+
+COPY --from=builder /usr/local/cargo/bin/jwt /usr/local/bin/jwt
+
+# RUN apk add --no-cache gnupg xclip bash && \
+#     gopass completion bash > /root/.bashrc
+
+WORKDIR /root
+
+ENTRYPOINT ["/usr/local/bin/jwt"]
