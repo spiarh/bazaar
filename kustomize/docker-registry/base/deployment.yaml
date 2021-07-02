@@ -65,7 +65,7 @@ spec:
             path: config.yml
       - name: docker-registry-tls
         secret:
-          secretName: docker-registry-tls
+          secretName: docker-auth-tls
           items:
           - key: tls.crt
             path: docker-auth-tls.crt
