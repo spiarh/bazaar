@@ -1,0 +1,34 @@
+ARG FROM_IMAGE_DOWNLOADER
+
+FROM ${FROM_IMAGE_DOWNLOADER} AS downloader
+
+ARG BRANCH
+ARG VERSION
+ARG BASE_URL="https://dl-cdn.alpinelinux.org/alpine/v${BRANCH}/releases/x86_64/"
+ARG DIST=alpine-minirootfs-${VERSION}-x86_64.tar.gz
+ARG DIST_DIR=/dist
+ARG RELEASE=${BASE_URL}/${DIST}
+ARG RELEASE_SHA256=${RELEASE}.sha256
+
+RUN echo -e " $DIST\n $RELEASE\n $RELEASE_SHA256\n"
+
+RUN wget -O $DIST $RELEASE && \
+    wget -q -O- $RELEASE_SHA256 | grep $DIST | sha256sum -c - && \
+    mkdir -p ${DIST_DIR} && \
+    tar -xf $DIST -C ${DIST_DIR}
+
+FROM scratch
+
+LABEL maintainer="_me@spiarh.fr"
+
+# ADD alpine-minirootfs-${VERSION}-x86_64.tar.gz /
+COPY --from=downloader ${DIST_DIR} /
+
+RUN addgroup -g 1871 -S regular && adduser -u 1871 -s /bin/false -S -D -G regular regular
+
+RUN mkdir -p /usr/local/etc
+
+RUN apk --no-cache update && \
+    apk --no-cache upgrade
+
+ENTRYPOINT ["/bin/sh"]

@@ -1,0 +1,20 @@
+kind: Build
+image:
+  registry: r.spiarh.fr/library
+  name: alpine
+  tag: 3.14.0
+spec:
+  fromImages:
+  - registry: docker.io/library
+    name: alpine
+    tag: latest
+    target: downloader
+  buildArgs:
+  - BRANCH
+  - VERSION
+  tagFormat: '{{ .gitCommit }}'
+  facts:
+  - name: BRANCH
+    value: "3.14"
+  - name: VERSION
+    value: 3.14.0
