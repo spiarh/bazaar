@@ -12,7 +12,7 @@ spec:
   buildArgs:
   - BRANCH
   - VERSION
-  tagFormat: '{{ .gitCommit }}'
+  tagFormat: '{{ .VERSION }}'
   facts:
   - name: BRANCH
     value: "3.14"
