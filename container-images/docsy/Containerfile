@@ -1,0 +1,12 @@
+ARG FROM_IMAGE
+
+FROM ${FROM_IMAGE}
+
+ARG VERSION
+ENV NODE_PATH=/usr/lib/node_modules
+
+LABEL maintainer="_me@spiarh.fr"
+
+RUN apk add --no-cache npm
+
+RUN npm install -g postcss postcss-cli autoprefixer 

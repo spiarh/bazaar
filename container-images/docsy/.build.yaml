@@ -1,0 +1,11 @@
+image:
+  registry: r.spiarh.fr/library
+  name: docsy
+  tag: "20210703112219"
+spec:
+  fromImages:
+  - registry: r.spiarh.fr/library
+    name: hugo
+    tag: latest
+  buildArgs: []
+  tagFormat: '{{ .date }}'

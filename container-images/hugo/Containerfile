@@ -1,0 +1,30 @@
+ARG FROM_IMAGE_BUILDER
+ARG FROM_IMAGE
+
+FROM ${FROM_IMAGE_BUILDER} AS builder
+
+ARG VERSION
+ENV HUGO_BUILD_TAGS=extended
+
+RUN apk add --no-cache git curl gcc g++ libc-dev && \
+    go get github.com/magefile/mage
+    # go get -u -d github.com/magefile/mage && \
+    # cd $GOPATH/src/github.com/magefile/mage && \
+    # go run bootstrap.go
+
+RUN cd /tmp && \
+    curl -OL "https://github.com/gohugoio/hugo/archive/v${VERSION}.tar.gz" && \
+    tar zxf "v${VERSION}.tar.gz" && cd "hugo-${VERSION}" && \
+    mage -v hugo && mv ./hugo /go/bin/hugo
+
+FROM ${FROM_IMAGE}
+
+LABEL maintainer="_me@spiarh.fr"
+
+COPY --from=builder /go/bin/hugo /usr/local/bin/hugo
+
+RUN apk add --no-cache git
+
+WORKDIR /app
+
+ENTRYPOINT ["/usr/local/bin/hugo"]
