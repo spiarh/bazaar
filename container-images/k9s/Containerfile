@@ -17,6 +17,8 @@ RUN curl -L https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL
 
 FROM ${FROM_IMAGE}
 
+RUN apk add --no-cache ca-certificates
+
 LABEL maintainer="_me@spiarh.fr"
 
 COPY --from=builder /go/bin/k9s /usr/local/bin/k9s
