@@ -1,6 +1,8 @@
-FROM r.spiarh.fr/alpine:latest AS downloader
+ARG FROM_IMAGE_DOWNLOADER
 
-ARG VERSION=focal
+FROM ${FROM_IMAGE_DOWNLOADER} AS downloader
+
+ARG VERSION
 ARG BASE_URL=https://partner-images.canonical.com/core/${VERSION}/current/
 ARG DIST=ubuntu-${VERSION}-core-cloudimg-amd64-root.tar.gz
 ARG DIST_DIR=/dist

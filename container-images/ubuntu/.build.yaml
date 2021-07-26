@@ -1,0 +1,17 @@
+kind: Build
+image:
+  registry: r.spiarh.fr/library
+  name: ubuntu
+  tag: "20.04"
+spec:
+  fromImages:
+  - registry: docker.io/library
+    name: alpine
+    tag: latest
+    target: downloader
+  buildArgs:
+  - VERSION
+  tagFormat: '{{ .VERSION }}'
+  facts:
+  - name: VERSION
+    value: focal
