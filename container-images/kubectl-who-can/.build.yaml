@@ -1,0 +1,27 @@
+image:
+  registry: r.spiarh.fr
+  name: kubectl-who-can
+  tag: 0.3.0
+spec:
+  fromImages:
+  - registry: docker.io/library
+    name: golang
+    tag: "1.16"
+    target: builder
+  - registry: r.spiarh.fr/library
+    name: alpine
+    tag: 3.14.0
+  buildArgs:
+  - VERSION
+  tagFormat: '{{ .VERSION }}'
+  facts:
+  - name: VERSION
+    value: 0.3.0
+    source: github
+    kind: version
+  sources:
+  - name: github
+    github:
+      owner: aquasecurity
+      repository: kubectl-who-can
+      object: release

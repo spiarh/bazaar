@@ -1,0 +1,21 @@
+ARG FROM_IMAGE_BUILDER
+ARG FROM_IMAGE
+
+FROM ${FROM_IMAGE_BUILDER} AS builder
+
+ARG VERSION
+
+RUN curl -OL "https://github.com/aquasecurity/kubectl-who-can/archive/v${VERSION}.tar.gz" && \
+    tar zxf "v${VERSION}.tar.gz" && cd "kubectl-who-can-${VERSION}" && \
+    make build && \
+    mv ./kubectl-who-can /go/bin/kubectl-who-can
+
+FROM ${FROM_IMAGE}
+
+LABEL maintainer="_me@spiarh.fr"
+
+COPY --from=builder /go/bin/kubectl-who-can /usr/local/bin/kubectl-who-can
+
+WORKDIR /root
+
+ENTRYPOINT ["/usr/local/bin/kubectl-who-can"]
