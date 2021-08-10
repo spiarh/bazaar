@@ -19,16 +19,19 @@ RUN wget -O $DIST $RELEASE && \
 
 FROM scratch
 
+ARG VERSION
+ARG DIST=alpine-minirootfs-${VERSION}-x86_64.tar.gz
+
 LABEL maintainer="_me@spiarh.fr"
 
 # ADD alpine-minirootfs-${VERSION}-x86_64.tar.gz /
 COPY --from=downloader ${DIST_DIR} /
 
-RUN addgroup -g 1871 -S regular && adduser -u 1871 -s /bin/false -S -D -G regular regular
+RUN addgroup -g 1871 -S regular && adduser -u 1871 -s /bin/false -S -D -G regular regular 
 
-RUN mkdir -p /usr/local/etc
-
-RUN apk --no-cache update && \
+RUN rm -vf /${DIST} && \
+    mkdir -p /usr/local/etc && \
+    apk --no-cache update && \
     apk --no-cache upgrade
 
 ENTRYPOINT ["/bin/sh"]
