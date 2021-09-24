@@ -1,7 +1,7 @@
 image:
   registry: r.spiarh.fr/library
   name: docsy
-  tag: "20210703112219"
+  tag: "20210714192017"
 spec:
   fromImages:
   - registry: r.spiarh.fr/library

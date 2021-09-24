@@ -8,7 +8,7 @@ spec:
     name: rust
     tag: latest
     target: builder
-  - registry: r.spiarh.fr
+  - registry: r.spiarh.fr/library
     name: ubuntu
     tag: "20.04"
   buildArgs:

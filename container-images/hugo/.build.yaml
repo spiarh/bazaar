@@ -1,7 +1,7 @@
 image:
   registry: r.spiarh.fr/library
   name: hugo
-  tag: 0.84.4
+  tag: 0.85.0
 spec:
   fromImages:
   - registry: docker.io/library
@@ -16,7 +16,7 @@ spec:
   tagFormat: '{{ .VERSION }}'
   facts:
   - name: VERSION
-    value: 0.84.4
+    value: 0.85.0
     source: github
     kind: version
   sources:

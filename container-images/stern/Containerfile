@@ -9,7 +9,8 @@ RUN apt update && apt install unzip
 
 RUN curl -OL "https://github.com/stern/stern/archive/v${VERSION}.zip" && \
     unzip "v${VERSION}.zip" && cd "stern-${VERSION}" && \
-    make build && mv dist/stern /go/bin/stern
+    CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-extldflags "-static"' -o dist/stern . && mv dist/stern /go/bin/stern
+    # make build && mv dist/stern /go/bin/stern
 
 FROM ${FROM_IMAGE}
 

@@ -1,12 +1,12 @@
 image:
   registry: r.spiarh.fr/library
-  name: stern
-  tag: 1.20.1
+  name: reg
+  tag: 0.16.1
 spec:
   fromImages:
   - registry: docker.io/library
     name: golang
-    tag: "1.16"
+    tag: 1.16-alpine
     target: builder
   - registry: r.spiarh.fr/library
     name: alpine
@@ -16,12 +16,12 @@ spec:
   tagFormat: '{{ .VERSION }}'
   facts:
   - name: VERSION
-    value: 1.20.1
-    source: github
+    value: 0.16.1
+    source: reg
     kind: version
   sources:
-  - name: github
+  - name: reg
     github:
-      owner: stern
-      repository: stern
+      owner: genuinetools
+      repository: reg
       object: release
