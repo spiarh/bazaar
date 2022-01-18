@@ -6,9 +6,9 @@ metadata:
   namespace: runtime
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: pod-reader
+  kind: ClusterRole
+  name: editor
 subjects:
 - kind: ServiceAccount
-  name: argocd
+  name: argocd-argocd-application-controller
   namespace: pipeline
