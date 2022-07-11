@@ -1,7 +1,7 @@
 image:
   registry: r.spiarh.fr/library
   name: k9s
-  tag: 0.25.18
+  tag: 0.25.21
 spec:
   fromImages:
   - registry: docker.io/library
@@ -17,7 +17,7 @@ spec:
   tagFormat: '{{ .K9S_VERSION }}'
   facts:
   - name: K9S_VERSION
-    value: 0.25.18
+    value: 0.25.21
     source: k9s
     kind: version
   - name: KUBECTL_VERSION
