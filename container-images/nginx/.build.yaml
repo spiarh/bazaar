@@ -1,7 +1,7 @@
 image:
   registry: r.spiarh.fr/library
   name: nginx
-  tag: 1.20.2-r1
+  tag: 1.22.1-r0
 spec:
   fromImages:
   - registry: r.spiarh.fr/library
@@ -12,7 +12,7 @@ spec:
   tagFormat: '{{ .VERSION }}'
   facts:
   - name: VERSION
-    value: 1.20.2-r1
+    value: 1.22.1-r0
     source: alpine
     kind: version
   sources:
@@ -20,6 +20,6 @@ spec:
     alpine:
       package: nginx
       repository: main
-      versionId: "3.14"
+      versionId: "3.16"
       arch: x86_64
       mirror: http://dl-cdn.alpinelinux.org
