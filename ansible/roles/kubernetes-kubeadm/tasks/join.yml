@@ -18,7 +18,7 @@
 
 
 - name: run_kubeadm_join
-  command: "kubeadm join --config {{ kubeadm.join.config_file }}  --skip-phases=\"{{ kubeadm.join.skip_phases }}\" --experimental-patches={{ kubeadm.patches_dir }} -v{{ kubeadm.log_level }}"
+  command: "kubeadm join --config {{ kubeadm.join.config_file }}  --skip-phases=\"{{ kubeadm.join.skip_phases }}\" --patches={{ kubeadm.patches_dir }} -v{{ kubeadm.log_level }}"
   notify: create_join_witness_file
   register: run_kubeadm_join
 

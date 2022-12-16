@@ -10,7 +10,7 @@
     - kubernetes.apiserver.secret_encryption.enable
 
 - name: run_kubeadm_init
-  command: "kubeadm init --config {{ kubeadm.init.config_file }} --skip-phases=\"{{ kubeadm.init.skip_phases }}\" --experimental-patches={{ kubeadm.patches_dir }} -v{{ kubeadm.log_level }}"
+  command: "kubeadm init --config {{ kubeadm.init.config_file }} --skip-phases=\"{{ kubeadm.init.skip_phases }}\" --patches={{ kubeadm.patches_dir }} -v{{ kubeadm.log_level }}"
   notify: create_init_witness_file
   register: run_kubeadm_init
 
