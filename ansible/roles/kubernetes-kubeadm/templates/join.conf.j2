@@ -1,5 +1,5 @@
 ---
-apiVersion: kubeadm.k8s.io/v1beta2
+apiVersion: kubeadm.k8s.io/v1beta3
 caCertPath: /etc/kubernetes/pki/ca.crt
 {% if inventory_hostname in groups['masters'] %}
 controlPlane:
@@ -17,5 +17,9 @@ discovery:
 kind: JoinConfiguration
 nodeRegistration:
   name: {{ ansible_nodename }}
+  imagePullPolicy: IfNotPresent
+patches:
+  directory: {{ kubeadm.patches_dir }}
+skipPhases: {{ kubeadm.init.skip_phases }}
 {% include "templates/kubelet.yml.j2" %}
 {% include "templates/kube_proxy.yml.j2" %}

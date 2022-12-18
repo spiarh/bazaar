@@ -1,5 +1,5 @@
 ---
-apiVersion: kubeadm.k8s.io/v1beta2
+apiVersion: kubeadm.k8s.io/v1beta3
 bootstrapTokens:
 - groups:
   - system:bootstrappers:kubeadm:default-node-token
@@ -14,9 +14,13 @@ localAPIEndpoint:
   bindPort: 6443
 nodeRegistration:
   name: {{ ansible_nodename }}
+  imagePullPolicy: IfNotPresent
   taints:
   - effect: NoSchedule
     key: node-role.kubernetes.io/master
+patches:
+  directory: {{ kubeadm.patches_dir }}
+skipPhases: {{ kubeadm.init.skip_phases }}
 ---
 apiServer:
   certSANs:
@@ -27,25 +31,23 @@ apiServer:
     encryption-provider-config: {{ kubernetes.apiserver.secret_encryption.path }}
 {% endif %}
   timeoutForControlPlane: 8m0s
-apiVersion: kubeadm.k8s.io/v1beta2
+apiVersion: kubeadm.k8s.io/v1beta3
 certificatesDir: /etc/kubernetes/pki
 clusterName: {{ kubernetes.cluster_name }}
 controllerManager:
   extraArgs:
     allocate-node-cidrs: "{{ kubernetes.controller_manager.allocate_node_cidrs }}"
 controlPlaneEndpoint: {{ kubernetes.control_plane_endpoint }}
-dns:
-  type: CoreDNS
+dns: {}
 etcd:
   local:
     dataDir: {{ etcd.data_dir }}
-imageRepository: k8s.gcr.io
+imageRepository: registry.k8s.io
 kind: ClusterConfiguration
 kubernetesVersion: v{{ kubernetes.version }}
 networking:
   dnsDomain: cluster.local
   podSubnet: {{ pod_subnet_cidr }}
   serviceSubnet: {{ service_subnet_cidr }}
-useHyperKubeImage: false
 {% include "templates/kubelet.yml.j2" %}
 {% include "templates/kube_proxy.yml.j2" %}
