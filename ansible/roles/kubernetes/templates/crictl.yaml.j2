@@ -1,0 +1,4 @@
+runtime-endpoint: unix://{{ containerd.crictl.runtime_endpoint }}
+image-endpoint: unix://{{ containerd.crictl.image_endpoint }}
+timeout: {{ containerd.crictl.timeout }}
+debug: {{ containerd.crictl.debug }}

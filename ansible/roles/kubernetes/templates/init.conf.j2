@@ -1,0 +1,55 @@
+---
+apiVersion: kubeadm.k8s.io/v1beta3
+bootstrapTokens:
+- groups:
+  - system:bootstrappers:kubeadm:default-node-token
+  token: "{{ lookup('file', kubeadm.token) }}"
+  ttl: 24h0m0s
+  usages:
+  - signing
+  - authentication
+kind: InitConfiguration
+localAPIEndpoint:
+  advertiseAddress: {{ (ansible_facts[kubernetes.apiserver.listen_interface | replace("-", "_")]['ipv4']['address']) | default(ansible_facts['default_ipv4']['address']) }}
+  bindPort: 6443
+nodeRegistration:
+  name: {{ ansible_nodename }}
+  imagePullPolicy: IfNotPresent
+  taints:
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/master
+patches:
+  directory: {{ kubeadm.patches_dir }}
+skipPhases: {{ kubeadm.init.skip_phases }}
+---
+apiServer:
+  certSANs:
+  - {{ kubernetes.control_plane_endpoint.split(":")[0] }}
+  extraArgs:
+    enable-admission-plugins: {{ kubernetes.apiserver.admission_plugins }}
+{% if kubernetes.apiserver.secret_encryption.enabled %}
+    encryption-provider-config: {{ kubernetes.apiserver.secret_encryption.path }}
+{% endif %}
+  timeoutForControlPlane: 8m0s
+apiVersion: kubeadm.k8s.io/v1beta3
+certificatesDir: /etc/kubernetes/pki
+clusterName: {{ kubernetes.cluster_name }}
+controllerManager:
+  extraArgs:
+    allocate-node-cidrs: "{{ kubernetes.controller_manager.allocate_node_cidrs }}"
+controlPlaneEndpoint: {{ kubernetes.control_plane_endpoint }}
+dns: {}
+etcd:
+  local:
+    dataDir: {{ etcd.data_dir }}
+imageRepository: registry.k8s.io
+kind: ClusterConfiguration
+kubernetesVersion: v{{ kubernetes.version }}
+networking:
+  dnsDomain: cluster.local
+  podSubnet: {{ kubernetes.pod_subnet_cidr }}
+  serviceSubnet: {{ kubernetes.service_subnet_cidr }}
+{% include "templates/kubelet.yml.j2" %}
+{% if kube_proxy.enabled %}
+{% include "templates/kube_proxy.yml.j2" %}
+{% endif -%}

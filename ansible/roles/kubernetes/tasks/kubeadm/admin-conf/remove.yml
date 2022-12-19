@@ -1,0 +1,5 @@
+---
+- name: remove_remote_admin_conf
+  file:
+    path: "{{ kubeconfig.path }}"
+    state: absent

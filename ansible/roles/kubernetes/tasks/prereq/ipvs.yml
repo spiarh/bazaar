@@ -1,0 +1,31 @@
+---
+- name: set_modprobe_ipvs
+  template:
+    src: modeprobe-ipvs.conf
+    dest: /etc/modules-load.d/ipvs.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart_systemd_modules_load
+  when: kubernetes.network_req.ipvs
+
+- name: install_ipvsadm
+  apt:
+    name: ipvsadm
+    state: latest
+  when: kubernetes.network_req.ipvs
+
+- name: remove_modprobe_ipvs
+  file:
+    dest: /etc/modules-load.d/ipvs.conf
+    state: absent
+  notify:
+    - restart_systemd_modules_load
+  when: not kubernetes.network_req.ipvs
+
+- name: remove_ipvsadm
+  apt:
+    name: ipvsadm
+    state: absent
+  when: not kubernetes.network_req.ipvs

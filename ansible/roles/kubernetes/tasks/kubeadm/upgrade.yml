@@ -1,0 +1,36 @@
+---
+- import_tasks: certs.yml
+- import_tasks: prereq.yml
+- include_tasks: patches.yml
+
+# Check apiserver is responding
+- include_tasks: check_apiserver_is_responding.yml
+
+- include_tasks: init/copy_conf.yml
+
+# push admin.conf
+- include_tasks: admin-conf/push.yml
+  when:
+    - inventory_hostname in groups['masters']
+
+- name: run_kubeadm_upgrade
+  command: "kubeadm upgrade apply --config {{ kubeadm.init.config_file }} --patches={{ kubeadm.patches_dir }} v{{ kubernetes.version }} --yes -v{{ kubeadm.log_level }}"
+  register: run_kubeadm_upgrade
+  when:
+    - inventory_hostname in groups['masters']
+
+- name: run_kubeadm_node_upgrade
+  command: "kubeadm upgrade node -v{{ kubeadm.log_level }}"
+  register: run_kubeadm_node_upgrade
+
+- debug:
+    var: run_kubeadm_upgrade
+
+- debug:
+    var: run_kubeadm_node_upgrade
+
+- meta: flush_handlers
+
+- include_tasks: init/rm_conf.yml
+- include_tasks: join/rm_conf.yml
+- include_tasks: admin-conf/remove.yml

@@ -1,0 +1,12 @@
+---
+- import_tasks: ./prereq/main.yml
+  when: prepare_cluster
+
+- import_tasks: ./install/main.yml
+  when: prepare_cluster
+
+- include_tasks: ./containerd/main.yml
+  when: prepare_cluster
+
+- include_tasks: ./kubeadm/main.yml
+  when: deploy_cluster

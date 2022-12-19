@@ -1,0 +1,41 @@
+---
+- name: create_patches_dir
+  file:
+    path: "{{ kubeadm.patches_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0750
+
+- name: copy_apiserver_patch
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ kubeadm.patches_dir }}/{{ item.dest }}"
+    owner: root
+    group: root
+    mode: 0600
+  with_items:
+    - {src: "patches/kube-apiserver0+json.json.j2", dest: "kube-apiserver0+json.json"}
+  when: kubernetes.apiserver.listen_interface != ""
+
+- name: copy_controller-manager_patch
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ kubeadm.patches_dir }}/{{ item.dest }}"
+    owner: root
+    group: root
+    mode: 0600
+  with_items:
+    - {src: "patches/kube-controller-manager0+json.json.j2", dest: "kube-controller-manager0+json.json"}
+  when: kubernetes.controller_manager.listen_interface != ""
+
+- name: copy_apiserver_patch
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ kubeadm.patches_dir }}/{{ item.dest }}"
+    owner: root
+    group: root
+    mode: 0600
+  with_items:
+    - {src: "patches/kube-scheduler0+json.json.j2", dest: "kube-scheduler0+json.json"}
+  when: kubernetes.scheduler.listen_interface != ""

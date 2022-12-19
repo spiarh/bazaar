@@ -1,0 +1,17 @@
+{%- set nodeport_addresses = kube_proxy.nodeport_addresses.cidr | default([]) -%}
+{%- if kube_proxy.nodeport_addresses.interfaces != [] -%}
+    {%- for h in (groups['masters'] + groups['workers']) -%}
+        {%- for i in kube_proxy.nodeport_addresses.interfaces -%}
+            {%- if hostvars[h]['ansible_' + i]['ipv4']['address'] is defined -%}
+               {%- do nodeport_addresses.append(hostvars[h]['ansible_' + i]['ipv4']['address'] | ipaddr('host')) -%}
+            {%- endif %}
+        {%- endfor -%}
+    {%- endfor -%}
+{%- endif -%}
+---
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+kind: KubeProxyConfiguration
+clusterCIDR: {{ kubernetes.pod_subnet_cidr }}
+mode: {{ kube_proxy.mode }}
+nodePortAddresses: {{ nodeport_addresses }}
+{{ kube_proxy.extra_configuration_default }}

@@ -1,0 +1,37 @@
+---
+- name: set_modprobe_bpf
+  template:
+    src: modeprobe-bpf.conf
+    dest: /etc/modules-load.d/bpf.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart_systemd_modules_load
+  when: kubernetes.network_req.bpf
+
+- name: mount_bpf_fs
+  mount:
+    path: /sys/fs/bpf
+    src: bpffs
+    fstype: bpf
+    opts: defaults
+    state: mounted
+  when: kubernetes.network_req.bpf
+
+- name: remove_modprobe_bpf
+  file:
+    dest: /etc/modules-load.d/bpf.conf
+    state: absent
+  notify:
+    - restart_systemd_modules_load
+  when: not kubernetes.network_req.bpf
+
+- name: mount_bpf_fs
+  mount:
+    path: /sys/fs/bpf
+    src: bpffs
+    fstype: bpf
+    opts: defaults
+    state: absent
+  when: not kubernetes.network_req.bpf

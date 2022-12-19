@@ -1,0 +1,15 @@
+---
+- name: check_apiserver_is_running
+  uri:
+     method: GET
+     url: https://{{ kubernetes.control_plane_endpoint }}/healthz
+     validate_certs: no
+     status_code: [200]
+  register: apiserver_req
+  until: apiserver_req.status == 200
+  failed_when: apiserver_req.status != 200
+  retries: 30
+  delay: 2
+
+- debug:
+    var: apiserver_req.content

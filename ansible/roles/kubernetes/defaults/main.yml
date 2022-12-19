@@ -1,0 +1,153 @@
+---
+prepare_cluster: false
+deploy_cluster: false
+remove_admin_conf: false
+
+containerd:
+  version: 1.5.9
+  pkgs:
+  - name: containerd=1.5.9-0ubuntu3.1
+    state: present
+
+  no_prometheus: "true"
+  disable_apparmor: "false"
+  systemd_cgroup: "true"
+
+  crictl:
+    runtime_endpoint: "/run/containerd/containerd.sock"
+    image_endpoint: "/run/containerd/containerd.sock"
+    debug: "false"
+    timeout: "8"
+
+kubeconfig:
+  path: "/etc/kubernetes/admin.conf"
+  local_path: "{{ inventory_dir }}/secrets/kubernetes/admin.conf"
+
+kubernetes:
+  network_req:
+    ipvs: False
+    bpf: False
+  # Packages
+  apt_keys:
+    - https://packages.cloud.google.com/apt/doc/apt-key.gpg
+  apt_repos:
+    - "deb https://apt.kubernetes.io/ kubernetes-xenial main"
+  pkgs:
+  - name: kubeadm=1.25.5-00
+    state: present
+  - name: kubectl=1.25.5-00
+    state: present
+  - name: kubelet=1.25.5-00
+    state: present
+
+  pod_subnet_cidr: "172.16.0.0/16"
+  service_subnet_cidr: "172.17.0.0/16"
+  # Certificates
+  pki:
+    dir: "/etc/kubernetes/pki"
+    local_dir: "{{ inventory_dir }}/secrets/kubernetes/pki"
+    sa:
+      key: "{{ inventory_dir }}/secrets/kubernetes/pki/sa.key"
+      pub: "{{ inventory_dir }}/secrets/kubernetes/pki/sa.pub"
+    ca:
+      common_name: "{{ (cluster_name | default('kubernetes')) + '-ca' }}"
+      openssl_conf: "{{ inventory_dir }}/secrets/kubernetes/pki/ca_openssl.conf"
+      crt: "{{ inventory_dir }}/secrets/kubernetes/pki/ca.crt"
+      key: "{{ inventory_dir }}/secrets/kubernetes/pki/ca.key"
+    front_proxy_ca:
+      common_name: "front-proxy-ca"
+      openssl_conf: "{{ inventory_dir }}/secrets/kubernetes/pki/front-proxy_openssl.conf"
+      crt: "{{ inventory_dir }}/secrets/kubernetes/pki/front-proxy-ca.crt"
+      key: "{{ inventory_dir }}/secrets/kubernetes/pki/front-proxy-ca.key"
+    etcd:
+      dir: "/etc/kubernetes/pki/etcd"
+      local_dir: "{{ inventory_dir }}/secrets/kubernetes/pki/etcd"
+      common_name: "etcd-ca"
+      openssl_conf: "{{ inventory_dir }}/secrets/kubernetes/pki/etcd/ca_openssl.conf"
+      crt: "{{ inventory_dir }}/secrets/kubernetes/pki/etcd/ca.crt"
+      key: "{{ inventory_dir }}/secrets/kubernetes/pki/etcd/ca.key"
+
+  # Components
+  apiserver:
+    secret_encryption:
+      enabled: false
+      local_dir: "{{ inventory_dir }}/secrets/kubernetes/secret_encryption"
+      local_key: "{{ inventory_dir }}/secrets/kubernetes/secret_encryption/key"
+      # use pki dir because it is already mounted in pod
+      path: "/etc/kubernetes/pki/encryption-provider-config.yaml"
+    # TODO: use for 1.26
+    # admission_plugins: "CertificateApproval,CertificateSigning,CertificateSubjectRestriction,DefaultIngressClass,DefaultStorageClass,DefaultTolerationSeconds,LimitRanger,MutatingAdmissionWebhook,NamespaceLifecycle,PersistentVolumeClaimResize,PodSecurity,Priority,ResourceQuota,RuntimeClass,ServiceAccount,StorageObjectInUseProtection,TaintNodesByCondition,ValidatingAdmissionPolicy,ValidatingAdmissionWebhook"
+    admission_plugins: "CertificateApproval,CertificateSigning,CertificateSubjectRestriction,DefaultIngressClass,DefaultStorageClass,DefaultTolerationSeconds,LimitRanger,MutatingAdmissionWebhook,NamespaceLifecycle,PersistentVolumeClaimResize,PodSecurity,Priority,ResourceQuota,RuntimeClass,ServiceAccount,StorageObjectInUseProtection,TaintNodesByCondition,ValidatingAdmissionWebhook"
+    listen_interface: ""
+
+  controller_manager:
+    allocate_node_cidrs: "true"
+    listen_interface: ""
+
+  scheduler:
+    listen_interface: ""
+
+  cluster_name: "the_knick"
+  control_plane_endpoint: "services.maison.lan:6443"
+  version: "1.19.2"
+  taints:
+    master:
+      noschedule: true
+
+etcd:
+  data_dir: "/var/lib/etcd"
+
+kubeadm:
+  patches_dir: "/etc/kubernetes/patches"
+  local_dir: "{{ inventory_dir }}/secrets/kubernetes/kubeadm"
+  # openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'
+  ca_cert_hash: "{{ inventory_dir }}/secrets/kubernetes/kubeadm/ca-cert-hash"
+  token: "{{ inventory_dir }}/secrets/kubernetes/kubeadm/token"
+  init:
+    skip_phases: []
+    config_file: "/etc/kubernetes/kubeadm-init.yaml"
+    witness_file: "/etc/kubernetes/init_already_done"
+  join:
+    skip_phases: []
+    config_file: "/etc/kubernetes/kubeadm-join.yaml"
+    witness_file: "/etc/kubernetes/join_already_done"
+  # "--container-runtime=remote --container-runtime-endpoint=/var/run/crio/crio.sock --resolv-conf=/run/systemd/resolve/resolv.conf"
+  kubelet_args: ""
+  log_level: "5"
+  reset:
+    clean_iptables: false
+
+kubelet:
+  # /etc/default/kubelet
+  extra_args: ""
+  extra_configuration_default: |
+    cgroupDriver: systemd
+    resolvConf: /run/systemd/resolve/resolv.conf
+    systemReserved:
+      cpu: 100m
+      memory: 128Mi
+  extra_configuration_kubereserved: |
+    kubeReserved:
+      cpu: 100m
+      memory: 128Mi
+      ephemeral-storage: 1024Mi
+  listen_interface: ""
+
+kube_proxy:
+  # enable: true
+  mode: "ipvs"
+  nodeport_addresses:
+    cidr: []
+    interfaces: []
+  # extra_configuration_default: |
+  extra_configuration_default: ""
+
+kube_vip:
+  enabled: false
+  version: "0.5.7"
+  imagePullPolicy: "IfNotPresent"
+  address: "192.168.45.203"
+  port: 6443
+  vip_interface: ""
+  svc_enable: true
+  svc_election: true

@@ -1,0 +1,27 @@
+---
+- include_tasks: init/copy_conf.yml
+
+- include_tasks: reset.yml
+# reimport cert, etcd secret wipe by kubeadm reset...
+- import_tasks: certs.yml
+- include_tasks: patches.yml
+- import_tasks: secret_encryption.yml
+  when:
+    - kubernetes.apiserver.secret_encryption.enabled
+- include_tasks: kube-vip.yml
+  when: kube_vip.enabled
+
+- name: run_kubeadm_init
+  command: "kubeadm init --config {{ kubeadm.init.config_file }} -v{{ kubeadm.log_level }}"
+  notify: create_init_witness_file
+  register: run_kubeadm_init
+
+- debug:
+    var: run_kubeadm_init
+
+- meta: flush_handlers
+
+- include_tasks: init/check.yml
+  when: run_kubeadm_init is succeeded
+
+- include_tasks: init/rm_conf.yml

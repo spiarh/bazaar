@@ -1,0 +1,53 @@
+---
+- import_tasks: prereq.yml
+
+# INIT
+- include_tasks: init/check.yml
+
+- name: init_cluster
+  import_tasks: init.yml
+  when:
+    - not kubeadm_init_already_done.stat.exists
+    - inventory_hostname == groups.masters[0]
+  run_once: yes
+
+# Check apiserver is responding
+- include_tasks: check_apiserver_is_responding.yml
+
+# fetch admin.conf
+- include_tasks: admin-conf/fetch.yml
+  when:
+    - inventory_hostname in groups['masters']
+
+# JOIN
+- include_tasks: join/check.yml
+
+- name: join_cluster_masters
+  import_tasks: join.yml
+  when:
+    - not kubeadm_join_already_done.stat.exists
+    - inventory_hostname in groups.masters
+    - not inventory_hostname == groups.masters[0]
+
+- name: join_cluster_workers
+  import_tasks: join.yml
+  when:
+    - kubeadm_init_already_done.stat.exists
+    - not kubeadm_join_already_done.stat.exists
+    - not inventory_hostname in groups.masters
+
+- import_tasks: certs.yml
+  when: inventory_hostname in groups['masters']
+
+- import_tasks: secret_encryption.yml
+  when:
+    - inventory_hostname in groups['masters']
+    - kubernetes.apiserver.secret_encryption.enabled
+
+- include_tasks: init/rm_conf.yml
+- include_tasks: join/rm_conf.yml
+
+- include_tasks: admin-conf/remove.yml
+  when:
+    - inventory_hostname in groups['masters']
+    - remove_admin_conf

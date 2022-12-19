@@ -1,0 +1,7 @@
+- name: copy_init_conf
+  template:
+    src: init.conf.j2
+    dest: "{{ kubeadm.init.config_file }}"
+    owner: root
+    group: root
+    mode: 0440

@@ -1,0 +1,37 @@
+---
+- name: restart_containerd
+  service:
+    name: containerd
+    state: restarted
+
+- name: disable_swap
+  command: /sbin/swapoff -a
+
+- name: reload_sysctl
+  command: /sbin/sysctl -p --system
+
+- name: restart_systemd_modules_load
+  service:
+    name: systemd-modules-load
+    state: restarted
+
+- name: restart_kubelet
+  service:
+    name: kubelet
+    state: restarted
+
+- name: create_init_witness_file
+  file:
+    path: "{{ kubeadm.init.witness_file }}"
+    state: touch
+    owner: root
+    group: root
+    mode: 0400
+
+- name: create_join_witness_file
+  file:
+    path: "{{ kubeadm.join.witness_file }}"
+    state: touch
+    owner: root
+    group: root
+    mode: 0400
