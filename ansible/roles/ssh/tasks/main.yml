@@ -30,12 +30,12 @@
     dest: /etc/ssh/sshd_config
     owner: root
     group: root
-    mode: 0644
+    mode: 0640
   notify:
-    - restart_sshd
+    - restart_ssh
 
-- name: start_enable_service_sshd
+- name: start_enable_service_ssh
   service:
-    name: sshd
+    name: ssh
     state: started
     enabled: True
