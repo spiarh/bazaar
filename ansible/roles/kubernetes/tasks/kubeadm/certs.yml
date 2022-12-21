@@ -16,7 +16,7 @@
     dest: "{{ kubernetes.pki.dir }}/{{ item | basename }}"
     owner: root
     group: root
-    mode: 0440
+    mode: 0400
   with_items:
     - "{{ kubernetes.pki.ca.crt }}"
     - "{{ kubernetes.pki.ca.key }}"
@@ -32,7 +32,7 @@
     dest: "{{ kubernetes.pki.etcd.dir }}/{{ item | basename }}"
     owner: root
     group: root
-    mode: 0440
+    mode: 0400
   with_items:
     - "{{ kubernetes.pki.etcd.crt }}"
     - "{{ kubernetes.pki.etcd.key }}"

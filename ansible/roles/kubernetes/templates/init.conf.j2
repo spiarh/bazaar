@@ -17,7 +17,7 @@ nodeRegistration:
   imagePullPolicy: IfNotPresent
   taints:
   - effect: NoSchedule
-    key: node-role.kubernetes.io/master
+    key: node-role.kubernetes.io/control-plane
 patches:
   directory: {{ kubeadm.patches_dir }}
 skipPhases: {{ kubeadm.init.skip_phases }}
@@ -30,6 +30,8 @@ apiServer:
 {% if kubernetes.apiserver.secret_encryption.enabled %}
     encryption-provider-config: {{ kubernetes.apiserver.secret_encryption.path }}
 {% endif %}
+    feature-gates: {{ kubernetes.apiserver.feature_gates }}
+    runtime-config: {{ kubernetes.apiserver.runtime_config }}
   timeoutForControlPlane: 8m0s
 apiVersion: kubeadm.k8s.io/v1beta3
 certificatesDir: /etc/kubernetes/pki

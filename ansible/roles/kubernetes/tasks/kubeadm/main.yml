@@ -18,6 +18,7 @@
 - include_tasks: admin-conf/fetch.yml
   when:
     - inventory_hostname in groups['masters']
+    - inventory_hostname == groups.masters[0]
 
 # JOIN
 - include_tasks: join/check.yml

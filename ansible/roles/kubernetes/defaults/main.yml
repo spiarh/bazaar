@@ -40,8 +40,14 @@ kubernetes:
   - name: kubelet=1.25.5-00
     state: present
 
+  version: "1.25.5"
+  cluster_name: "the_knick"
+  control_plane_endpoint: "services.maison.lan:6443"
   pod_subnet_cidr: "172.16.0.0/16"
   service_subnet_cidr: "172.17.0.0/16"
+  taints:
+    master:
+      noschedule: true
   # Certificates
   pki:
     dir: "/etc/kubernetes/pki"
@@ -75,9 +81,10 @@ kubernetes:
       local_key: "{{ inventory_dir }}/secrets/kubernetes/secret_encryption/key"
       # use pki dir because it is already mounted in pod
       path: "/etc/kubernetes/pki/encryption-provider-config.yaml"
-    # TODO: use for 1.26
-    # admission_plugins: "CertificateApproval,CertificateSigning,CertificateSubjectRestriction,DefaultIngressClass,DefaultStorageClass,DefaultTolerationSeconds,LimitRanger,MutatingAdmissionWebhook,NamespaceLifecycle,PersistentVolumeClaimResize,PodSecurity,Priority,ResourceQuota,RuntimeClass,ServiceAccount,StorageObjectInUseProtection,TaintNodesByCondition,ValidatingAdmissionPolicy,ValidatingAdmissionWebhook"
-    admission_plugins: "CertificateApproval,CertificateSigning,CertificateSubjectRestriction,DefaultIngressClass,DefaultStorageClass,DefaultTolerationSeconds,LimitRanger,MutatingAdmissionWebhook,NamespaceLifecycle,PersistentVolumeClaimResize,PodSecurity,Priority,ResourceQuota,RuntimeClass,ServiceAccount,StorageObjectInUseProtection,TaintNodesByCondition,ValidatingAdmissionWebhook"
+    # Comma separated, e.g: "ValidatingAdmissionPolicy=true,"
+    feature_gates: ""
+    runtime_config: ""
+    admission_plugins: "CertificateApproval,CertificateSigning,CertificateSubjectRestriction,DefaultIngressClass,DefaultStorageClass,DefaultTolerationSeconds,LimitRanger,MutatingAdmissionWebhook,NamespaceLifecycle,PersistentVolumeClaimResize,PodSecurity,Priority,ResourceQuota,RuntimeClass,ServiceAccount,StorageObjectInUseProtection,TaintNodesByCondition,ValidatingAdmissionPolicy,ValidatingAdmissionWebhook"
     listen_interface: ""
 
   controller_manager:
@@ -86,13 +93,6 @@ kubernetes:
 
   scheduler:
     listen_interface: ""
-
-  cluster_name: "the_knick"
-  control_plane_endpoint: "services.maison.lan:6443"
-  version: "1.19.2"
-  taints:
-    master:
-      noschedule: true
 
 etcd:
   data_dir: "/var/lib/etcd"
