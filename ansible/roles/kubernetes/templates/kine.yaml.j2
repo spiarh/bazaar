@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  name: kine
+  namespace: kube-system
+spec:
+  containers:
+  - args:
+    - "--listen-address=127.0.0.1:2379"
+    - "--metrics-bind-address=0"
+    - "--ca-file=/etc/kubernetes/pki/etcd/ca.crt"
+    - "--server-cert-file=/etc/kubernetes/pki/etcd/server.crt"
+    - "--server-key-file=/etc/kubernetes/pki/etcd/server.key"
+    image: docker.io/rancher/kine:v{{ kine.version }}
+    imagePullPolicy: {{ kine.imagePullPolicy }}
+    name: kine
+    resources: {}
+    securityContext:
+      # allows kine to read the certs created by kubeadm, not great though
+      runAsUser: 0
+      readOnlyRootFilesystem: true
+    volumeMounts:
+    - mountPath: /etc/kubernetes/pki/etcd
+      name: etcd-certs
+    - mountPath: /db
+      name: kine
+  hostNetwork: true
+  volumes:
+  - hostPath:
+      path: /etc/kubernetes/pki/etcd
+    name: etcd-certs
+  - hostPath:
+      path: {{ kine.data_dir }}
+    name: kine

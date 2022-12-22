@@ -20,6 +20,9 @@
     - inventory_hostname in groups['masters']
     - inventory_hostname == groups.masters[0]
 
+- include_tasks: kine.yml
+  when: kine.enabled
+
 # JOIN
 - include_tasks: join/check.yml
 

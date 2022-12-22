@@ -25,8 +25,8 @@ kubeconfig:
 
 kubernetes:
   network_req:
-    ipvs: False
-    bpf: False
+    ipvs: false
+    bpf: false
   # Packages
   apt_keys:
     - https://packages.cloud.google.com/apt/doc/apt-key.gpg
@@ -134,8 +134,9 @@ kubelet:
   listen_interface: ""
 
 kube_proxy:
-  # enable: true
-  mode: "ipvs"
+  enabled: true
+  mode: ""
+  # mode: "ipvs"
   nodeport_addresses:
     cidr: []
     interfaces: []
@@ -151,3 +152,10 @@ kube_vip:
   vip_interface: ""
   svc_enable: true
   svc_election: true
+
+# kine is just for single node using sqlite
+kine:
+  enabled: false
+  version: 0.9.8
+  imagePullPolicy: "IfNotPresent"
+  data_dir: "/var/lib/kine/db"

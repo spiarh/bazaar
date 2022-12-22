@@ -18,6 +18,9 @@ nodeRegistration:
   taints:
   - effect: NoSchedule
     key: node-role.kubernetes.io/control-plane
+{% if kine.enabled %}
+  ignorePreflightErrors: ["ExternalEtcdVersion"]
+{% endif %}
 patches:
   directory: {{ kubeadm.patches_dir }}
 skipPhases: {{ kubeadm.init.skip_phases }}
@@ -42,8 +45,19 @@ controllerManager:
 controlPlaneEndpoint: {{ kubernetes.control_plane_endpoint }}
 dns: {}
 etcd:
+{% if kine.enabled %}
+  external:
+    # ca is already provided by ansible
+    # certs are generated with 'kubeadm init phase certs etcd-server'
+    endpoints:
+    - https://127.0.0.1:2379
+    caFile: {{kubernetes.pki.etcd.dir }}/ca.crt
+    certFile: {{kubernetes.pki.etcd.dir }}/server.crt
+    keyFile: {{kubernetes.pki.etcd.dir }}/server.key
+{% else %}
   local:
     dataDir: {{ etcd.data_dir }}
+{% endif %}
 imageRepository: registry.k8s.io
 kind: ClusterConfiguration
 kubernetesVersion: v{{ kubernetes.version }}

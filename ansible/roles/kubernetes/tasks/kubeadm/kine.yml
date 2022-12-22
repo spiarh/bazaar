@@ -1,0 +1,33 @@
+---
+- name: create_cni_conf
+  template:
+    src: cni.05-bridge.conf.j2
+    dest: /etc/cni/net.d/05-bridge.conf
+    owner: root
+    group: root
+    mode: 0600
+
+- name: create_kine_data_dir
+  file:
+    path: "{{ kine.data_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0750
+
+- name: check_etcd_server_crt_for_kine_exists
+  stat:
+    path: "{{kubernetes.pki.etcd.dir }}/server.crt"
+  register: etcd_server_crt_for_kine
+
+- name: create_etcd_server_crt_for_kine
+  command: "kubeadm init phase certs etcd-server"
+  when: etcd_server_crt_for_kine.stat.exists == false
+
+- name: create_kine_manifest
+  template:
+    src: kine.yaml.j2
+    dest: /etc/kubernetes/manifests/kine.yaml
+    owner: root
+    group: root
+    mode: 0600
