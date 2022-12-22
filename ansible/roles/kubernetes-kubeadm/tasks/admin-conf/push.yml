@@ -1,8 +1,0 @@
----
-- name: push_admin_conf
-  copy:
-    src: "{{ kubeconfig.local_path }}"
-    dest: "{{ kubeconfig.path }}"
-    owner: root
-    group: root
-    mode: "0400"

@@ -1,5 +1,0 @@
----
-- name: remove_join_conf
-  file:
-    path: "{{ kubeadm.join.config_file }}"
-    state: absent
