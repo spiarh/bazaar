@@ -1,0 +1,24 @@
+{
+  "cniVersion":"0.3.1",
+  "name":"cni",
+  "plugins":[
+    {
+      "type":"bridge",
+      "bridge":"cni0",
+      "isDefaultGateway":true,
+      "forceAddress":false,
+      "ipMasq":true,
+      "hairpinMode":false,
+      "ipam":{
+        "type":"host-local",
+        "subnet":"{{ kubernetes.pod_subnet_cidr }}"
+      }
+    },
+    {
+      "type":"portmap",
+      "capabilities":{
+        "portMappings":true
+      }
+    }
+  ]
+}

@@ -1,8 +1,8 @@
 ---
 - name: create_cni_conf
   template:
-    src: cni.05-bridge.conf.j2
-    dest: /etc/cni/net.d/05-bridge.conf
+    src: cni.05-bridge.conflist.j2
+    dest: /etc/cni/net.d/05-bridge.conflist
     owner: root
     group: root
     mode: 0600
