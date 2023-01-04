@@ -28,6 +28,7 @@ skipPhases: {{ kubeadm.init.skip_phases }}
 apiServer:
   certSANs:
   - {{ kubernetes.control_plane_endpoint.split(":")[0] }}
+  extraVolumes: {{ kubernetes.apiserver.extraVolumes }}
   extraArgs:
     enable-admission-plugins: {{ kubernetes.apiserver.admission_plugins }}
 {% if kubernetes.apiserver.secret_encryption.enabled %}

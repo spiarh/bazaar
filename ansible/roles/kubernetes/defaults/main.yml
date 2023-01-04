@@ -75,6 +75,12 @@ kubernetes:
 
   # Components
   apiserver:
+    extraVolumes: []
+    # - name: "some-volume"
+    #   hostPath: "/etc/some-path"
+    #   mountPath: "/etc/some-pod-path"
+    #   readOnly: false
+    #   pathType: File
     secret_encryption:
       enabled: false
       local_dir: "{{ inventory_dir }}/secrets/kubernetes/secret_encryption"
