@@ -1,32 +1,53 @@
 ---
+- name: create_tempfile
+  delegate_to: localhost
+  ansible.builtin.tempfile:
+    state: file
+  register: tempfile
+
+- name: copy_kubeconfig
+  delegate_to: localhost
+  ansible.builtin.copy:
+    src: "{{ kubeconfig.local_path }}"
+    dest: "{{ tempfile.path }}"
+    mode: '0400'
+
 - name: apply_baseline_template_manifests
-  shell: "echo '{{ lookup('template', item) }}' | kubectl apply -f -"
+  shell: "echo '{{ lookup('template', item) }}' | kubectl --kubeconfig {{ tempfile.path }} apply -f -"
   delegate_to: localhost
   run_once: true
   with_items:
     - kubernetes-services-endpoint.yml
 
 - name: check_podcidr
-  command: "kubectl get nodes {{ ansible_nodename }} -ojsonpath='{.spec.podCIDR}'"
+  command: "kubectl --kubeconfig {{ tempfile.path }} get nodes {{ ansible_nodename }} -ojsonpath='{.spec.podCIDR}'"
   delegate_to: localhost
   changed_when: false
   register: node_podcidr
 
+- debug:
+    var: node_podcidr
+
+# default to kubernetes.pod_subnet_cidr for single nodes
+- ansible.builtin.set_fact:
+    pod_cidr: "{{ kubernetes.pod_subnet_cidr }}"
+  when: pod_cidr is not defined
+
 - name: add_podcdir
-  command: "kubectl patch node {{ ansible_nodename }} -p '{\"spec\":{\"podCIDR\":\"{{ pod_cidr }}\"}}'"
+  command: "kubectl --kubeconfig {{ tempfile.path }} patch node {{ ansible_nodename }} -p '{\"spec\":{\"podCIDR\":\"{{ pod_cidr }}\"}}'"
   delegate_to: localhost
   when:
     - kubernetes.controller_manager.allocate_node_cidrs == "false"
-    - pod_cidr not in node_podcidr.stdout
+    - not pod_cidr in node_podcidr.stdout
 
 - name: check_noschedule_taint
-  command: "kubectl get nodes {{ ansible_nodename }} -ojsonpath='{.spec.taints}'"
+  command: "kubectl --kubeconfig {{ tempfile.path }} get nodes {{ ansible_nodename }} -ojsonpath='{.spec.taints}'"
   delegate_to: localhost
   changed_when: false
   register: node_taints
 
 - name: add_noschedule_taint
-  command: "kubectl taint node {{ ansible_nodename }} node-role.kubernetes.io/control-plane=:NoSchedule"
+  command: "kubectl --kubeconfig {{ tempfile.path }} taint node {{ ansible_nodename }} node-role.kubernetes.io/control-plane=:NoSchedule"
   delegate_to: localhost
   when:
     - kubernetes.taints.master.noschedule
@@ -34,9 +55,22 @@
     - inventory_hostname in groups['masters']
 
 - name: remove_noschedule_taint
-  command: "kubectl taint node {{ ansible_nodename }} node-role.kubernetes.io/control-plane=:NoSchedule-"
+  command: "kubectl --kubeconfig {{ tempfile.path }} taint node {{ ansible_nodename }} node-role.kubernetes.io/control-plane=:NoSchedule-"
   delegate_to: localhost
   when:
     - kubernetes.taints.master.noschedule == false
     - '"NoSchedule" in node_taints.stdout'
     - inventory_hostname in groups['masters']
+
+- name: patch_coredns_replicas_nodename
+  command: "kubectl --kubeconfig {{ tempfile.path }} -n kube-system patch deploy coredns -p '{\"spec\":{\"replicas\":1,\"template\":{\"spec\":{\"nodeName\":\"{{ ansible_nodename }}\"}}}}'"
+  delegate_to: localhost
+  when:
+    # assume single node with kind
+    - kine.enabled
+
+- name: remove_tempfile
+  ansible.builtin.file:
+    path: "{{ tempfile.path }}"
+    state: absent
+  delegate_to: localhost
