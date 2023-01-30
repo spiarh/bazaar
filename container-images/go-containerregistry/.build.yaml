@@ -1,0 +1,27 @@
+image:
+  registry: r.spiarh.fr/library
+  name: go-containerregistry
+  tag: 0.13.0
+spec:
+  fromImages:
+  - registry: docker.io/library
+    name: golang
+    tag: "1.18"
+    target: builder
+  - registry: r.spiarh.fr/library
+    name: alpine
+    tag: 3.16.3
+  buildArgs:
+  - VERSION
+  tagFormat: '{{ .VERSION }}'
+  facts:
+  - name: VERSION
+    value: 0.13.0
+    source: go-containerregistry
+    kind: version
+  sources:
+  - name: go-containerregistry
+    github:
+      owner: google
+      repository: go-containerregistry
+      object: release

@@ -5,13 +5,11 @@ FROM ${FROM_IMAGE_BUILDER} AS builder
 
 ARG VERSION
 
-RUN apk add --no-cache git make curl
-
 RUN curl -OL "https://github.com/google/go-containerregistry/archive/v${VERSION}.tar.gz" && \
     tar zxf "v${VERSION}.tar.gz" && cd "go-containerregistry-${VERSION}" && \
-    go install ./cmd/crane && \
-    go install ./cmd/gcrane && \
-    go install ./cmd/registry
+    CGO_ENABLED=0 go install -a -ldflags '-extldflags "-static"' ./cmd/crane && \
+    CGO_ENABLED=0 go install -a -ldflags '-extldflags "-static"' ./cmd/gcrane && \
+    CGO_ENABLED=0 go install -a -ldflags '-extldflags "-static"' ./cmd/registry
 
 FROM ${FROM_IMAGE}
 
